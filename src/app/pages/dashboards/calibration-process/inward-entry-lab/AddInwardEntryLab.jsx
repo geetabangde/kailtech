@@ -398,7 +398,7 @@ export default function AddInwardEntry() {
       <div className="p-6">
         <form
           onSubmit={handleSubmit}
-          className="grid grid-cols-1 gap-4 md:grid-cols-2"
+          className="grid grid-cols-1 gap-4 md:grid-cols-4"
         >
           <Input
             label="Date"
@@ -407,12 +407,14 @@ export default function AddInwardEntry() {
             onChange={handleChange}
             required
           />
+
           <Input
             label="Sample Received Date"
             name="sample_received_on"
             type="date"
             onChange={handleChange}
           />
+
           <div>
             <label className="block text-sm font-medium">Customer Type</label>
             <ReactSelect
@@ -430,6 +432,10 @@ export default function AddInwardEntry() {
               onChange={(option) => handleSelectChange(option, "customerid")}
               placeholder="Select Customer"
             />
+            <p className="text-sm font-medium">
+              <strong>Customer Credit:</strong> {creditInfo.days} Days | ₹{" "}
+              {creditInfo.amount}
+            </p>
           </div>
           <div>
             <label className="block text-sm font-medium">
@@ -444,12 +450,16 @@ export default function AddInwardEntry() {
               placeholder="Select Purpose"
             />
           </div>
-          <div className="col-span-2">
-            <p className="text-sm font-medium">
-              <strong>Customer Credit:</strong> {creditInfo.days} Days | ₹{" "}
-              {creditInfo.amount}
-            </p>
-          </div>
+
+          <Input
+            label="GST No"
+            name="gst_no"
+            value={formData.gst_no}
+            onChange={handleChange}
+          />
+
+          <div className="col-span-2"></div>
+
           {/* Report Details */}
           <div className="col-span-2 mt-4 border-t pt-4">
             <h3 className="text-md mb-2 font-semibold">
@@ -545,59 +555,9 @@ export default function AddInwardEntry() {
                   isDisabled={billingAddressOptions.length === 0}
                 />
               </div>
-
-              <div>
-                <Input
-                  label="GST No"
-                  name="gst_no"
-                  value={formData.gst_no}
-                  onChange={handleChange}
-                />
-              </div>
             </div>
           </div>
-          {/* Concern Person Section */}
-          <div className="col-span-2 mt-4 border-t pt-4">
-            <h3 className="text-md mb-2 font-semibold">Concern Person</h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium">
-                  Concern Person Name
-                </label>
-                <ReactSelect
-                  name="concern_person_id"
-                  options={concernPersonOptions}
-                  onChange={(option) =>
-                    handleSelectChange(option, "concern_person_id")
-                  }
-                  placeholder="Select Concern Person"
-                />
-              </div>
 
-              {formData.concern_person_id && (
-                <>
-                  <Input
-                    label="Concern Person Designation"
-                    name="concern_designation"
-                    value={selectedConcernPerson.designation}
-                    disabled
-                  />
-                  <Input
-                    label="Concern Person Email"
-                    name="concern_email"
-                    value={selectedConcernPerson.email}
-                    disabled
-                  />
-                  <Input
-                    label="Concern Person Mobile"
-                    name="concern_mobile"
-                    value={selectedConcernPerson.mobile}
-                    disabled
-                  />
-                </>
-              )}
-            </div>
-          </div>
           {/* Quotation NO*/}
           <div>
             <label className="block text-sm font-medium">Quotation No</label>
@@ -670,28 +630,74 @@ export default function AddInwardEntry() {
               isDisabled={choiceOptions.length === 0}
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium">Approved By</label>
-            <ReactSelect
-              name="approval"
-              options={approvedByOptions}
-              value={
-                approvedByOptions.find(
-                  (opt) => opt.value === formData.approval,
-                ) || null
-              }
-              onChange={(option) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  approval: option?.value || "",
-                }))
-              }
-              placeholder="Select Approver"
-              isDisabled={approvedByOptions.length === 0}
-            />
+          {/* Concern Person Section */}
+          <div className="col-span-2 mt-4 border-t pt-4">
+          
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium">
+                  Concern Person Name
+                </label>
+                <ReactSelect
+                  name="concern_person_id"
+                  options={concernPersonOptions}
+                  onChange={(option) =>
+                    handleSelectChange(option, "concern_person_id")
+                  }
+                  placeholder="Select Concern Person"
+                />
+              </div>
+
+              {formData.concern_person_id && (
+                <>
+                  <Input
+                    label="Concern Person Designation"
+                    name="concern_designation"
+                    value={selectedConcernPerson.designation}
+                    disabled
+                  />
+                  <Input
+                    label="Concern Person Email"
+                    name="concern_email"
+                    value={selectedConcernPerson.email}
+                    disabled
+                  />
+                  <Input
+                    label="Concern Person Mobile"
+                    name="concern_mobile"
+                    value={selectedConcernPerson.mobile}
+                    disabled
+                  />
+                </>
+              )}
+            </div>
+          </div>
+          <div className="col-span-2 mt-4 border-t pt-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium">Approved By</label>
+                <ReactSelect
+                  name="approval"
+                  options={approvedByOptions}
+                  value={
+                    approvedByOptions.find(
+                      (opt) => opt.value === formData.approval,
+                    ) || null
+                  }
+                  onChange={(option) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      approval: option?.value || "",
+                    }))
+                  }
+                  placeholder="Select Approver"
+                  isDisabled={approvedByOptions.length === 0}
+                />
+              </div>
+            </div>
           </div>
           {/*   Priority Testing Charges */}
-          <div className="grid grid-cols-3 items-center gap-4">
+          <div>
             {/* Label */}
             <label className="col-span-1 text-sm font-medium">
               Priority Testing Charges
@@ -727,6 +733,7 @@ export default function AddInwardEntry() {
             </select>
           </div>
           {/* Work Order No */}
+
           <div>
             <label className="mb-1 block text-sm font-medium">
               Work Order No
@@ -763,7 +770,6 @@ export default function AddInwardEntry() {
             />
           </div>
 
-        
           {/* Mode Of Receipt Dropdown */}
           <div>
             <label className="mb-1 block text-sm font-medium">
@@ -1005,7 +1011,6 @@ export default function AddInwardEntry() {
           )}
           {/* CERTIFICATE COLLECTION DETAILS (Please tick) */}
           <div className="mt-8 space-y-6">
-          
             <div>
               <label className="block text-sm font-medium">
                 Certificate Collect as

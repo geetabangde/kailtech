@@ -930,7 +930,6 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-
                     {
                       path: "edit/:id",
                       lazy: async () => ({
