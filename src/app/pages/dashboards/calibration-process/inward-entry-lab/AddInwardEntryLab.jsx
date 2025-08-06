@@ -11,17 +11,20 @@ export default function AddInwardEntry() {
 
   const [formData, setFormData] = useState({
     inwarddate: "",
-    sample_received_date: "",
+    sample_received_on: "",
     ctype: "",
     customerid: "",
     specificpurpose: "",
-    report_customer_id: "",
-    customer_address: "",
-    billing_customer_id: "",
-    billing_address: "",
-    gst_no: "",
-    concern_person_id: "",
-    quotation_no: "",
+    reportname: "",
+    reportaddress: "",
+    billingname: "",
+    billingaddress: "",
+  
+    concernpersonname: "",
+    concernpersondesignation: "",
+    concernpersonmobile: "",
+    concernpersonemail: "",
+    quotationid: "",
     bd: "",
     promoter: "",
     priority: "",
@@ -30,6 +33,7 @@ export default function AddInwardEntry() {
     pchargestype: "",
     ponumber: "",
     wupload: null,
+    wstatus: null,
     modeofreciept: "",
     couriernamerec: "",
     dateofdispatchrec: "",
@@ -57,6 +61,9 @@ export default function AddInwardEntry() {
     calibacc: "Nabl",
     instrumentlocation: "Lab",
     caliblocation: "Lab",
+    customername: "",
+    customeraddress: "",
+    gstno: "", // already done
   });
 
   const [certificateOptions, setCertificateOptions] = useState([]);
@@ -131,7 +138,9 @@ export default function AddInwardEntry() {
             value: item.id,
             creditdays: item.creditdays,
             creditamount: item.creditamount,
-            gst_no: item.gstno || "",
+            customername: item.name, 
+            customeraddress: "nothing",
+            gstno: item.gstno || "",
           })),
         );
 
@@ -201,6 +210,7 @@ export default function AddInwardEntry() {
       "dateofdispatchrec",
       "dateofdispatch",
       "deadline",
+      
     ];
 
     if (dateFields.includes(name) && value) {
@@ -229,43 +239,47 @@ export default function AddInwardEntry() {
         amount: option.creditamount || 0,
       });
 
+    
       // ✅ Set GST No from selected customer
       setFormData((prev) => ({
         ...prev,
-        gst_no: option.gst_no || "", // auto-fill but editable
+        gstno: option.gstno || "", // already done
+        customername: option.customername, // 👈 set this
+        customeraddress: option.customeraddress, // 👈 set this ("nothing")
       }));
 
       fetchConcernPersons(option.value);
       fetchQuotations(option.value); // 🔁 Call quotation list
     }
 
-    if (name === "report_customer_id" && option?.value) {
+    if (name === "reportname" && option?.value) {
       fetchCustomerAddresses(option.value, "report");
     }
 
-    if (name === "billing_customer_id" && option?.value) {
+    if (name === "billingname" && option?.value) {
       fetchCustomerAddresses(option.value, "billing");
     }
 
+
     if (
-      (name === "report_customer_id" || name === "billing_customer_id") &&
+      (name === "reportname" || name === "billingname") &&
       !option
     ) {
-      if (name === "report_customer_id") {
+      if (name === "reportname") {
         setReportAddressOptions([]);
-        setFormData((prev) => ({ ...prev, customer_address: "" }));
+        setFormData((prev) => ({ ...prev, reportaddress: "" }));
       } else {
         setBillingAddressOptions([]);
-        setFormData((prev) => ({ ...prev, billing_address: "" }));
+        setFormData((prev) => ({ ...prev, billingaddress: "" }));
       }
     }
     if (name === "customerid" && !option) {
       setConcernPersonOptions([]);
-      setFormData((prev) => ({ ...prev, concern_person_id: "" }));
+      setFormData((prev) => ({ ...prev, concernpersonname: "" }));
       setSelectedConcernPerson({ designation: "", email: "", mobile: "" });
     }
     
-    if (name === "concern_person_id" && option) {
+    if (name === "concernpersonname" && option) {
       fetchConcernPersonDetails(option.value);
     }
   };
@@ -319,6 +333,13 @@ export default function AddInwardEntry() {
           email: data.email || "",
           mobile: data.mobile || "",
         });
+        // ✅ Also update hidden fields for submission
+        setFormData((prev) => ({
+          ...prev,
+          concernpersondesignation: data.designation || "",
+          concernpersonemail: data.email || "",
+          concernpersonmobile: data.mobile || "",
+        }));
       }
     } catch (err) {
       toast.error("Failed to fetch concern person details");
@@ -347,8 +368,8 @@ export default function AddInwardEntry() {
   const handleSameAsReporting = () => {
     setFormData((prev) => ({
       ...prev,
-      billing_customer_id: prev.report_customer_id,
-      billing_address: prev.customer_address,
+      billingname: prev.reportname,
+      billingaddress: prev.reportaddress,
     }));
     setBillingAddressOptions(reportAddressOptions);
   };
@@ -365,6 +386,10 @@ export default function AddInwardEntry() {
         if (formData[key] !== null && formData[key] !== undefined) {
           form.append(key, formData[key]);
         }
+      }
+      
+      for (let [key, value] of form.entries()) {
+        console.log(`${key}:`, value);
       }
 
       const res = await axios.post(
@@ -398,7 +423,7 @@ export default function AddInwardEntry() {
       <div className="p-6">
         <form
           onSubmit={handleSubmit}
-          className="grid grid-cols-1 gap-4 md:grid-cols-4"
+          className="grid grid-cols-1 gap-4 md:grid-cols-2"
         >
           <Input
             label="Date"
@@ -407,14 +432,12 @@ export default function AddInwardEntry() {
             onChange={handleChange}
             required
           />
-
           <Input
             label="Sample Received Date"
             name="sample_received_on"
             type="date"
             onChange={handleChange}
           />
-
           <div>
             <label className="block text-sm font-medium">Customer Type</label>
             <ReactSelect
@@ -432,10 +455,6 @@ export default function AddInwardEntry() {
               onChange={(option) => handleSelectChange(option, "customerid")}
               placeholder="Select Customer"
             />
-            <p className="text-sm font-medium">
-              <strong>Customer Credit:</strong> {creditInfo.days} Days | ₹{" "}
-              {creditInfo.amount}
-            </p>
           </div>
           <div>
             <label className="block text-sm font-medium">
@@ -450,16 +469,12 @@ export default function AddInwardEntry() {
               placeholder="Select Purpose"
             />
           </div>
-
-          <Input
-            label="GST No"
-            name="gst_no"
-            value={formData.gst_no}
-            onChange={handleChange}
-          />
-
-          <div className="col-span-2"></div>
-
+          <div className="col-span-2">
+            <p className="text-sm font-medium">
+              <strong>Customer Credit:</strong> {creditInfo.days} Days | ₹{" "}
+              {creditInfo.amount}
+            </p>
+          </div>
           {/* Report Details */}
           <div className="col-span-2 mt-4 border-t pt-4">
             <h3 className="text-md mb-2 font-semibold">
@@ -471,10 +486,10 @@ export default function AddInwardEntry() {
                   Customer Name
                 </label>
                 <ReactSelect
-                  name="report_customer_id"
+                  name="reportname"
                   options={customerOptions}
                   onChange={(option) =>
-                    handleSelectChange(option, "report_customer_id")
+                    handleSelectChange(option, "reportname")
                   }
                   placeholder="Select Customer"
                 />
@@ -484,12 +499,12 @@ export default function AddInwardEntry() {
                   Customer Address
                 </label>
                 <ReactSelect
-                  name="customer_address"
+                  name="reportaddress"
                   options={reportAddressOptions}
                   onChange={(option) =>
                     setFormData((prev) => ({
                       ...prev,
-                      customer_address: option?.value || "",
+                      reportaddress: option?.value || "",
                     }))
                   }
                   placeholder="Select Address"
@@ -519,42 +534,92 @@ export default function AddInwardEntry() {
                   Customer Name
                 </label>
                 <ReactSelect
-                  name="billing_customer_id"
+                  name="billingname"
                   options={customerOptions}
                   value={
                     customerOptions.find(
-                      (opt) => opt.value === formData.billing_customer_id,
+                      (opt) => opt.value === formData.billingname,
                     ) || null
                   }
                   onChange={(option) =>
-                    handleSelectChange(option, "billing_customer_id")
+                    handleSelectChange(option, "billingname")
                   }
                   placeholder="Select Customer"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium">
                   Customer Address
                 </label>
                 <ReactSelect
-                  name="billing_address"
+                  name="billingaddress"
                   options={billingAddressOptions}
                   value={
                     billingAddressOptions.find(
-                      (opt) => opt.value === formData.billing_address,
+                      (opt) => opt.value === formData.billingaddress,
                     ) || null
                   }
                   onChange={(option) =>
                     setFormData((prev) => ({
                       ...prev,
-                      billing_address: option?.value || "",
+                      billingaddress: option?.value || "",
                     }))
                   }
                   placeholder="Select Address"
                   isDisabled={billingAddressOptions.length === 0}
                 />
               </div>
+
+              <div>
+                <Input
+                  label="GST No"
+                  name="gstno"
+                  value={formData.gstno}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+          </div>
+          {/* Concern Person Section */}
+          <div className="col-span-2 mt-4 border-t pt-4">
+            <h3 className="text-md mb-2 font-semibold">Concern Person</h3>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium">
+                  Concern Person Name
+                </label>
+                <ReactSelect
+                  name="concernpersonname"
+                  options={concernPersonOptions}
+                  onChange={(option) =>
+                    handleSelectChange(option, "concernpersonname")
+                  }
+                  placeholder="Select Concern Person"
+                />
+              </div>
+
+              {formData.concernpersonname && (
+                <>
+                  <Input
+                    label="Concern Person Designation"
+                    name="concernpersondesignation"
+                    value={selectedConcernPerson.designation}
+                    disabled
+                  />
+                  <Input
+                    label="Concern Person Email"
+                    name="concernpersonemail"
+                    value={selectedConcernPerson.email}
+                    disabled
+                  />
+                  <Input
+                    label="Concern Person Mobile"
+                    name="concernpersonmobile"
+                    value={selectedConcernPerson.mobile}
+                    disabled
+                  />
+                </>
+              )}
             </div>
           </div>
 
@@ -562,12 +627,12 @@ export default function AddInwardEntry() {
           <div>
             <label className="block text-sm font-medium">Quotation No</label>
             <ReactSelect
-              name="quotation_no"
+              name="quotationid"
               options={quotationOptions}
               onChange={(option) =>
                 setFormData((prev) => ({
                   ...prev,
-                  quotation_no: option?.value || "",
+                  quotationid: option?.value || "",
                 }))
               }
               placeholder="Select Quotation"
@@ -630,74 +695,29 @@ export default function AddInwardEntry() {
               isDisabled={choiceOptions.length === 0}
             />
           </div>
-          {/* Concern Person Section */}
-          <div className="col-span-2 mt-4 border-t pt-4">
-          
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium">
-                  Concern Person Name
-                </label>
-                <ReactSelect
-                  name="concern_person_id"
-                  options={concernPersonOptions}
-                  onChange={(option) =>
-                    handleSelectChange(option, "concern_person_id")
-                  }
-                  placeholder="Select Concern Person"
-                />
-              </div>
 
-              {formData.concern_person_id && (
-                <>
-                  <Input
-                    label="Concern Person Designation"
-                    name="concern_designation"
-                    value={selectedConcernPerson.designation}
-                    disabled
-                  />
-                  <Input
-                    label="Concern Person Email"
-                    name="concern_email"
-                    value={selectedConcernPerson.email}
-                    disabled
-                  />
-                  <Input
-                    label="Concern Person Mobile"
-                    name="concern_mobile"
-                    value={selectedConcernPerson.mobile}
-                    disabled
-                  />
-                </>
-              )}
-            </div>
-          </div>
-          <div className="col-span-2 mt-4 border-t pt-4">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium">Approved By</label>
-                <ReactSelect
-                  name="approval"
-                  options={approvedByOptions}
-                  value={
-                    approvedByOptions.find(
-                      (opt) => opt.value === formData.approval,
-                    ) || null
-                  }
-                  onChange={(option) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      approval: option?.value || "",
-                    }))
-                  }
-                  placeholder="Select Approver"
-                  isDisabled={approvedByOptions.length === 0}
-                />
-              </div>
-            </div>
+          <div>
+            <label className="block text-sm font-medium">Approved By</label>
+            <ReactSelect
+              name="approval"
+              options={approvedByOptions}
+              value={
+                approvedByOptions.find(
+                  (opt) => opt.value === formData.approval,
+                ) || null
+              }
+              onChange={(option) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  approval: option?.value || "",
+                }))
+              }
+              placeholder="Select Approver"
+              isDisabled={approvedByOptions.length === 0}
+            />
           </div>
           {/*   Priority Testing Charges */}
-          <div>
+          <div className="grid grid-cols-3 items-center gap-4">
             {/* Label */}
             <label className="col-span-1 text-sm font-medium">
               Priority Testing Charges
@@ -733,7 +753,6 @@ export default function AddInwardEntry() {
             </select>
           </div>
           {/* Work Order No */}
-
           <div>
             <label className="mb-1 block text-sm font-medium">
               Work Order No
@@ -818,7 +837,6 @@ export default function AddInwardEntry() {
                 <input
                   type="date"
                   name="dateofdispatchrec"
-                  value={formData.dateofdispatchrec}
                   onChange={handleChange}
                   className="w-full rounded border px-3 py-2"
                 />
@@ -916,7 +934,6 @@ export default function AddInwardEntry() {
                 <input
                   type="date"
                   name="dateofdispatch"
-                  value={formData.dateofdispatch || ""}
                   onChange={handleChange}
                   className="w-full rounded border px-3 py-2"
                 />
@@ -1087,7 +1104,6 @@ export default function AddInwardEntry() {
                 placeholder="Certificate Collection Remark"
               />
             </div>
-
             {/* Deadline */}
             <div>
               <label className="block text-sm font-medium">Any Deadline</label>
@@ -1102,7 +1118,6 @@ export default function AddInwardEntry() {
                 min={new Date().toISOString().split("T")[0]} // disables past dates
               />
             </div>
-
             {/* Special Request */}
             <div>
               <label className="block text-sm font-medium">
@@ -1118,9 +1133,7 @@ export default function AddInwardEntry() {
                 placeholder="terms"
               ></textarea>
             </div>
-
             <hr />
-
             {/* Notes */}
             <div>
               <label className="block text-sm font-medium">Notes</label>
@@ -1134,8 +1147,18 @@ export default function AddInwardEntry() {
                 placeholder="terms"
               ></textarea>
             </div>
-
             {/* Hidden Inputs (stored in formData) */}
+
+            <input
+              type="hidden"
+              name="customeraddress"
+              value={formData.customeraddress}
+            />
+            <input
+              type="hidden"
+              name="customername"
+              value={formData.customername}
+            />
             <input
               type="hidden"
               name="nablrequired"
@@ -1163,4 +1186,4 @@ export default function AddInwardEntry() {
       </div>
     </Page>
   );
-}
+} 

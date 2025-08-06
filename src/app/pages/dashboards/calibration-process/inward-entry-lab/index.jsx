@@ -49,7 +49,7 @@ export default function OrdersDatatableV1() {
       setLoading(true);
 
       const response = await axios.get(
-        "/calibrationprocess/inward-entry-list?caliblocation=Lab&calibacc=Non Nabl",
+        "/calibrationprocess/inward-entry-list?caliblocation=Lab&calibacc=Nabl",
       );
 
       if (Array.isArray(response.data.data)) {
