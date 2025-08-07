@@ -25,6 +25,7 @@ export default function AddInwardEntry() {
     concernpersonmobile: "",
     concernpersonemail: "",
     quotationid: "",
+    
     bd: "",
     promoter: "",
     priority: "",
@@ -65,7 +66,8 @@ export default function AddInwardEntry() {
     customeraddress: "",
     gstno: "", // already done
   });
-
+  const [errors, setErrors] = useState({});
+ 
   const [certificateOptions, setCertificateOptions] = useState([]);
   const [customerTypeOptions, setCustomerTypeOptions] = useState([]);
   const [specificPurposeOptions, setSpecificPurposeOptions] = useState([]);
@@ -89,7 +91,7 @@ export default function AddInwardEntry() {
   const [loading, setLoading] = useState(false);
   const isTransportMode = formData.modeofreciept !== "1"; // '1' = By Hand
   const isTransportDispatchMode = formData.modeofdispatch !== "BY Hand";
-
+  
 
   useEffect(() => {
     const fetchDropdowns = async () => {
@@ -378,6 +380,32 @@ export default function AddInwardEntry() {
     e.preventDefault();
     setLoading(true);
 
+    const newErrors = {};
+
+    if (!formData.inwarddate) newErrors.inwarddate = "Date is required";
+    if (!formData.sample_received_on)newErrors.sample_received_on = "Sample Received On Date is required";
+    if (!formData.ctype) newErrors.ctype = "Customer type is required";
+    if (!formData.customerid) newErrors.customerid = "Customer is required";
+    if (!formData.specificpurpose) newErrors.specificpurpose = "Purpose is required";
+    if (!formData.bd) newErrors.bd = "BD is required";
+    if (!formData.promoter) newErrors.promoter = "Sales Promoter is required";
+    if (!formData.priority) newErrors.priority = "Priority is required";
+    if (!formData.approval) newErrors.approval = "Approved By is required";
+    if (!formData.reportname) newErrors.reportname = "Report Name is required";
+    if (!formData.reportaddress) newErrors.reportaddress = "Report Address is required";
+    if (!formData.billingname) newErrors.billingname = "Billing Name is required";
+    if (!formData.billingaddress) newErrors.billingaddress = "Billing Address is required";
+    if (!formData.concernpersonname) newErrors.concernpersonname = "Concern Person Name is required";
+
+    // ❗️ If any errors, block submission and show them
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setLoading(false);
+      return;
+    }
+
+    setErrors({}); // Clear previous errors
+
     try {
       const form = new FormData();
 
@@ -387,7 +415,7 @@ export default function AddInwardEntry() {
           form.append(key, formData[key]);
         }
       }
-      
+
       for (let [key, value] of form.entries()) {
         console.log(`${key}:`, value);
       }
@@ -417,658 +445,281 @@ export default function AddInwardEntry() {
     }
   };
 
-
   return (
     <Page title="Add Inward Entry">
       <div className="p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Inward Entry - Lab</h2>
+          <Button
+            variant="outline"
+            className="bg-blue-600 text-white hover:bg-blue-700"
+            onClick={() =>
+              navigate("/dashboards/calibration-process/inward-entry-lab")
+            }
+          >
+            Back
+          </Button>
+        </div>
+        {/* form */}
         <form
           onSubmit={handleSubmit}
           className="grid grid-cols-1 gap-4 md:grid-cols-2"
         >
-          <Input
-            label="Date"
-            name="inwarddate"
-            type="date"
-            onChange={handleChange}
-            required
-          />
-          <Input
-            label="Sample Received Date"
-            name="sample_received_on"
-            type="date"
-            onChange={handleChange}
-          />
-          <div>
-            <label className="block text-sm font-medium">Customer Type</label>
-            <ReactSelect
-              name="ctype"
-              options={customerTypeOptions}
-              onChange={(option) => handleSelectChange(option, "ctype")}
-              placeholder="Select Customer Type"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Customer</label>
-            <ReactSelect
-              name="customerid"
-              options={customerOptions}
-              onChange={(option) => handleSelectChange(option, "customerid")}
-              placeholder="Select Customer"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium">
-              Specific Purpose
-            </label>
-            <ReactSelect
-              name="specificpurpose"
-              options={specificPurposeOptions}
-              onChange={(option) =>
-                handleSelectChange(option, "specificpurpose")
-              }
-              placeholder="Select Purpose"
-            />
-          </div>
-          <div className="col-span-2">
-            <p className="text-sm font-medium">
-              <strong>Customer Credit:</strong> {creditInfo.days} Days | ₹{" "}
-              {creditInfo.amount}
-            </p>
-          </div>
-          {/* Report Details */}
-          <div className="col-span-2 mt-4 border-t pt-4">
-            <h3 className="text-md mb-2 font-semibold">
-              Customer&apos;s Report Detail
-            </h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium">
-                  Customer Name
-                </label>
-                <ReactSelect
-                  name="reportname"
-                  options={customerOptions}
-                  onChange={(option) =>
-                    handleSelectChange(option, "reportname")
-                  }
-                  placeholder="Select Customer"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">
-                  Customer Address
-                </label>
-                <ReactSelect
-                  name="reportaddress"
-                  options={reportAddressOptions}
-                  onChange={(option) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      reportaddress: option?.value || "",
-                    }))
-                  }
-                  placeholder="Select Address"
-                  isDisabled={reportAddressOptions.length === 0}
-                />
-              </div>
-            </div>
-          </div>
-          {/* Billing Details */}
-          <div className="col-span-2 mt-4 border-t pt-4">
-            <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-md font-semibold">
-                Customer&apos;s Billing Detail
-              </h3>
-              <button
-                type="button"
-                className="text-sm text-blue-600 underline"
-                onClick={handleSameAsReporting}
-              >
-                Same as reporting
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium">
-                  Customer Name
-                </label>
-                <ReactSelect
-                  name="billingname"
-                  options={customerOptions}
-                  value={
-                    customerOptions.find(
-                      (opt) => opt.value === formData.billingname,
-                    ) || null
-                  }
-                  onChange={(option) =>
-                    handleSelectChange(option, "billingname")
-                  }
-                  placeholder="Select Customer"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">
-                  Customer Address
-                </label>
-                <ReactSelect
-                  name="billingaddress"
-                  options={billingAddressOptions}
-                  value={
-                    billingAddressOptions.find(
-                      (opt) => opt.value === formData.billingaddress,
-                    ) || null
-                  }
-                  onChange={(option) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      billingaddress: option?.value || "",
-                    }))
-                  }
-                  placeholder="Select Address"
-                  isDisabled={billingAddressOptions.length === 0}
-                />
-              </div>
-
-              <div>
-                <Input
-                  label="GST No"
-                  name="gstno"
-                  value={formData.gstno}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-          </div>
-          {/* Concern Person Section */}
-          <div className="col-span-2 mt-4 border-t pt-4">
-            <h3 className="text-md mb-2 font-semibold">Concern Person</h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium">
-                  Concern Person Name
-                </label>
-                <ReactSelect
-                  name="concernpersonname"
-                  options={concernPersonOptions}
-                  onChange={(option) =>
-                    handleSelectChange(option, "concernpersonname")
-                  }
-                  placeholder="Select Concern Person"
-                />
-              </div>
-
-              {formData.concernpersonname && (
-                <>
-                  <Input
-                    label="Concern Person Designation"
-                    name="concernpersondesignation"
-                    value={selectedConcernPerson.designation}
-                    disabled
-                  />
-                  <Input
-                    label="Concern Person Email"
-                    name="concernpersonemail"
-                    value={selectedConcernPerson.email}
-                    disabled
-                  />
-                  <Input
-                    label="Concern Person Mobile"
-                    name="concernpersonmobile"
-                    value={selectedConcernPerson.mobile}
-                    disabled
-                  />
-                </>
+          {/* First Column */}
+          <div className="space-y-4">
+            <div>
+              <Input
+                label="Date"
+                name="inwarddate"
+                type="date"
+                onChange={handleChange}
+              />
+              {errors.inwarddate && (
+                <p className="mt-1 text-sm text-red-500">{errors.inwarddate}</p>
               )}
             </div>
-          </div>
 
-          {/* Quotation NO*/}
-          <div>
-            <label className="block text-sm font-medium">Quotation No</label>
-            <ReactSelect
-              name="quotationid"
-              options={quotationOptions}
-              onChange={(option) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  quotationid: option?.value || "",
-                }))
-              }
-              placeholder="Select Quotation"
-              isDisabled={quotationOptions.length === 0}
-            />
-          </div>
-          {/* Concerned */}
-          <div>
-            <label className="block text-sm font-medium">Concerned BD</label>
-            <ReactSelect
-              name="bd"
-              options={bdOptions}
-              value={bdOptions.find((opt) => opt.value === formData.bd) || null}
-              onChange={(option) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  bd: option?.value || "",
-                }))
-              }
-              placeholder="Select BD"
-              isDisabled={bdOptions.length === 0}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Promoter</label>
-            <ReactSelect
-              name="promoter"
-              options={promoterOptions}
-              value={
-                promoterOptions.find(
-                  (opt) => opt.value === formData.promoter,
-                ) || null
-              }
-              onChange={(option) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  promoter: option?.value || "",
-                }))
-              }
-              placeholder="Select Promoter"
-              isDisabled={promoterOptions.length === 0}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Priority Sample</label>
-            <ReactSelect
-              name="priority"
-              options={choiceOptions}
-              value={
-                choiceOptions.find((opt) => opt.value === formData.priority) ||
-                null
-              }
-              onChange={(option) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  priority: option?.value || "",
-                }))
-              }
-              placeholder="Select Choice"
-              isDisabled={choiceOptions.length === 0}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium">Approved By</label>
-            <ReactSelect
-              name="approval"
-              options={approvedByOptions}
-              value={
-                approvedByOptions.find(
-                  (opt) => opt.value === formData.approval,
-                ) || null
-              }
-              onChange={(option) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  approval: option?.value || "",
-                }))
-              }
-              placeholder="Select Approver"
-              isDisabled={approvedByOptions.length === 0}
-            />
-          </div>
-          {/*   Priority Testing Charges */}
-          <div className="grid grid-cols-3 items-center gap-4">
-            {/* Label */}
-            <label className="col-span-1 text-sm font-medium">
-              Priority Testing Charges
-            </label>
-
-            {/* pcharges Input */}
-            <input
-              type="number"
-              value={formData.pcharges}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  pcharges: e.target.value,
-                }))
-              }
-              className="col-span-1 rounded border px-3 py-1"
-              placeholder="Enter charges"
-            />
-
-            {/* pchargestype Dropdown */}
-            <select
-              value={formData.pchargestype || "%"}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  pchargestype: e.target.value,
-                }))
-              }
-              className="col-span-1 rounded border px-3 py-1"
-            >
-              <option value="%">%</option>
-              <option value="₹">₹</option>
-            </select>
-          </div>
-          {/* Work Order No */}
-          <div>
-            <label className="mb-1 block text-sm font-medium">
-              Work Order No
-            </label>
-            <input
-              type="text"
-              name="ponumber"
-              value={formData.ponumber || ""}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  ponumber: e.target.value,
-                }))
-              }
-              className="w-full rounded border px-3 py-2"
-              placeholder="Enter Work Order No"
-            />
-          </div>
-          {/* Work Order Upload */}
-          <div>
-            <label className="mb-1 block text-sm font-medium">
-              Work Order Upload
-            </label>
-            <input
-              type="file"
-              name="wupload"
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  wupload: e.target.files[0],
-                }))
-              }
-              className="block w-full rounded border px-3 py-2"
-            />
-          </div>
-
-          {/* Mode Of Receipt Dropdown */}
-          <div>
-            <label className="mb-1 block text-sm font-medium">
-              Mode Of Receipt
-            </label>
-            <select
-              name="modeofreciept"
-              value={formData.modeofreciept}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  modeofreciept: e.target.value,
-                }))
-              }
-              className="w-full rounded border px-3 py-2"
-            >
-              <option value="">Select Mode</option>
-              {modeOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Conditionally Show: Only if mode is NOT "By Hand" */}
-          {isTransportMode && (
-            <div className="mt-4 grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium">
-                  Courier/Cargo/Transport
-                </label>
-                <input
-                  type="text"
-                  name="couriernamerec"
-                  value={formData.couriernamerec}
-                  onChange={handleChange}
-                  className="w-full rounded border px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium">
-                  Date Of Dispatch
-                </label>
-                <input
-                  type="date"
-                  name="dateofdispatchrec"
-                  onChange={handleChange}
-                  className="w-full rounded border px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium">
-                  Docket/Airway Bill No
-                </label>
-                <input
-                  type="text"
-                  name="docketnorec"
-                  value={formData.docketnorec}
-                  onChange={handleChange}
-                  className="w-full rounded border px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium">
-                  Local Contact of Courier
-                </label>
-                <input
-                  type="text"
-                  name="localcontactrec"
-                  value={formData.localcontactrec}
-                  onChange={handleChange}
-                  className="w-full rounded border px-3 py-2"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Receipt Doc Upload */}
-          <div>
-            <label className="mb-1 block text-sm font-medium">
-              Receipt Doc Upload
-            </label>
-            <input
-              type="file"
-              name="rupload"
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  rupload: e.target.files[0],
-                }))
-              }
-              className="block w-full rounded border px-3 py-2"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm font-medium">
-              Mode Of Return
-            </label>
-            <select
-              name="modeofdispatch"
-              value={formData.modeofdispatch || ""}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  modeofdispatch: e.target.value,
-                }))
-              }
-              required
-              className="w-full rounded border px-3 py-2"
-            >
-              <option value="">Select Mode</option>
-              <option value="BY Hand">BY Hand</option>
-              <option value="by Courier/Cargo/Transport">
-                by Courier/Cargo/Transport
-              </option>
-            </select>
-          </div>
-
-          {isTransportDispatchMode && (
-            <div className="mt-4 grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium">
-                  Courier/Cargo/Transport
-                </label>
-                <input
-                  type="text"
-                  name="couriername"
-                  value={formData.couriername || ""}
-                  onChange={handleChange}
-                  className="w-full rounded border px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium">
-                  Date Of Dispatch
-                </label>
-                <input
-                  type="date"
-                  name="dateofdispatch"
-                  onChange={handleChange}
-                  className="w-full rounded border px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium">
-                  Docket/Airway Bill No
-                </label>
-                <input
-                  type="text"
-                  name="docketno"
-                  value={formData.docketno || ""}
-                  onChange={handleChange}
-                  className="w-full rounded border px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium">
-                  Local Contact of Courier
-                </label>
-                <input
-                  type="text"
-                  name="localcontact"
-                  value={formData.localcontact || ""}
-                  onChange={handleChange}
-                  className="w-full rounded border px-3 py-2"
-                />
-              </div>
-            </div>
-          )}
-
-          <div>
-            <label className="mb-1 block text-sm font-medium">
-              Is Payment Done?
-            </label>
-            <select
-              name="paymentstatus"
-              value={formData.paymentstatus}
-              onChange={handleChange}
-              className="w-full rounded border px-3 py-2"
-            >
-              <option value="2">No</option>
-              <option value="1">Yes</option>
-            </select>
-          </div>
-          {formData.paymentstatus === "1" && (
             <div>
-              <label className="mb-1 block text-sm font-medium">
-                Mode of Payment
-              </label>
-              <select
-                name="modeofpayment"
-                value={formData.modepaymnetOptions}
+              <Input
+                label="Sample Received Date"
+                name="sample_received_on"
+                type="date"
                 onChange={handleChange}
-                className="w-full rounded border px-3 py-2"
-              >
-                <option value="">Select Payment Mode</option>
-                {modepaymnetOptions.map((item) => (
-                  <option key={item.value} value={item.value}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
-              <div>
-                <label className="mb-1 block text-sm font-medium">
-                  Details
-                </label>
-                <input
-                  type="text"
-                  name="detailsofpayment"
-                  value={formData.detailsofpayment}
-                  onChange={handleChange}
-                  className="w-full rounded border px-3 py-2"
-                  placeholder="Enter payment details"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium">Amount</label>
-                <input
-                  type="number"
-                  name="paymentamount"
-                  value={formData.paymentamount}
-                  onChange={handleChange}
-                  className="w-full rounded border px-3 py-2"
-                  placeholder="Enter amount"
-                />
-              </div>
+              />
+              {errors.sample_received_on && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.sample_received_on}
+                </p>
+              )}
             </div>
-          )}
-          {/* CERTIFICATE COLLECTION DETAILS (Please tick) */}
-          <div className="mt-8 space-y-6">
+
+            <div>
+              <label className="block text-sm font-medium">Customer Type</label>
+              <ReactSelect
+                name="ctype"
+                options={customerTypeOptions}
+                onChange={(option) => handleSelectChange(option, "ctype")}
+                placeholder="Select Customer Type"
+              />
+              {errors.ctype && (
+                <p className="mt-1 text-sm text-red-500">{errors.ctype}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium">Customer</label>
+              <ReactSelect
+                name="customerid"
+                options={customerOptions}
+                onChange={(option) => handleSelectChange(option, "customerid")}
+                placeholder="Select Customer"
+              />
+              {errors.customerid && (
+                <p className="mt-1 text-sm text-red-500">{errors.customerid}</p>
+              )}
+            </div>
+
             <div>
               <label className="block text-sm font-medium">
-                Certificate Collect as
+                Specific Purpose
               </label>
-              <select
-                name="certcollectiondetail"
-                value={formData.certcollectiondetail}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    certcollectiondetail: e.target.value,
-                  })
+              <ReactSelect
+                name="specificpurpose"
+                options={specificPurposeOptions}
+                onChange={(option) =>
+                  handleSelectChange(option, "specificpurpose")
                 }
-                className="w-full rounded border px-3 py-2"
-              >
-                <option value="">Select</option>
-                {certificateOptions.map((item) => (
-                  <option key={item.value} value={item.value}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
+                placeholder="Select Purpose"
+              />
+              {errors.specificpurpose && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.specificpurpose}
+                </p>
+              )}
             </div>
 
-            {/* Additional Email Ids */}
             <div>
-              <label className="block text-sm font-medium">
-                Additional Email Ids
-              </label>
-              <textarea
-                name="additionalemail"
-                value={formData.additionalemail}
-                onChange={(e) =>
-                  setFormData({ ...formData, additionalemail: e.target.value })
-                }
-                className="w-full rounded border px-3 py-2"
-                placeholder="Comma separated additional emails"
-              ></textarea>
+              <p className="text-sm font-medium">
+                <strong>Customer Credit:</strong> {creditInfo.days} Days | ₹{" "}
+                {creditInfo.amount}
+              </p>
             </div>
 
-            {/* Description */}
+            {/* Report Details */}
+            <div className="mt-4 border-t pt-4">
+              <h3 className="text-md mb-2 font-semibold">
+                Customer&apos;s Report Detail
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium">
+                    Customer Name
+                  </label>
+                  <ReactSelect
+                    name="reportname"
+                    options={customerOptions}
+                    onChange={(option) =>
+                      handleSelectChange(option, "reportname")
+                    }
+                    placeholder="Select Customer"
+                  />
+                  {errors.reportname && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.reportname}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium">
+                    Customer Address
+                  </label>
+                  <ReactSelect
+                    name="reportaddress"
+                    options={reportAddressOptions}
+                    onChange={(option) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        reportaddress: option?.value || "",
+                      }))
+                    }
+                    placeholder="Select Address"
+                    isDisabled={reportAddressOptions.length === 0}
+                  />
+                  {errors.reportaddress && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.reportaddress}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Billing Details */}
+            <div className="mt-4 border-t pt-4">
+              <div className="mb-2 flex items-center justify-between">
+                <h3 className="text-md font-semibold">
+                  Customer&apos;s Billing Detail
+                </h3>
+                <button
+                  type="button"
+                  className="text-sm text-blue-600 underline"
+                  onClick={handleSameAsReporting}
+                >
+                  Same as reporting
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium">
+                    Customer Name
+                  </label>
+                  <ReactSelect
+                    name="billingname"
+                    options={customerOptions}
+                    value={
+                      customerOptions.find(
+                        (opt) => opt.value === formData.billingname,
+                      ) || null
+                    }
+                    onChange={(option) =>
+                      handleSelectChange(option, "billingname")
+                    }
+                    placeholder="Select Customer"
+                  />
+                  {errors.billingname && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.billingname}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium">
+                    Customer Address
+                  </label>
+                  <ReactSelect
+                    name="billingaddress"
+                    options={billingAddressOptions}
+                    value={
+                      billingAddressOptions.find(
+                        (opt) => opt.value === formData.billingaddress,
+                      ) || null
+                    }
+                    onChange={(option) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        billingaddress: option?.value || "",
+                      }))
+                    }
+                    placeholder="Select Address"
+                    isDisabled={billingAddressOptions.length === 0}
+                  />
+                  {errors.billingaddress && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.billingaddress}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <Input
+                    label="GST No"
+                    name="gstno"
+                    value={formData.gstno}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Concern Person Section */}
+            <div className="mt-4 border-t pt-4">
+              <h3 className="text-md mb-2 font-semibold">Concern Person</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium">
+                    Concern Person Name
+                  </label>
+                  <ReactSelect
+                    name="concernpersonname"
+                    options={concernPersonOptions}
+                    onChange={(option) =>
+                      handleSelectChange(option, "concernpersonname")
+                    }
+                    placeholder="Select Concern Person"
+                  />
+                  {errors.concernpersonname && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.concernpersonname}
+                    </p>
+                  )}
+                </div>
+
+                {formData.concernpersonname && (
+                  <>
+                    <Input
+                      label="Concern Person Designation"
+                      name="concernpersondesignation"
+                      value={selectedConcernPerson.designation}
+                      disabled
+                    />
+                    <Input
+                      label="Concern Person Email"
+                      name="concernpersonemail"
+                      value={selectedConcernPerson.email}
+                      disabled
+                    />
+                    <Input
+                      label="Concern Person Mobile"
+                      name="concernpersonmobile"
+                      value={selectedConcernPerson.mobile}
+                      disabled
+                    />
+                  </>
+                )}
+              </div>
+            </div>
             <div>
               <label className="block text-sm font-medium">Description</label>
               <input
@@ -1085,56 +736,6 @@ export default function AddInwardEntry() {
                 placeholder="Enter description"
               />
             </div>
-          </div>
-          {/* SPECIAL INSTRUCTIONS */}
-          <div className="mt-8 space-y-6">
-            {/* Documents Submitted */}
-            <div>
-              <label className="block text-sm font-medium">
-                Documents Submitted, if any (Details)
-              </label>
-              <input
-                type="text"
-                name="documents"
-                value={formData.documents}
-                onChange={(e) =>
-                  setFormData({ ...formData, documents: e.target.value })
-                }
-                className="w-full rounded border px-3 py-2"
-                placeholder="Certificate Collection Remark"
-              />
-            </div>
-            {/* Deadline */}
-            <div>
-              <label className="block text-sm font-medium">Any Deadline</label>
-              <input
-                type="date"
-                name="deadline"
-                value={formData.deadline}
-                onChange={(e) =>
-                  setFormData({ ...formData, deadline: e.target.value })
-                }
-                className="w-full rounded border px-3 py-2"
-                min={new Date().toISOString().split("T")[0]} // disables past dates
-              />
-            </div>
-            {/* Special Request */}
-            <div>
-              <label className="block text-sm font-medium">
-                Any Special Request
-              </label>
-              <textarea
-                name="specialrequest"
-                value={formData.specialrequest}
-                onChange={(e) =>
-                  setFormData({ ...formData, specialrequest: e.target.value })
-                }
-                className="w-full rounded border px-3 py-2"
-                placeholder="terms"
-              ></textarea>
-            </div>
-            <hr />
-            {/* Notes */}
             <div>
               <label className="block text-sm font-medium">Notes</label>
               <textarea
@@ -1147,36 +748,557 @@ export default function AddInwardEntry() {
                 placeholder="terms"
               ></textarea>
             </div>
-            {/* Hidden Inputs (stored in formData) */}
-
-            <input
-              type="hidden"
-              name="customeraddress"
-              value={formData.customeraddress}
-            />
-            <input
-              type="hidden"
-              name="customername"
-              value={formData.customername}
-            />
-            <input
-              type="hidden"
-              name="nablrequired"
-              value={formData.nablrequired}
-            />
-            <input type="hidden" name="calibacc" value={formData.calibacc} />
-            <input
-              type="hidden"
-              name="instrumentlocation"
-              value={formData.instrumentlocation}
-            />
-            <input
-              type="hidden"
-              name="caliblocation"
-              value={formData.caliblocation}
-            />
           </div>
 
+          {/* Second Column */}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium">Quotation No</label>
+              <ReactSelect
+                name="quotationid"
+                options={quotationOptions}
+                onChange={(option) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    quotationid: option?.value || "",
+                  }))
+                }
+                placeholder="Select Quotation"
+                isDisabled={quotationOptions.length === 0}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium">Concerned BD</label>
+              <ReactSelect
+                name="bd"
+                options={bdOptions}
+                value={
+                  bdOptions.find((opt) => opt.value === formData.bd) || null
+                }
+                onChange={(option) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    bd: option?.value || "",
+                  }))
+                }
+                placeholder="Select BD"
+                isDisabled={bdOptions.length === 0}
+              />
+              {errors.bd && (
+                <p className="mt-1 text-sm text-red-500">{errors.bd}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium">
+                Sales Promoter
+              </label>
+              <ReactSelect
+                name="promoter"
+                options={promoterOptions}
+                value={
+                  promoterOptions.find(
+                    (opt) => opt.value === formData.promoter,
+                  ) || null
+                }
+                onChange={(option) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    promoter: option?.value || "",
+                  }))
+                }
+                placeholder="Select Promoter"
+                isDisabled={promoterOptions.length === 0}
+              />
+              {errors.promoter && (
+                <p className="mt-1 text-sm text-red-500">{errors.promoter}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium">
+                Priority Sample
+              </label>
+              <ReactSelect
+                name="priority"
+                options={choiceOptions}
+                value={
+                  choiceOptions.find(
+                    (opt) => opt.value === formData.priority,
+                  ) || null
+                }
+                onChange={(option) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    priority: option?.value || "",
+                  }))
+                }
+                placeholder="Select Choice"
+                isDisabled={choiceOptions.length === 0}
+              />
+              {errors.priority && (
+                <p className="mt-1 text-sm text-red-500">{errors.priority}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium">Approved By</label>
+              <ReactSelect
+                name="approval"
+                options={approvedByOptions}
+                value={
+                  approvedByOptions.find(
+                    (opt) => opt.value === formData.approval,
+                  ) || null
+                }
+                onChange={(option) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    approval: option?.value || "",
+                  }))
+                }
+                placeholder="Select Approver"
+                isDisabled={approvedByOptions.length === 0}
+              />
+              {errors.approval && (
+                <p className="mt-1 text-sm text-red-500">{errors.approval}</p>
+              )}
+            </div>
+
+            {/* Priority Testing Charges */}
+            <div className="grid grid-cols-3 items-center gap-4">
+              <label className="col-span-1 text-sm font-medium">
+                Priority Testing Charges
+              </label>
+              <input
+                type="number"
+                value={formData.pcharges}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    pcharges: e.target.value,
+                  }))
+                }
+                className="col-span-1 rounded border px-3 py-1"
+                placeholder="Enter charges"
+              />
+              <select
+                value={formData.pchargestype || "%"}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    pchargestype: e.target.value,
+                  }))
+                }
+                className="col-span-1 rounded border px-3 py-1"
+              >
+                <option value="%">%</option>
+                <option value="₹">₹</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium">
+                Work Order No
+              </label>
+              <input
+                type="text"
+                name="ponumber"
+                value={formData.ponumber || ""}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    ponumber: e.target.value,
+                  }))
+                }
+                className="w-full rounded border px-3 py-2"
+                placeholder="Enter Work Order No"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium">
+                Work Order Upload
+              </label>
+              <input
+                type="file"
+                name="wupload"
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    wupload: e.target.files[0],
+                  }))
+                }
+                className="block w-full rounded border px-3 py-2"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium">
+                Mode Of Receipt
+              </label>
+              <select
+                name="modeofreciept"
+                value={formData.modeofreciept}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    modeofreciept: e.target.value,
+                  }))
+                }
+                className="w-full rounded border px-3 py-2"
+              >
+                <option value="">Select Mode</option>
+                {modeOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Conditionally Show: Only if mode is NOT "By Hand" */}
+            {isTransportMode && (
+              <div className="mt-4 grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium">
+                    Courier/Cargo/Transport
+                  </label>
+                  <input
+                    type="text"
+                    name="couriernamerec"
+                    value={formData.couriernamerec}
+                    onChange={handleChange}
+                    className="w-full rounded border px-3 py-2"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium">
+                    Date Of Dispatch
+                  </label>
+                  <input
+                    type="date"
+                    name="dateofdispatchrec"
+                    onChange={handleChange}
+                    className="w-full rounded border px-3 py-2"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium">
+                    Docket/Airway Bill No
+                  </label>
+                  <input
+                    type="text"
+                    name="docketnorec"
+                    value={formData.docketnorec}
+                    onChange={handleChange}
+                    className="w-full rounded border px-3 py-2"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium">
+                    Local Contact of Courier
+                  </label>
+                  <input
+                    type="text"
+                    name="localcontactrec"
+                    value={formData.localcontactrec}
+                    onChange={handleChange}
+                    className="w-full rounded border px-3 py-2"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div>
+              <label className="mb-1 block text-sm font-medium">
+                Receipt Doc Upload
+              </label>
+              <input
+                type="file"
+                name="rupload"
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    rupload: e.target.files[0],
+                  }))
+                }
+                className="block w-full rounded border px-3 py-2"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium">
+                Mode Of Return
+              </label>
+              <select
+                name="modeofdispatch"
+                value={formData.modeofdispatch || ""}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    modeofdispatch: e.target.value,
+                  }))
+                }
+                className="w-full rounded border px-3 py-2"
+              >
+                <option value="">Select Mode</option>
+                <option value="BY Hand">BY Hand</option>
+                <option value="by Courier/Cargo/Transport">
+                  by Courier/Cargo/Transport
+                </option>
+              </select>
+            </div>
+
+            {isTransportDispatchMode && (
+              <div className="mt-4 grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium">
+                    Courier/Cargo/Transport
+                  </label>
+                  <input
+                    type="text"
+                    name="couriername"
+                    value={formData.couriername || ""}
+                    onChange={handleChange}
+                    className="w-full rounded border px-3 py-2"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium">
+                    Date Of Dispatch
+                  </label>
+                  <input
+                    type="date"
+                    name="dateofdispatch"
+                    onChange={handleChange}
+                    className="w-full rounded border px-3 py-2"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium">
+                    Docket/Airway Bill No
+                  </label>
+                  <input
+                    type="text"
+                    name="docketno"
+                    value={formData.docketno || ""}
+                    onChange={handleChange}
+                    className="w-full rounded border px-3 py-2"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium">
+                    Local Contact of Courier
+                  </label>
+                  <input
+                    type="text"
+                    name="localcontact"
+                    value={formData.localcontact || ""}
+                    onChange={handleChange}
+                    className="w-full rounded border px-3 py-2"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div>
+              <label className="mb-1 block text-sm font-medium">
+                Is Payment Done?
+              </label>
+              <select
+                name="paymentstatus"
+                value={formData.paymentstatus}
+                onChange={handleChange}
+                className="w-full rounded border px-3 py-2"
+              >
+                <option value="2">No</option>
+                <option value="1">Yes</option>
+              </select>
+            </div>
+
+            {formData.paymentstatus === "1" && (
+              <div className="space-y-4">
+                <div>
+                  <label className="mb-1 block text-sm font-medium">
+                    Mode of Payment
+                  </label>
+                  <select
+                    name="modeofpayment"
+                    value={formData.modepaymnetOptions}
+                    onChange={handleChange}
+                    className="w-full rounded border px-3 py-2"
+                  >
+                    <option value="">Select Payment Mode</option>
+                    {modepaymnetOptions.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium">
+                    Details
+                  </label>
+                  <input
+                    type="text"
+                    name="detailsofpayment"
+                    value={formData.detailsofpayment}
+                    onChange={handleChange}
+                    className="w-full rounded border px-3 py-2"
+                    placeholder="Enter payment details"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium">Amount</label>
+                  <input
+                    type="number"
+                    name="paymentamount"
+                    value={formData.paymentamount}
+                    onChange={handleChange}
+                    className="w-full rounded border px-3 py-2"
+                    placeholder="Enter amount"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* CERTIFICATE COLLECTION DETAILS */}
+            <div className="mt-4 space-y-4">
+              <div>
+                <label className="block text-sm font-medium">
+                  Certificate Collect as
+                </label>
+                <select
+                  name="certcollectiondetail"
+                  value={formData.certcollectiondetail}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      certcollectiondetail: e.target.value,
+                    })
+                  }
+                  className="w-full rounded border px-3 py-2"
+                >
+                  <option value="">Select</option>
+                  {certificateOptions.map((item) => (
+                    <option key={item.value} value={item.value}>
+                      {item.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium">
+                  Additional Email Ids
+                </label>
+                <textarea
+                  name="additionalemail"
+                  value={formData.additionalemail}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      additionalemail: e.target.value,
+                    })
+                  }
+                  className="w-full rounded border px-3 py-2"
+                  placeholder="Comma separated additional emails"
+                ></textarea>
+              </div>
+            </div>
+
+            {/* SPECIAL INSTRUCTIONS */}
+            <div className="mt-4 space-y-4">
+              <div>
+                <label className="block text-sm font-medium">
+                  Documents Submitted, if any (Details)
+                </label>
+                <input
+                  type="text"
+                  name="documents"
+                  value={formData.documents}
+                  onChange={(e) =>
+                    setFormData({ ...formData, documents: e.target.value })
+                  }
+                  className="w-full rounded border px-3 py-2"
+                  placeholder="Certificate Collection Remark"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium">
+                  Any Deadline
+                </label>
+                <input
+                  type="date"
+                  name="deadline"
+                  value={formData.deadline}
+                  onChange={(e) =>
+                    setFormData({ ...formData, deadline: e.target.value })
+                  }
+                  className="w-full rounded border px-3 py-2"
+                  min={new Date().toISOString().split("T")[0]}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium">
+                  Any Special Request
+                </label>
+                <textarea
+                  name="specialrequest"
+                  value={formData.specialrequest}
+                  onChange={(e) =>
+                    setFormData({ ...formData, specialrequest: e.target.value })
+                  }
+                  className="w-full rounded border px-3 py-2"
+                  placeholder="terms"
+                ></textarea>
+              </div>
+
+              <hr />
+
+              {/* Hidden Inputs */}
+              <input
+                type="hidden"
+                name="customeraddress"
+                value={formData.customeraddress}
+              />
+              <input
+                type="hidden"
+                name="customername"
+                value={formData.customername}
+              />
+              <input
+                type="hidden"
+                name="nablrequired"
+                value={formData.nablrequired}
+              />
+              <input type="hidden" name="calibacc" value={formData.calibacc} />
+              <input
+                type="hidden"
+                name="instrumentlocation"
+                value={formData.instrumentlocation}
+              />
+              <input
+                type="hidden"
+                name="caliblocation"
+                value={formData.caliblocation}
+              />
+            </div>
+          </div>
+
+          {/* Submit Button - Full Width */}
           <div className="col-span-1 md:col-span-2">
             <Button type="submit" color="primary" disabled={loading}>
               {loading ? "Saving..." : "Save"}

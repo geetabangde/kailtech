@@ -428,11 +428,92 @@ const protectedRoutes = {
                       }),
                     },
                     {
-                      path: "edit/:id", // Edit Page
+                      path: "edit-inward-entry/:id", // Edit Page
                       lazy: async () => ({
                         Component: (
                           await import(
                             "app/pages/dashboards/calibration-process/inward-entry-lab/EditInwardEntryLab"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit-bd-person/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/EditBdPerson"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "crf-view/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/CrfView"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "srf-view/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/SrfView"
+                          )
+                        ).default,
+                      }),
+                    },
+
+                    {
+                      path: "edit-billing/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/EditBilling"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit-customer/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/EditCustomer"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "fill-feedback/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/FillFeedback"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "review-inward/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/ReviewInward"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit-work-order/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/EditWorkOrder"
                           )
                         ).default,
                       }),

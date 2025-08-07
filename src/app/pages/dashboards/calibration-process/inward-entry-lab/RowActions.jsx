@@ -1,4 +1,4 @@
-// Import Dependencies
+
 import {
   Menu,
   MenuButton,
@@ -6,13 +6,15 @@ import {
   MenuItems,
   Transition,
 } from "@headlessui/react";
-import { EllipsisHorizontalIcon,PencilIcon,
+import {
+  EllipsisHorizontalIcon,
+  PencilIcon,
+  TrashIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { Fragment, useCallback, useState } from "react";
 import PropTypes from "prop-types";
 
-// Local Imports
 import { ConfirmModal } from "components/shared/ConfirmModal";
 import { Button } from "components/ui";
 
@@ -20,25 +22,20 @@ import axios from "utils/axios";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
 
-
 // ----------------------------------------------------------------------
 
 const confirmMessages = {
   pending: {
     description:
-      "Are you sure you want to delete this Enward Entry? Once deleted, it cannot be restored.",
+      "Are you sure you want to delete this Inward Entry? Once deleted, it cannot be restored.",
   },
   success: {
-    title: "Inward Entry operations Deleted",
+    title: "Inward Entry operation deleted",
   },
 };
 
 export function RowActions({ row, table }) {
-    const navigate = useNavigate(); // 👈 Hook
-   const handleEdit = () => {
-    const id = row.original.id;
-    navigate(`/dashboards/calibration-process/inward-entry-lab/edit/${id}`);
-  };
+  const navigate = useNavigate();
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [confirmDeleteLoading, setConfirmDeleteLoading] = useState(false);
@@ -49,36 +46,136 @@ export function RowActions({ row, table }) {
     setDeleteModalOpen(false);
   };
 
-  // const openModal = () => {
-  //   setDeleteModalOpen(true);
-  //   setDeleteError(false);
-  //   setDeleteSuccess(false);
-  // };
+  const openModal = () => {
+    setDeleteModalOpen(true);
+    setDeleteError(false);
+    setDeleteSuccess(false);
+  };
 
   const handleDeleteRows = useCallback(async () => {
-  const id = row.original.id; // Assuming your row contains `id`
-  setConfirmDeleteLoading(true);
+    const id = row.original.id;
+    setConfirmDeleteLoading(true);
 
-  try {
-    await axios.delete(`/calibrationoperations/calibration-method-destroy/${id}`);
-    table.options.meta?.deleteRow(row); // remove row from UI
-    setDeleteSuccess(true);
-     toast.success("calibration operations deleted successfully ✅", {
-      duration: 1000,
-      icon: "🗑️",
-    });
-  } catch (error) {
-    console.error("Delete failed:", error);
-    setDeleteError(true);
-     toast.error("Failed to delete calibration operations ❌", {
-      duration: 2000,
-    });
-  } finally {
-    setConfirmDeleteLoading(false);
-  }
-}, [row, table]);
+    try {
+      await axios.delete(
+        `/calibrationoperations/calibration-method-destroy/${id}`
+      );
+      table.options.meta?.deleteRow(row);
+      setDeleteSuccess(true);
+      toast.success("Calibration operation deleted ✅", {
+        duration: 1000,
+        icon: "🗑️",
+      });
+    } catch (error) {
+      console.error("Delete failed:", error);
+      setDeleteError(true);
+      toast.error("Failed to delete calibration operation ❌", {
+        duration: 2000,
+      });
+    } finally {
+      setConfirmDeleteLoading(false);
+    }
+  }, [row, table]);
 
   const state = deleteError ? "error" : deleteSuccess ? "success" : "pending";
+
+  // ✅ Clean reusable actions list with custom paths
+  const actions = [
+    // {
+    //   label: "Edit CRF Entry Detail",
+    //   onClick: () =>
+    //     navigate(
+    //       `/dashboards/calibration-process/inward-entry-lab/edit/${row.original.id}`
+    //     ),
+    // },
+       {
+  label: "Edit CRF Entry Detail",
+  onClick: () => {
+    const caliblocation = row.original.caliblocation || "Lab";
+    const calibacc = row.original.calibacc || "Nabl";
+
+    navigate(
+      `/dashboards/calibration-process/inward-entry-lab/edit-inward-entry/${row.original.id}?caliblocation=${caliblocation}&calibacc=${calibacc}`
+    );
+  },
+},
+  
+     {
+  label: "Review Inward",
+  onClick: () => {
+    const caliblocation = row.original.caliblocation || "Lab";
+    const calibacc = row.original.calibacc || "Nabl";
+
+    navigate(
+      `/dashboards/calibration-process/inward-entry-lab/review-inward/${row.original.id}?caliblocation=${caliblocation}&calibacc=${calibacc}`
+    );
+  },
+},
+    // {
+    //   label: "Edit Bd Person",
+    //   onClick: () =>
+    //     navigate(
+    //       `/dashboards/calibration-process/inward-entry-lab/edit-bd-person/${row.original.id}`
+    //     ),
+    // },
+  {
+  label: "Edit Bd Person",
+  onClick: () => {
+    const caliblocation = row.original.caliblocation || "Lab";
+    const calibacc = row.original.calibacc || "Nabl";
+
+    navigate(
+      `/dashboards/calibration-process/inward-entry-lab/edit-bd-person/${row.original.id}?caliblocation=${caliblocation}&calibacc=${calibacc}`
+    );
+  },
+},
+
+    {
+      label: "SRF View",
+      onClick: () =>
+        navigate(
+          `/dashboards/calibration-process/inward-entry-lab/srf-view/${row.original.id}`
+        ),
+    },
+    {
+      label: "CRF View",
+      onClick: () =>{
+         const caliblocation = row.original.caliblocation || "Lab";
+         const calibacc = row.original.calibacc || "Nabl";
+        navigate(
+          `/dashboards/calibration-process/inward-entry-lab/crf-view/${row.original.id}?caliblocation=${caliblocation}&calibacc=${calibacc}`
+        );
+      },
+    },
+    {
+      label: "Edit Work Order detail",
+      onClick: () =>
+        navigate(
+          `/dashboards/calibration-process/inward-entry-lab/edit-work-order/${row.original.id}`
+        ),
+    },
+    {
+      label: "Edit Customer Responsible for payment",
+      onClick: () =>
+        navigate(
+          `/dashboards/calibration-process/inward-entry-lab/edit-customer/${row.original.id}`
+        ),
+    },
+    {
+      label: "Edit Billing Detail",
+      onClick: () =>
+        navigate(
+          `/dashboards/calibration-process/inward-entry-lab/edit-billing/${row.original.id}`
+        ),
+    },
+    {
+      label: "Fill Feedback form",
+      onClick: () =>
+        navigate(
+          `/dashboards/calibration-process/inward-entry-lab/fill-feedback/${row.original.id}`
+        ),
+    },
+  ];
 
   return (
     <>
@@ -87,6 +184,7 @@ export function RowActions({ row, table }) {
           <MenuButton as={Button} isIcon className="size-8 rounded-full">
             <EllipsisHorizontalIcon className="size-4.5" />
           </MenuButton>
+
           <Transition
             as={Fragment}
             enter="transition ease-out"
@@ -98,158 +196,41 @@ export function RowActions({ row, table }) {
           >
             <MenuItems
               anchor={{ to: "bottom end", gap: 12 }}
-              className="dark:border-dark-500 dark:bg-dark-750 absolute z-100 w-[10rem] rounded-lg border border-gray-300 bg-white py-1 shadow-lg shadow-gray-200/50 outline-hidden focus-visible:outline-hidden ltr:right-0 rtl:left-0 dark:shadow-none"
+              className="absolute z-50 w-56 rounded-lg border border-gray-300 bg-white py-1 shadow-lg shadow-gray-200/50 dark:border-dark-500 dark:bg-dark-750 dark:shadow-none"
             >
-              <MenuItem>
-                {({ focus }) => (
-                  <button
-                    onClick={handleEdit}
-                    className={clsx(
-                      "flex h-9 w-full items-center space-x-3 px-3 tracking-wide outline-hidden transition-colors",
-                      focus &&
-                        "dark:bg-dark-600 dark:text-dark-100 bg-gray-100 text-gray-800",
-                    )}
-                  >
-                    <PencilIcon className="size-4.5 stroke-1" />
-                    <span>Edit CRF Entry Detail</span>
-                  </button>
-                )}
-              </MenuItem>
-              <MenuItem>
-                {({ focus }) => (
-                  <button
-                    onClick={handleEdit}
-                    className={clsx(
-                      "flex h-9 w-full items-center space-x-3 px-3 tracking-wide outline-hidden transition-colors",
-                      focus &&
-                        "dark:bg-dark-600 dark:text-dark-100 bg-gray-100 text-gray-800",
-                    )}
-                  >
-                    <PencilIcon className="size-4.5 stroke-1" />
-                    <span>Review Inward</span>
-                  </button>
-                )}
-              </MenuItem>
-              <MenuItem>
-                {({ focus }) => (
-                  <button
-                    onClick={handleEdit}
-                    className={clsx(
-                      "flex h-9 w-full items-center space-x-3 px-3 tracking-wide outline-hidden transition-colors",
-                      focus &&
-                        "dark:bg-dark-600 dark:text-dark-100 bg-gray-100 text-gray-800",
-                    )}
-                  >
-                    <PencilIcon className="size-4.5 stroke-1" />
-                    <span>Edit Bd Person</span>
-                  </button>
-                )}
-              </MenuItem>
-              <MenuItem>
-                {({ focus }) => (
-                  <button
-                    onClick={handleEdit}
-                    className={clsx(
-                      "flex h-9 w-full items-center space-x-3 px-3 tracking-wide outline-hidden transition-colors",
-                      focus &&
-                        "dark:bg-dark-600 dark:text-dark-100 bg-gray-100 text-gray-800",
-                    )}
-                  >
-                    <PencilIcon className="size-4.5 stroke-1" />
-                    <span>SRF View</span>
-                  </button>
-                )}
-              </MenuItem>
-              <MenuItem>
-                {({ focus }) => (
-                  <button
-                    onClick={handleEdit}
-                    className={clsx(
-                      "flex h-9 w-full items-center space-x-3 px-3 tracking-wide outline-hidden transition-colors",
-                      focus &&
-                        "dark:bg-dark-600 dark:text-dark-100 bg-gray-100 text-gray-800",
-                    )}
-                  >
-                    <PencilIcon className="size-4.5 stroke-1" />
-                    <span>CRF View</span>
-                  </button>
-                )}
-              </MenuItem>
-              <MenuItem>
-                {({ focus }) => (
-                  <button
-                    onClick={handleEdit}
-                    className={clsx(
-                      "flex h-9 w-full items-center space-x-3 px-3 tracking-wide outline-hidden transition-colors",
-                      focus &&
-                        "dark:bg-dark-600 dark:text-dark-100 bg-gray-100 text-gray-800",
-                    )}
-                  >
-                    <PencilIcon className="size-4.5 stroke-1" />
-                    <span>Edit Work Order detail</span>
-                  </button>
-                )}
-              </MenuItem>
-              <MenuItem>
-                {({ focus }) => (
-                  <button
-                    onClick={handleEdit}
-                    className={clsx(
-                      "flex h-9 w-full items-center space-x-3 px-3 tracking-wide outline-hidden transition-colors",
-                      focus &&
-                        "dark:bg-dark-600 dark:text-dark-100 bg-gray-100 text-gray-800",
-                    )}
-                  >
-                    <PencilIcon className="size-4.5 stroke-1" />
-                    <span>Edit Customer Responsible for payment</span>
-                  </button>
-                )}
-              </MenuItem>
-              <MenuItem>
-                {({ focus }) => (
-                  <button
-                    onClick={handleEdit}
-                    className={clsx(
-                      "flex h-9 w-full items-center space-x-3 px-3 tracking-wide outline-hidden transition-colors",
-                      focus &&
-                        "dark:bg-dark-600 dark:text-dark-100 bg-gray-100 text-gray-800",
-                    )}
-                  >
-                    <PencilIcon className="size-4.5 stroke-1" />
-                    <span>Edit Billing Detail</span>
-                  </button>
-                )}
-              </MenuItem>
-              <MenuItem>
-                {({ focus }) => (
-                  <button
-                    onClick={handleEdit}
-                    className={clsx(
-                      "flex h-9 w-full items-center space-x-3 px-3 tracking-wide outline-hidden transition-colors",
-                      focus &&
-                        "dark:bg-dark-600 dark:text-dark-100 bg-gray-100 text-gray-800",
-                    )}
-                  >
-                    <PencilIcon className="size-4.5 stroke-1" />
-                    <span>Fill Feedback form</span>
-                  </button>
-                )}
-              </MenuItem>
+              {actions.map((action) => (
+                <MenuItem key={action.label}>
+                  {({ focus }) => (
+                    <button
+                      onClick={action.onClick}
+                      className={clsx(
+                        "flex h-9 w-full items-center space-x-3 px-3 tracking-wide outline-none transition-colors",
+                        focus
+                          ? "bg-gray-100 text-gray-800 dark:bg-dark-600 dark:text-dark-100"
+                          : ""
+                      )}
+                    >
+                      <PencilIcon className="size-4.5 stroke-1" />
+                      <span>{action.label}</span>
+                    </button>
+                  )}
+                </MenuItem>
+              ))}
 
-              {/* <MenuItem>
+              <MenuItem>
                 {({ focus }) => (
                   <button
                     onClick={openModal}
                     className={clsx(
-                      "this:error text-this dark:text-this-light flex h-9 w-full items-center space-x-3 px-3 tracking-wide outline-hidden transition-colors",
-                      focus && "bg-this/10 dark:bg-this-light/10",
+                      "flex h-9 w-full items-center space-x-3 px-3 tracking-wide text-red-600 transition-colors",
+                      focus ? "bg-red-50" : ""
                     )}
                   >
                     <TrashIcon className="size-4.5 stroke-1" />
                     <span>Delete</span>
                   </button>
                 )}
-              </MenuItem> */}
+              </MenuItem>
             </MenuItems>
           </Transition>
         </Menu>
