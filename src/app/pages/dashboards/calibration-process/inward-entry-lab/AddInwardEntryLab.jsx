@@ -19,13 +19,13 @@ export default function AddInwardEntry() {
     reportaddress: "",
     billingname: "",
     billingaddress: "",
-  
+
     concernpersonname: "",
     concernpersondesignation: "",
     concernpersonmobile: "",
     concernpersonemail: "",
     quotationid: "",
-    
+
     bd: "",
     promoter: "",
     priority: "",
@@ -66,8 +66,12 @@ export default function AddInwardEntry() {
     customeraddress: "",
     gstno: "", // already done
   });
+
   const [errors, setErrors] = useState({});
- 
+
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
   const [certificateOptions, setCertificateOptions] = useState([]);
   const [customerTypeOptions, setCustomerTypeOptions] = useState([]);
   const [specificPurposeOptions, setSpecificPurposeOptions] = useState([]);
@@ -87,11 +91,11 @@ export default function AddInwardEntry() {
     email: "",
     mobile: "",
   });
+
   const [creditInfo, setCreditInfo] = useState({ days: 0, amount: 0 });
   const [loading, setLoading] = useState(false);
   const isTransportMode = formData.modeofreciept !== "1"; // '1' = By Hand
   const isTransportDispatchMode = formData.modeofdispatch !== "BY Hand";
-  
 
   useEffect(() => {
     const fetchDropdowns = async () => {
@@ -119,32 +123,33 @@ export default function AddInwardEntry() {
           axios.get("/mode-of-payment"),
           axios.get("/certificate-collect-as"),
         ]);
-
+        // ✅ Set all dropdown options
         setCustomerTypeOptions(
           (typeRes?.data?.Data || []).map((item) => ({
             label: item.name,
             value: item.id,
           })),
         );
-
+        // ✅ Set specific purpose options
         setSpecificPurposeOptions(
           (purposeRes?.data?.data || []).map((item) => ({
             label: item.name,
             value: item.id,
           })),
         );
-
+        // ✅ Set all other options
         setCustomerOptions(
           (customerRes?.data?.data || []).map((item) => ({
             label: `${item.name} (${item.mobile})`,
             value: item.id,
             creditdays: item.creditdays,
             creditamount: item.creditamount,
-            customername: item.name, 
+            customername: item.name,
             customeraddress: "nothing",
             gstno: item.gstno || "",
           })),
         );
+        // ✅ Set BD, Promoter, Choice, Approved By, Mode, Payment Mode, Certificate options
 
         setBdOptions(
           (bdRes?.data?.data || []).map((item) => ({
@@ -152,19 +157,22 @@ export default function AddInwardEntry() {
             value: item.id,
           })),
         );
+        // ✅ Set Promoter options
+
         setPromoterOptions(
           (promoterRes?.data?.data || []).map((item) => ({
             label: `${item.name}`,
             value: item.id,
           })),
         );
-
+        // ✅ Set Choice options
         setChoiceOptions(
           (choiceRes?.data?.data || []).map((item) => ({
             label: item.name,
             value: item.id,
           })),
         );
+        // ✅ Set Approved By options
 
         setApprovedByOptions(
           (approvedRes?.data?.data || []).map((item) => ({
@@ -172,20 +180,21 @@ export default function AddInwardEntry() {
             value: item.id,
           })),
         );
-
+         // ✅ Set Mode of Receipt options
         setModeOptions(
           (modeRes?.data?.data || []).map((item) => ({
             label: item.name,
             value: item.id,
           })),
         );
-
+        // ✅ Set Mode of Payment options
         setModePaymentOptions(
           (paymentmodeRes?.data?.data || []).map((item) => ({
             label: item.name,
             value: item.id,
           })),
         );
+        // ✅ Set Certificate Collection options
         setCertificateOptions(
           (setCertificateRes?.data?.data || []).map((item) => ({
             label: item.name,
@@ -201,8 +210,6 @@ export default function AddInwardEntry() {
     fetchDropdowns();
   }, []);
 
-  
-
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -212,7 +219,6 @@ export default function AddInwardEntry() {
       "dateofdispatchrec",
       "dateofdispatch",
       "deadline",
-      
     ];
 
     if (dateFields.includes(name) && value) {
@@ -228,9 +234,7 @@ export default function AddInwardEntry() {
         [name]: value,
       }));
     }
-
   };
-
 
   const handleSelectChange = (option, name) => {
     setFormData((prev) => ({ ...prev, [name]: option?.value || "" }));
@@ -241,12 +245,11 @@ export default function AddInwardEntry() {
         amount: option.creditamount || 0,
       });
 
-    
       // ✅ Set GST No from selected customer
       setFormData((prev) => ({
         ...prev,
-        gstno: option.gstno || "", // already done
-        customername: option.customername, // 👈 set this
+        gstno: option.gstno || "", 
+        customername: option.customername, 
         customeraddress: option.customeraddress, // 👈 set this ("nothing")
       }));
 
@@ -262,11 +265,7 @@ export default function AddInwardEntry() {
       fetchCustomerAddresses(option.value, "billing");
     }
 
-
-    if (
-      (name === "reportname" || name === "billingname") &&
-      !option
-    ) {
+    if ((name === "reportname" || name === "billingname") && !option) {
       if (name === "reportname") {
         setReportAddressOptions([]);
         setFormData((prev) => ({ ...prev, reportaddress: "" }));
@@ -280,7 +279,7 @@ export default function AddInwardEntry() {
       setFormData((prev) => ({ ...prev, concernpersonname: "" }));
       setSelectedConcernPerson({ designation: "", email: "", mobile: "" });
     }
-    
+
     if (name === "concernpersonname" && option) {
       fetchConcernPersonDetails(option.value);
     }
@@ -305,6 +304,8 @@ export default function AddInwardEntry() {
     }
   };
 
+  // fetchConcernPersons
+
   const fetchConcernPersons = async (customerId) => {
     try {
       const res = await axios.get(`/get-concern-person/${customerId}`);
@@ -323,6 +324,7 @@ export default function AddInwardEntry() {
       console.error(err);
     }
   };
+  
   //  fetchConcernPersonDetails
   const fetchConcernPersonDetails = async (personId) => {
     try {
@@ -358,7 +360,7 @@ export default function AddInwardEntry() {
       setQuotationOptions(
         data.map((item) => ({
           label: `${String(item.id).padStart(5, "0")}`,
-          value: item.id, 
+          value: item.id,
         })),
       );
     } catch (err) {
@@ -383,19 +385,25 @@ export default function AddInwardEntry() {
     const newErrors = {};
 
     if (!formData.inwarddate) newErrors.inwarddate = "Date is required";
-    if (!formData.sample_received_on)newErrors.sample_received_on = "Sample Received On Date is required";
+    if (!formData.sample_received_on)
+      newErrors.sample_received_on = "Sample Received On Date is required";
     if (!formData.ctype) newErrors.ctype = "Customer type is required";
     if (!formData.customerid) newErrors.customerid = "Customer is required";
-    if (!formData.specificpurpose) newErrors.specificpurpose = "Purpose is required";
+    if (!formData.specificpurpose)
+      newErrors.specificpurpose = "Purpose is required";
     if (!formData.bd) newErrors.bd = "BD is required";
     if (!formData.promoter) newErrors.promoter = "Sales Promoter is required";
     if (!formData.priority) newErrors.priority = "Priority is required";
     if (!formData.approval) newErrors.approval = "Approved By is required";
     if (!formData.reportname) newErrors.reportname = "Report Name is required";
-    if (!formData.reportaddress) newErrors.reportaddress = "Report Address is required";
-    if (!formData.billingname) newErrors.billingname = "Billing Name is required";
-    if (!formData.billingaddress) newErrors.billingaddress = "Billing Address is required";
-    if (!formData.concernpersonname) newErrors.concernpersonname = "Concern Person Name is required";
+    if (!formData.reportaddress)
+      newErrors.reportaddress = "Report Address is required";
+    if (!formData.billingname)
+      newErrors.billingname = "Billing Name is required";
+    if (!formData.billingaddress)
+      newErrors.billingaddress = "Billing Address is required";
+    if (!formData.concernpersonname)
+      newErrors.concernpersonname = "Concern Person Name is required";
 
     // ❗️ If any errors, block submission and show them
     if (Object.keys(newErrors).length > 0) {
@@ -433,7 +441,15 @@ export default function AddInwardEntry() {
           duration: 1200,
           icon: "✅",
         });
-        navigate("/dashboards/calibration-process/inward-entry-lab");
+        if (
+          String(res.data.status) === "true" ||
+          String(res.data.status) === "1"
+        ) {
+          setSuccessMessage(res.data.message || "Inward Entry Added");
+          setShowSuccessModal(true);
+        } else {
+          toast.error(res.data.message || "Failed to save entry ❌");
+        }
       } else {
         toast.error(res.data.message || "Failed to save entry ❌");
       }
@@ -467,6 +483,8 @@ export default function AddInwardEntry() {
         >
           {/* First Column */}
           <div className="space-y-4">
+            <h3>SERVICE REQUESTOR</h3>
+
             <div>
               <Input
                 label="Date"
@@ -720,6 +738,7 @@ export default function AddInwardEntry() {
                 )}
               </div>
             </div>
+
             <div>
               <label className="block text-sm font-medium">Description</label>
               <input
@@ -748,10 +767,41 @@ export default function AddInwardEntry() {
                 placeholder="terms"
               ></textarea>
             </div>
+            <div>
+              <label className="block text-sm font-medium">
+                Additional Email Ids
+              </label>
+              <textarea
+                name="additionalemail"
+                value={formData.additionalemail}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    additionalemail: e.target.value,
+                  })
+                }
+                className="w-full rounded border px-3 py-2"
+                placeholder="Comma separated additional emails"
+              ></textarea>
+            </div>
+            <div>
+              <label className="block text-sm font-medium">
+                Any Special Request
+              </label>
+              <textarea
+                name="specialrequest"
+                value={formData.specialrequest}
+                onChange={(e) =>
+                  setFormData({ ...formData, specialrequest: e.target.value })
+                }
+                className="w-full rounded border px-3 py-2"
+                placeholder="Any Special Request"
+              ></textarea>
+            </div>
           </div>
 
           {/* Second Column */}
-          <div className="space-y-4">
+          <div className="space-y-4" style={{ marginTop: "7%" }}>
             <div>
               <label className="block text-sm font-medium">Quotation No</label>
               <ReactSelect
@@ -1197,24 +1247,6 @@ export default function AddInwardEntry() {
                   ))}
                 </select>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium">
-                  Additional Email Ids
-                </label>
-                <textarea
-                  name="additionalemail"
-                  value={formData.additionalemail}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      additionalemail: e.target.value,
-                    })
-                  }
-                  className="w-full rounded border px-3 py-2"
-                  placeholder="Comma separated additional emails"
-                ></textarea>
-              </div>
             </div>
 
             {/* SPECIAL INSTRUCTIONS */}
@@ -1249,21 +1281,6 @@ export default function AddInwardEntry() {
                   className="w-full rounded border px-3 py-2"
                   min={new Date().toISOString().split("T")[0]}
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium">
-                  Any Special Request
-                </label>
-                <textarea
-                  name="specialrequest"
-                  value={formData.specialrequest}
-                  onChange={(e) =>
-                    setFormData({ ...formData, specialrequest: e.target.value })
-                  }
-                  className="w-full rounded border px-3 py-2"
-                  placeholder="terms"
-                ></textarea>
               </div>
 
               <hr />
@@ -1306,6 +1323,24 @@ export default function AddInwardEntry() {
           </div>
         </form>
       </div>
+      {showSuccessModal && (
+        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
+          <div className="w-[90%] max-w-md rounded bg-white p-6 text-center shadow-lg">
+            <h2 className="mb-2 text-lg font-bold">Result</h2>
+            <p className="mb-4 text-gray-700">
+              <strong>{successMessage}</strong>
+            </p>
+            <Button
+              onClick={() => {
+                setShowSuccessModal(false);
+                navigate("/dashboards/calibration-process/inward-entry-lab");
+              }}
+            >
+              OK
+            </Button>
+          </div>
+        </div>
+      )}
     </Page>
   );
-} 
+}

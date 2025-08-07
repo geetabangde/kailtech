@@ -65,8 +65,8 @@ export const columns = [
   }),
 
   // ✅ Remarks
-  columnHelper.accessor("reviewremark", {
-    id: "reviewremark",
+  columnHelper.accessor("certcollectionremark", {
+    id: "certcollectionremark",
     header: "Remarks",
     cell: (info) => info.getValue(),
   }),

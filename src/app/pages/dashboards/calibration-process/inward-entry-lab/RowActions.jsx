@@ -9,7 +9,7 @@ import {
 import {
   EllipsisHorizontalIcon,
   PencilIcon,
-  TrashIcon,
+  
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { Fragment, useCallback, useState } from "react";
@@ -46,11 +46,11 @@ export function RowActions({ row, table }) {
     setDeleteModalOpen(false);
   };
 
-  const openModal = () => {
-    setDeleteModalOpen(true);
-    setDeleteError(false);
-    setDeleteSuccess(false);
-  };
+  // const openModal = () => {
+  //   setDeleteModalOpen(true);
+  //   setDeleteError(false);
+  //   setDeleteSuccess(false);
+  // };
 
   const handleDeleteRows = useCallback(async () => {
     const id = row.original.id;
@@ -217,20 +217,7 @@ export function RowActions({ row, table }) {
                 </MenuItem>
               ))}
 
-              <MenuItem>
-                {({ focus }) => (
-                  <button
-                    onClick={openModal}
-                    className={clsx(
-                      "flex h-9 w-full items-center space-x-3 px-3 tracking-wide text-red-600 transition-colors",
-                      focus ? "bg-red-50" : ""
-                    )}
-                  >
-                    <TrashIcon className="size-4.5 stroke-1" />
-                    <span>Delete</span>
-                  </button>
-                )}
-              </MenuItem>
+              
             </MenuItems>
           </Transition>
         </Menu>
