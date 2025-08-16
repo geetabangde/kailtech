@@ -518,6 +518,16 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
+                    {
+                      path: "technical-acceptance/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/TechnicalAcceptance"
+                          )
+                        ).default,
+                      }),
+                    },
                   ],
                 },
               ],

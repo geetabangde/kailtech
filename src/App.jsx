@@ -32,7 +32,6 @@ function App() {
           <BreakpointProvider>
             <SidebarProvider>
               <AppContent />
-              
             </SidebarProvider>
           </BreakpointProvider>
         </LocaleProvider>

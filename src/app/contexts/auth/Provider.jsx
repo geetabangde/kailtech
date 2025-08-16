@@ -87,7 +87,7 @@ export function AuthProvider({ children }) {
               parsedUser = JSON.parse(userData);
             } catch (err) {
               console.error("Invalid user data in localStorage", err);
-              localStorage.removeItem("user"); // 🧹 Clean invalid entry
+              localStorage.removeItem("user"); 
             }
           }
           
@@ -126,7 +126,8 @@ export function AuthProvider({ children }) {
 
 
 
- // ✅ Login function used in SignIn.jsx
+  // ✅ Login function
+  // This function handles user login, updates the context state, and manages local storage.
   const login = async ({ username, password, finyear }) => {
   dispatch({ type: "LOGIN_REQUEST" });
 

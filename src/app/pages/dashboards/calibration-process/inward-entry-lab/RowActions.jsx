@@ -88,29 +88,29 @@ export function RowActions({ row, table }) {
     //       `/dashboards/calibration-process/inward-entry-lab/edit/${row.original.id}`
     //     ),
     // },
-       {
-  label: "Edit CRF Entry Detail",
-  onClick: () => {
-    const caliblocation = row.original.caliblocation || "Lab";
-    const calibacc = row.original.calibacc || "Nabl";
+    {
+      label: "Edit CRF Entry Detail",
+      onClick: () => {
+        const caliblocation = row.original.caliblocation || "Lab";
+        const calibacc = row.original.calibacc || "Nabl";
 
-    navigate(
-      `/dashboards/calibration-process/inward-entry-lab/edit-inward-entry/${row.original.id}?caliblocation=${caliblocation}&calibacc=${calibacc}`
-    );
-  },
-},
-  
-     {
-  label: "Review Inward",
-  onClick: () => {
-    const caliblocation = row.original.caliblocation || "Lab";
-    const calibacc = row.original.calibacc || "Nabl";
+        navigate(
+          `/dashboards/calibration-process/inward-entry-lab/edit-inward-entry/${row.original.id}?caliblocation=${caliblocation}&calibacc=${calibacc}`,
+        );
+      },
+    },
 
-    navigate(
-      `/dashboards/calibration-process/inward-entry-lab/review-inward/${row.original.id}?caliblocation=${caliblocation}&calibacc=${calibacc}`
-    );
-  },
-},
+    {
+      label: "Review Inward",
+      onClick: () => {
+        const caliblocation = row.original.caliblocation || "Lab";
+        const calibacc = row.original.calibacc || "Nabl";
+
+        navigate(
+          `/dashboards/calibration-process/inward-entry-lab/review-inward/${row.original.id}?caliblocation=${caliblocation}&calibacc=${calibacc}`,
+        );
+      },
+    },
     // {
     //   label: "Edit Bd Person",
     //   onClick: () =>
@@ -118,32 +118,32 @@ export function RowActions({ row, table }) {
     //       `/dashboards/calibration-process/inward-entry-lab/edit-bd-person/${row.original.id}`
     //     ),
     // },
-  {
-  label: "Edit Bd Person",
-  onClick: () => {
-    const caliblocation = row.original.caliblocation || "Lab";
-    const calibacc = row.original.calibacc || "Nabl";
+    {
+      label: "Edit Bd Person",
+      onClick: () => {
+        const caliblocation = row.original.caliblocation || "Lab";
+        const calibacc = row.original.calibacc || "Nabl";
 
-    navigate(
-      `/dashboards/calibration-process/inward-entry-lab/edit-bd-person/${row.original.id}?caliblocation=${caliblocation}&calibacc=${calibacc}`
-    );
-  },
-},
+        navigate(
+          `/dashboards/calibration-process/inward-entry-lab/edit-bd-person/${row.original.id}?caliblocation=${caliblocation}&calibacc=${calibacc}`,
+        );
+      },
+    },
 
     {
       label: "SRF View",
       onClick: () =>
         navigate(
-          `/dashboards/calibration-process/inward-entry-lab/srf-view/${row.original.id}`
+          `/dashboards/calibration-process/inward-entry-lab/srf-view/${row.original.id}`,
         ),
     },
     {
       label: "CRF View",
-      onClick: () =>{
-         const caliblocation = row.original.caliblocation || "Lab";
-         const calibacc = row.original.calibacc || "Nabl";
+      onClick: () => {
+        const caliblocation = row.original.caliblocation || "Lab";
+        const calibacc = row.original.calibacc || "Nabl";
         navigate(
-          `/dashboards/calibration-process/inward-entry-lab/crf-view/${row.original.id}?caliblocation=${caliblocation}&calibacc=${calibacc}`
+          `/dashboards/calibration-process/inward-entry-lab/crf-view/${row.original.id}?caliblocation=${caliblocation}&calibacc=${calibacc}`,
         );
       },
     },
@@ -151,29 +151,40 @@ export function RowActions({ row, table }) {
       label: "Edit Work Order detail",
       onClick: () =>
         navigate(
-          `/dashboards/calibration-process/inward-entry-lab/edit-work-order/${row.original.id}`
+          `/dashboards/calibration-process/inward-entry-lab/edit-work-order/${row.original.id}`,
         ),
     },
     {
       label: "Edit Customer Responsible for payment",
       onClick: () =>
         navigate(
-          `/dashboards/calibration-process/inward-entry-lab/edit-customer/${row.original.id}`
+          `/dashboards/calibration-process/inward-entry-lab/edit-customer/${row.original.id}`,
         ),
     },
     {
       label: "Edit Billing Detail",
       onClick: () =>
         navigate(
-          `/dashboards/calibration-process/inward-entry-lab/edit-billing/${row.original.id}`
+          `/dashboards/calibration-process/inward-entry-lab/edit-billing/${row.original.id}`,
         ),
     },
     {
       label: "Fill Feedback form",
       onClick: () =>
         navigate(
-          `/dashboards/calibration-process/inward-entry-lab/fill-feedback/${row.original.id}`
+          `/dashboards/calibration-process/inward-entry-lab/fill-feedback/${row.original.id}`,
         ),
+    },
+    {
+      label: "Technical Acceptance",
+      onClick: () => {
+        const caliblocation = row.original.caliblocation || "Lab";
+        const calibacc = row.original.calibacc || "Nabl";
+
+        navigate(
+          `/dashboards/calibration-process/inward-entry-lab/technical-acceptance/${row.original.id}?caliblocation=${caliblocation}&calibacc=${calibacc}`,
+        );
+      },
     },
   ];
 
