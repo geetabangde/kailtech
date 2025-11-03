@@ -1218,6 +1218,125 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
+
+                          {
+                      path: "maintenance-equipment-history",
+                      children: [
+                        {
+                          path: "",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/building-material/MaintenanceEquipmentHistory"
+                              )
+                            ).default,
+                          }),
+                        },
+                        {
+                          path: "view-review-form",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/building-material/MaintenanceEquipmentHistory/ViewReviewForm"
+                              )
+                            ).default,
+                          }),
+                        },
+
+                        {
+                          path: "edit-validity",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/building-material/MaintenanceEquipmentHistory/EditValidity"
+                              )
+                            ).default,
+                          }),
+                        },
+
+
+
+                        {
+                          path: "validity-detail",
+                          children: [
+                            {
+                              path: "",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/building-material/MaintenanceEquipmentHistory/ValidityDetail/index"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "add-new-master-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/building-material/MaintenanceEquipmentHistory/ValidityDetail/AddNewMasterMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "edit-new-master-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/building-material/MaintenanceEquipmentHistory/ValidityDetail/EditNewMasterMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "add-new-uncertinity-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/building-material/MaintenanceEquipmentHistory/ValidityDetail/AddNewUncertinityMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "edit-new-uncertinity-master-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/building-material/MaintenanceEquipmentHistory/ValidityDetail/EditNewUncertinityMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                          ]
+                        },
+
+                        {
+                          path: "add-imc",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/building-material/MaintenanceEquipmentHistory/AddImc"
+                              )
+                            ).default,
+                          }),
+                        },
+
+                        {
+                          path: "clone-certificate-details",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/building-material/MaintenanceEquipmentHistory/CloneCertificateDetails"
+                              )
+                            ).default,
+                          }),
+                        },
+
+
+                      ],
+                    },
                   ],
                 },
 

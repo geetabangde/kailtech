@@ -345,7 +345,7 @@ export function RowActions({ row, table }) {
       permission: 402, // Add appropriate permission number
       onClick: () =>
         navigate(
-                  `/dashboards/material-list/building-material/maintenance-equipment-history/${row.original.id}`   
+                  `/dashboards/material-list/building-material/maintenance-equipment-history`   
         ),
     },
 
