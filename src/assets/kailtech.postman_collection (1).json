@@ -1,0 +1,5382 @@
+{
+	"info": {
+		"_postman_id": "afc92e75-4305-489a-9f0b-d82f582291a1",
+		"name": "kailtech",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43014135"
+	},
+	"item": [
+		{
+			"name": "Authantication",
+			"item": [
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "Ruby",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "Ruby@123!@#",
+									"type": "text"
+								},
+								{
+									"key": "finyear",
+									"value": "2025-2026",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/login",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"login"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "username",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "profile",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvbGltcy5rYWlsdGVjaC5pblwvYXBpXC9sb2dpbiIsImlhdCI6MTc1MzA5MjU0OCwiZXhwIjoxNzUzMDk2MTQ4LCJuYmYiOjE3NTMwOTI1NDgsImp0aSI6ImNKZ2FianlmT05SQldyQ3giLCJzdWIiOjMxLCJwcnYiOiJkZjg4M2RiOTdiZDA1ZWY4ZmY4NTA4MmQ2ODZjNDVlODMyZTU5M2E5In0.PPWEFhg3aTm1fTd_DFEMZJpD6EqyxBYdHQSBH6UqukE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"inwardid\": 3610,\r\n  \"instid\": \"20\",\r\n  \"instno\": [\"1\", \"2\"],\r\n  \"hakuna\": \"5\",\r\n  \"matata\": \"1\",\r\n  \"quoteid\": \"QT2025-01\",\r\n  \"instlocation\": \"Lab\",\r\n  \"nabl\": \"Nabl\",\r\n\r\n  \"name1\": \"Digital Caliper\",\r\n  \"instid1\": \"5\",\r\n  \"make1\": \"Mitutoyo\",\r\n  \"model1\": \"500-197-30\",\r\n  \"serialno1\": \"SN001\",\r\n  \"idno1\": \"DC-001\",\r\n  \"accuracy1\": \"±0.02mm\",\r\n  \"location1\": \"Lab\",\r\n  \"calibrationvalidity1\": \"2025-12-31\",\r\n  \"sop1\": \"SOP-CAL-001\",\r\n  \"standard1\": [\"STD001\", \"STD002\"],\r\n  \"letterref1\": \"LTR123\",\r\n  \"accessories1\": \"Charger, Manual\",\r\n  \"conditiononrecieve1\": \"Good\",\r\n  \"conformitystatement1\": \"Within Tolerance\",\r\n  \"decisionrule1\": \"ILAC-G8\",\r\n  \"remark1\": \"First time calibration\",\r\n  \"newLocation1\": \"Lab-1\",\r\n  \"temp1\": \"22\",\r\n  \"tempvariable1\": \"±2\",\r\n  \"humi1\": \"50\",\r\n  \"humivariable1\": \"±5\",\r\n\r\n  \"pricematrixid1\": [11, 12],\r\n\r\n  \"price1packagename11\": [\"Standard Package\"],\r\n  \"price1packagedesc11\": [\"Basic calibration up to 200mm\"],\r\n  \"price1accreditation11\": [\"Nabl\"],\r\n  \"price1rate11\": [\"1500\"],\r\n  \"price1currency11\": [\"INR\"],\r\n  \"price1daysrequired11\": [\"Lab\"],\r\n\r\n  \"price1packagename12\": [\"Extended Package\"],\r\n  \"price1packagedesc12\": [\"Extended calibration range\"],\r\n  \"price1accreditation12\": [\"Nabl\"],\r\n  \"price1rate12\": [\"2000\"],\r\n  \"price1currency12\": [\"INR\"],\r\n  \"price1daysrequired12\": [\"Lab\"]\r\n}\r\n"
+						},
+						"url": {
+							"raw": "https://lims.kailtech.in/api/profile",
+							"protocol": "https",
+							"host": [
+								"lims",
+								"kailtech",
+								"in"
+							],
+							"path": [
+								"api",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/logout",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "People",
+			"item": [
+				{
+					"name": "customertype",
+					"item": [
+						{
+							"name": "add-customer-types",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Electronics nn",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "Electronics ndd",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/people/add-customer-types",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"add-customer-types"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete-customer-type",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/people/delete-customer-type/24",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"delete-customer-type",
+										"24"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get-customer-type",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/people/get-customer-type",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"get-customer-type"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "customer-type-update",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Update Api",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "Update Desc",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/people/customer-type-update/24",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"customer-type-update",
+										"24"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "spcific-purpose",
+					"item": [
+						{
+							"name": "add-specific-purpose",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Test",
+											"type": "text"
+										},
+										{
+											"key": "ctype",
+											"value": "3",
+											"type": "text"
+										},
+										{
+											"key": "parta",
+											"value": "2",
+											"type": "text"
+										},
+										{
+											"key": "partb",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "remnant",
+											"value": "21",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "test specific purpose",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/people/add-specific-purpose",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"add-specific-purpose"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get-specific-purpose",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/people/get-specific-purpose",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"get-specific-purpose"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update-specific-purpose",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "testupdate",
+											"type": "text"
+										},
+										{
+											"key": "ctype",
+											"value": "3",
+											"type": "text"
+										},
+										{
+											"key": "parta",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "partb",
+											"value": "2",
+											"type": "text"
+										},
+										{
+											"key": "remnant",
+											"value": "22",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "update success",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/people/update-specific-purpose/11",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"update-specific-purpose",
+										"11"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete-specific-purpose",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/people/delete-specific-purpose/10",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"delete-specific-purpose",
+										"10"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "promoter",
+					"item": [
+						{
+							"name": "add-promoter",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "mohit",
+											"type": "text"
+										},
+										{
+											"key": "mobile",
+											"value": "7250326525",
+											"type": "text"
+										},
+										{
+											"key": "address",
+											"value": "indore",
+											"type": "text"
+										},
+										{
+											"key": "pname",
+											"value": "vishu",
+											"type": "text"
+										},
+										{
+											"key": "pnumber",
+											"value": "5236521452",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "vishu@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "city",
+											"value": "indore",
+											"type": "text"
+										},
+										{
+											"key": "state",
+											"value": "madhya pradesh",
+											"type": "text"
+										},
+										{
+											"key": "gstno",
+											"value": "2536525451256",
+											"type": "text"
+										},
+										{
+											"key": "pan",
+											"value": "mkbp6565",
+											"type": "text"
+										},
+										{
+											"key": "discount",
+											"value": "5",
+											"type": "text"
+										},
+										{
+											"key": "thumb_image",
+											"type": "file",
+											"src": "ijQBY6cb5/WhatsApp Image 2024-08-28 at 11.25.29 AM.jpeg"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/people/add-promoter",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"add-promoter"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "list-promoters",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/people/list-promoters",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"list-promoters"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get-single-promoter",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/people/get-promoter/70",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"get-promoter",
+										"70"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update-promoter",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "mohit patidar",
+											"type": "text"
+										},
+										{
+											"key": "mobile",
+											"value": "7250326525",
+											"type": "text"
+										},
+										{
+											"key": "address",
+											"value": "indore",
+											"type": "text"
+										},
+										{
+											"key": "pname",
+											"value": "vishu patidar",
+											"type": "text"
+										},
+										{
+											"key": "pnumber",
+											"value": "5236521452",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "vishu@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "city",
+											"value": "indore",
+											"type": "text"
+										},
+										{
+											"key": "state",
+											"value": "madhya pradesh",
+											"type": "text"
+										},
+										{
+											"key": "gstno",
+											"value": "2536525451256",
+											"type": "text"
+										},
+										{
+											"key": "pan",
+											"value": "mkbp6565",
+											"type": "text"
+										},
+										{
+											"key": "discount",
+											"value": "10",
+											"type": "text"
+										},
+										{
+											"key": "thumb_image",
+											"type": "file",
+											"src": [],
+											"disabled": true
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/people/update-promoter/69",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"update-promoter",
+										"69"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete-promoter",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/people/delete-promoter/70",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"delete-promoter",
+										"70"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "customer",
+					"item": [
+						{
+							"name": "add-customer",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "mohti",
+											"type": "text"
+										},
+										{
+											"key": "customertype[]",
+											"value": "3",
+											"type": "text"
+										},
+										{
+											"key": "modeofpayment",
+											"value": "3",
+											"type": "text"
+										},
+										{
+											"key": "creditdays",
+											"value": "32",
+											"type": "text"
+										},
+										{
+											"key": "creditamount",
+											"value": "35000",
+											"type": "text"
+										},
+										{
+											"key": "mobile",
+											"value": "7250616525",
+											"type": "text"
+										},
+										{
+											"key": "pname",
+											"value": "vishu",
+											"type": "text"
+										},
+										{
+											"key": "pnumber",
+											"value": "87203652142",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "vishu@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "country",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "stateid",
+											"value": "23",
+											"type": "text"
+										},
+										{
+											"key": "city",
+											"value": "indore",
+											"type": "text"
+										},
+										{
+											"key": "gstno",
+											"value": "5665982685",
+											"type": "text"
+										},
+										{
+											"key": "pan",
+											"value": "mkbwe20",
+											"type": "text"
+										},
+										{
+											"key": "discount",
+											"value": "2",
+											"type": "text"
+										},
+										{
+											"key": "sapua",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "thumb_image",
+											"type": "file",
+											"src": "I3ffqb_TP/WhatsApp Image 2024-08-28 at 11.25.29 AM.jpeg"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/people/add-customer",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"add-customer"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get-all-customers",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/people/get-all-customers",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"get-all-customers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get-single-customer",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/people/get-single-customer/3987",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"get-single-customer",
+										"3987"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update-customer",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "mohit patidar ",
+											"type": "text"
+										},
+										{
+											"key": "customertype[]",
+											"value": "3",
+											"type": "text"
+										},
+										{
+											"key": "modeofpayment",
+											"value": "3",
+											"type": "text"
+										},
+										{
+											"key": "creditdays",
+											"value": "32",
+											"type": "text"
+										},
+										{
+											"key": "creditamount",
+											"value": "35000",
+											"type": "text"
+										},
+										{
+											"key": "mobile",
+											"value": "7250616525",
+											"type": "text"
+										},
+										{
+											"key": "pname",
+											"value": "vishu patidar ",
+											"type": "text"
+										},
+										{
+											"key": "pnumber",
+											"value": "87203652142",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "vishu@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "country",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "stateid",
+											"value": "23",
+											"type": "text"
+										},
+										{
+											"key": "city",
+											"value": "indore",
+											"type": "text"
+										},
+										{
+											"key": "gstno",
+											"value": "5665982685",
+											"type": "text"
+										},
+										{
+											"key": "pan",
+											"value": "mkbwe2014",
+											"type": "text"
+										},
+										{
+											"key": "discount",
+											"value": "2",
+											"type": "text"
+										},
+										{
+											"key": "sapua",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "thumb_image",
+											"type": "file",
+											"src": [],
+											"disabled": true
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/people/update-customer/3987",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"update-customer",
+										"3987"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete-customer-type",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/people/delete-customer-type/24",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"delete-customer-type",
+										"24"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "HRM",
+			"item": [
+				{
+					"name": "Manage Branch",
+					"item": [
+						{
+							"name": "add-branch",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Ask innovation",
+											"type": "text"
+										},
+										{
+											"key": "location",
+											"value": "Janjirwala square indore",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/hrm/add-branch",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"hrm",
+										"add-branch"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "list-branch",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/hrm/list-branch",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"hrm",
+										"list-branch"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get-branch-byid",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/hrm/get-branch-byid/2",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"hrm",
+										"get-branch-byid",
+										"2"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update-branch",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Ask innovation technology",
+											"type": "text"
+										},
+										{
+											"key": "location",
+											"value": "Indore",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/hrm/update-branch/2",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"hrm",
+										"update-branch",
+										"2"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete-branch",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/hrm/delete-branch/2",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"hrm",
+										"delete-branch",
+										"2"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Manage Department",
+					"item": [
+						{
+							"name": "add-department",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "api",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "test api",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/hrm/add-department",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"hrm",
+										"add-department"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "department-list",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/hrm/department-list",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"hrm",
+										"department-list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get-department-byid",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/hrm/get-department-byid/15",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"hrm",
+										"get-department-byid",
+										"15"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update-department",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "api update",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "test api",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/hrm/update-department/15",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"hrm",
+										"update-department",
+										"15"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete-department",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/hrm/delete-department/15",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"hrm",
+										"delete-department",
+										"15"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Manage Designation",
+					"item": [
+						{
+							"name": "add-designation",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "PHP ",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "PHP devloper",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/hrm/add-designation",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"hrm",
+										"add-designation"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "designation-list",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/hrm/designation-list",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"hrm",
+										"designation-list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get-designation-byid",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/hrm/get-designation-byid/11",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"hrm",
+										"get-designation-byid",
+										"11"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update-designation",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "PHP Devloper",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "Backend Roles and Responsnblity",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/hrm/update-designation/11",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"hrm",
+										"update-designation",
+										"11"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete-designation",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/hrm/delete-designation/11",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"hrm",
+										"delete-designation",
+										"11"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "salary structure",
+					"item": [
+						{
+							"name": "add-salary-structure",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "test api",
+											"type": "text"
+										},
+										{
+											"key": "basic",
+											"value": "565",
+											"type": "text"
+										},
+										{
+											"key": "basicpercentof",
+											"value": "7",
+											"type": "text"
+										},
+										{
+											"key": "hra",
+											"value": "7",
+											"type": "text"
+										},
+										{
+											"key": "hrapercentof",
+											"value": "7",
+											"type": "text"
+										},
+										{
+											"key": "sa",
+											"value": "5",
+											"type": "text"
+										},
+										{
+											"key": "sapercentof",
+											"value": "7",
+											"type": "text"
+										},
+										{
+											"key": "bonus",
+											"value": "7",
+											"type": "text"
+										},
+										{
+											"key": "bonuspercentof",
+											"value": "test",
+											"type": "text"
+										},
+										{
+											"key": "pfrequired",
+											"value": "No",
+											"type": "text"
+										},
+										{
+											"key": "pfmax",
+											"value": "2",
+											"type": "text"
+										},
+										{
+											"key": "esicrequired",
+											"value": "No",
+											"type": "text"
+										},
+										{
+											"key": "epfemp",
+											"value": "43",
+											"type": "text"
+										},
+										{
+											"key": "esicemppercentof",
+											"value": "Manual",
+											"type": "text"
+										},
+										{
+											"key": "epfemppercentof",
+											"value": "Na",
+											"type": "text"
+										},
+										{
+											"key": "esicemp",
+											"value": "4",
+											"type": "text"
+										},
+										{
+											"key": "mobileallowance",
+											"value": "23423423432",
+											"type": "text"
+										},
+										{
+											"key": "mobileallowancepercentof",
+											"value": "na",
+											"type": "text"
+										},
+										{
+											"key": "esicmin",
+											"value": "4",
+											"type": "text"
+										},
+										{
+											"key": "esicmax",
+											"value": "4",
+											"type": "text"
+										},
+										{
+											"key": "esicrequired",
+											"value": "no",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "epfemployer",
+											"value": "4",
+											"type": "text"
+										},
+										{
+											"key": "epfemployerpercentof",
+											"value": "4",
+											"type": "text"
+										},
+										{
+											"key": "esicemployer",
+											"value": "4",
+											"type": "text"
+										},
+										{
+											"key": "esicemployerpercetof",
+											"value": "4",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/hrm/add-salary-structure",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"hrm",
+										"add-salary-structure"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "salary-structure-list",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/hrm/salary-structure-list",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"hrm",
+										"salary-structure-list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "salary-structure-get-byid",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/hrm/salary-structure-get-byid/3",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"hrm",
+										"salary-structure-get-byid",
+										"3"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "salary-structure-update",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "test api update",
+											"type": "text"
+										},
+										{
+											"key": "basic",
+											"value": "5650",
+											"type": "text"
+										},
+										{
+											"key": "basicpercentof",
+											"value": "70",
+											"type": "text"
+										},
+										{
+											"key": "hra",
+											"value": "700",
+											"type": "text"
+										},
+										{
+											"key": "hrapercentof",
+											"value": "70",
+											"type": "text"
+										},
+										{
+											"key": "sa",
+											"value": "50",
+											"type": "text"
+										},
+										{
+											"key": "sapercentof",
+											"value": "70",
+											"type": "text"
+										},
+										{
+											"key": "bonus",
+											"value": "70",
+											"type": "text"
+										},
+										{
+											"key": "bonuspercentof",
+											"value": "test",
+											"type": "text"
+										},
+										{
+											"key": "pfrequired",
+											"value": "No",
+											"type": "text"
+										},
+										{
+											"key": "pfmax",
+											"value": "2",
+											"type": "text"
+										},
+										{
+											"key": "esicrequired",
+											"value": "No",
+											"type": "text"
+										},
+										{
+											"key": "epfemp",
+											"value": "43",
+											"type": "text"
+										},
+										{
+											"key": "esicemppercentof",
+											"value": "Manual",
+											"type": "text"
+										},
+										{
+											"key": "epfemppercentof",
+											"value": "Na",
+											"type": "text"
+										},
+										{
+											"key": "esicemp",
+											"value": "40",
+											"type": "text"
+										},
+										{
+											"key": "mobileallowance",
+											"value": "23423423432",
+											"type": "text"
+										},
+										{
+											"key": "mobileallowancepercentof",
+											"value": "na",
+											"type": "text"
+										},
+										{
+											"key": "esicmin",
+											"value": "4",
+											"type": "text"
+										},
+										{
+											"key": "esicmax",
+											"value": "4",
+											"type": "text"
+										},
+										{
+											"key": "epfemployer",
+											"value": "4",
+											"type": "text"
+										},
+										{
+											"key": "epfemployerpercentof",
+											"value": "4",
+											"type": "text"
+										},
+										{
+											"key": "esicemployer",
+											"value": "4",
+											"type": "text"
+										},
+										{
+											"key": "esicemployerpercetof",
+											"value": "4",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/hrm/salary-structure-update/3",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"hrm",
+										"salary-structure-update",
+										"3"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "salary-structure-delete",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/hrm/salary-structure-delete/3",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"hrm",
+										"salary-structure-delete",
+										"3"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Master Data",
+			"item": [
+				{
+					"name": "Unit",
+					"item": [
+						{
+							"name": "units-list",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/master/units-list",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"units-list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get-unit-byid",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/master/get-unit-byid/207",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"get-unit-byid",
+										"207"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "add-unit",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "test",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "testunit",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/master/add-unit",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"add-unit"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update-unit",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Update_unit",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "testunit",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/master/update-unit/209",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"update-unit",
+										"209"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete-unit",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/master/delete-unit/209",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"delete-unit",
+										"209"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Unit Types / Parameters",
+					"item": [
+						{
+							"name": "unit-type-list",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/master/unit-type-list",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"unit-type-list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "add-unit-type",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "test type",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "test se",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/master/add-unit-type",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"add-unit-type"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get-unit-type-byid",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/master/get-unit-type-byid/143",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"get-unit-type-byid",
+										"143"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update-unit-type",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "test type update 3",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "test se update 4",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/master/update-unit-type/143",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"update-unit-type",
+										"143"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete-unit-type",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/master/delete-unit-type/143",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"delete-unit-type",
+										"143"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Modes",
+					"item": [
+						{
+							"name": "mode-list",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/master/mode-list",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"mode-list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "mode-create",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "add mode",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "add mode description ",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/master/mode-create",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"mode-create"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "mode-byid",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/master/mode-byid/11",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"mode-byid",
+										"11"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "mode-update",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "update mode",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "update mode de",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/master/mode-update/11",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"mode-update",
+										"11"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "mode-delete",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/master/mode-delete/11",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"mode-delete",
+										"11"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Currencies",
+					"item": [
+						{
+							"name": "currency-create",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Afghanistan Afghani",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "#",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/master/currency-create",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"currency-create"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "currency-list",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/master/currency-list",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"currency-list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "currency-byid",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/master/currency-byid/5",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"currency-byid",
+										"5"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "currency-update",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Bahamas Dolla",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "$",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/master/currency-update/5",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"currency-update",
+										"5"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "currency-delete",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/master/currency-delete/6",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"currency-delete",
+										"6"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Manage Labs",
+					"item": [
+						{
+							"name": "create-lab",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"name\": \"Micro Lab 1\",\r\n  \"users\": [7, 8],\r\n  \"qaapprove\": [11],\r\n  \"ulrgenerate\": [15, 16],\r\n  \"uploadreport\": [20],\r\n  \"envrecord\": [22],\r\n  \"recordEnviornment\": \"Yes\",\r\n  \"masters\": [565, 566],\r\n  \"vertical\": 1\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/master/create-lab",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"create-lab"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "list-lab",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/master/list-lab",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"list-lab"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get-lab-byid",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/master/get-lab-byid/50",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"get-lab-byid",
+										"50"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update-lab",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"name\": \"Micro Lab 3\",\r\n  \"users\": [90, 98],\r\n  \"qaapprove\": [11],\r\n  \"ulrgenerate\": [15, 16],\r\n  \"uploadreport\": [20],\r\n  \"envrecord\": [22],\r\n  \"recordEnviornment\": \"Yes\",\r\n  \"masters\": [565, 566],\r\n  \"vertical\": 2\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/master/update-lab/50",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"update-lab",
+										"50"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete-lab",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/master/delete-lab/50",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"delete-lab",
+										"50"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Verticals",
+					"item": [
+						{
+							"name": "create-vertical",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "testverticals",
+											"type": "text"
+										},
+										{
+											"key": "code",
+											"value": "test code ",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/master/create-vertical",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"create-vertical"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "vertical-list",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/master/vertical-list",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"master",
+										"vertical-list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get-vertical-byid",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://lims.kailtech.in/api/master/get-vertical-byid/4",
+									"protocol": "https",
+									"host": [
+										"lims",
+										"kailtech",
+										"in"
+									],
+									"path": [
+										"api",
+										"master",
+										"get-vertical-byid",
+										"4"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update-vertical",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "update vertical",
+											"type": "text"
+										},
+										{
+											"key": "code",
+											"value": "V235WSD",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://lims.kailtech.in/api/master/update-vertical/4",
+									"protocol": "https",
+									"host": [
+										"lims",
+										"kailtech",
+										"in"
+									],
+									"path": [
+										"api",
+										"master",
+										"update-vertical",
+										"4"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete-vertical",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "https://lims.kailtech.in/api/master/delete-vertical/4",
+									"protocol": "https",
+									"host": [
+										"lims",
+										"kailtech",
+										"in"
+									],
+									"path": [
+										"api",
+										"master",
+										"delete-vertical",
+										"4"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Tax Slabs",
+					"item": [
+						{
+							"name": "create-taxslab",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "IGST",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "8.8 percent of IGST",
+											"type": "text"
+										},
+										{
+											"key": "percentage",
+											"value": "8.8",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://lims.kailtech.in/api/master/create-taxslab",
+									"protocol": "https",
+									"host": [
+										"lims",
+										"kailtech",
+										"in"
+									],
+									"path": [
+										"api",
+										"master",
+										"create-taxslab"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get-taxslab-list",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://lims.kailtech.in/api/master/get-taxslab-list",
+									"protocol": "https",
+									"host": [
+										"lims",
+										"kailtech",
+										"in"
+									],
+									"path": [
+										"api",
+										"master",
+										"get-taxslab-list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get-taxslab-byid",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://lims.kailtech.in/api/master/get-taxslab-byid/6",
+									"protocol": "https",
+									"host": [
+										"lims",
+										"kailtech",
+										"in"
+									],
+									"path": [
+										"api",
+										"master",
+										"get-taxslab-byid",
+										"6"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update-taxslab",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "IGST8%",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "IGST 8% ",
+											"type": "text"
+										},
+										{
+											"key": "percentage",
+											"value": "8",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://lims.kailtech.in/api/master/update-taxslab/6",
+									"protocol": "https",
+									"host": [
+										"lims",
+										"kailtech",
+										"in"
+									],
+									"path": [
+										"api",
+										"master",
+										"update-taxslab",
+										"6"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete-taxslab",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "https://lims.kailtech.in/api/master/delete-taxslab/6",
+									"protocol": "https",
+									"host": [
+										"lims",
+										"kailtech",
+										"in"
+									],
+									"path": [
+										"api",
+										"master",
+										"delete-taxslab",
+										"6"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "calibrationoperations",
+			"item": [
+				{
+					"name": "calibration method/sop",
+					"item": [
+						{
+							"name": "calibration-method-add",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Method",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "Method desc",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/calibrationoperations/calibration-method-add",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"calibrationoperations",
+										"calibration-method-add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "calibration-method-list",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Method",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "Method desc",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/calibrationoperations/calibration-method-list",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"calibrationoperations",
+										"calibration-method-list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "calibration-method-byid",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/calibrationoperations/calibration-method-byid/68",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"calibrationoperations",
+										"calibration-method-byid",
+										"68"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "calibration-method-update",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "method update",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "method desc update",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/calibrationoperations/calibration-method-update/68",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"calibrationoperations",
+										"calibration-method-update",
+										"68"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "calibration-method-destroy",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/calibrationoperations/calibration-method-destroy/68",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"calibrationoperations",
+										"calibration-method-destroy",
+										"68"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Calibration Standards",
+					"item": [
+						{
+							"name": "calibration-standard-create",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "test standard",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "test description",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/calibrationoperations/calibration-standard-create",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"calibrationoperations",
+										"calibration-standard-create"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "calibration-standard-list",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/calibrationoperations/calibration-standard-list",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"calibrationoperations",
+										"calibration-standard-list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "calibration-standard-byid",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/calibrationoperations/calibration-standard-byid/210",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"calibrationoperations",
+										"calibration-standard-byid",
+										"210"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "calibration-standard-update",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "test standard update ",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "test description",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/calibrationoperations/calibration-standard-update/210",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"calibrationoperations",
+										"calibration-standard-update",
+										"210"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "calibration-standard-delete",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/calibrationoperations/calibration-standard-delete/210",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"calibrationoperations",
+										"calibration-standard-delete",
+										"210"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Calibration List Of Instrument",
+					"item": [
+						{
+							"name": "add-new-instrument",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"name\": \"test\",\r\n  \"sop\": [\"63\"],\r\n  \"standard\": [\"95\"],\r\n  \"description\": \"test\",\r\n  \"vertical\": \"1\",\r\n  \"remark\": \"test\",\r\n  \"discipline\": \"test\",\r\n  \"groups\": \"test\",\r\n  \"range\": \"Yes\",\r\n  \"leastcount\": \"Yes\",\r\n  \"unittype\": \"Yes\",\r\n  \"mode\": \"Yes\",\r\n  \"supportmaster\": \"Yes\",\r\n  \"supportrange\": \"Yes\",\r\n  \"supportleastcount\": \"Yes\",\r\n  \"supportunittype\": \"Yes\",\r\n  \"supportmode\": \"Yes\",\r\n  \"scopematrixvalidation\": \"Yes\",\r\n  \"digitincmc\": \"2\",\r\n  \"biomedical\": \"No\",\r\n  \"showvisualtest\": \"No\",\r\n  \"showelectricalsafety\": \"No\",\r\n  \"showbasicsafety\": \"No\",\r\n  \"showperformancetest\": \"No\",\r\n  \"setpoint\": \"UUC\",\r\n  \"uuc\": \"1\",\r\n  \"master\": \"1\",\r\n  \"setpointheading\": \"Set Point\",\r\n  \"parameterheading\": \"test \",\r\n  \"uucheading\": \"Observation On UUC\",\r\n  \"masterheading\": \"Standard Reading\",\r\n  \"errorheading\": \"Error\",\r\n  \"remarkheading\": \"Remark\",\r\n  \"setpointtoshow\": \"Yes\",\r\n  \"parametertoshow\": \"Yes\",\r\n  \"uuctoshow\": \"Yes\",\r\n  \"mastertoshow\": \"Yes\",\r\n  \"errortoshow\": \"Yes\",\r\n  \"remarktoshow\": \"Yes\",\r\n  \"specificationtoshow\": \"Yes\",\r\n  \"specificationheading\": \"test\",\r\n  \"tempsite\": \"33\",\r\n  \"tempvariablesite\": \"2\",\r\n  \"humisite\": \"32\",\r\n  \"humivariablesite\": \"2\",\r\n  \"templab\": \"44\",\r\n  \"tempvariablelab\": \"3\",\r\n  \"humilab\": \"43\",\r\n  \"humivariablelab\": \"3\",\r\n  \"mastersincertificate\": \"Yes\",\r\n  \"uncertaintyincertificate\": \"Yes\",\r\n  \"allottolab\": \"\",\r\n  \"suffix\": \"apg\",\r\n  \"uncertaintytable\": \"apg\",\r\n\r\n  \"packagename\": [\"test\", \"test2\"],\r\n  \"packagedesc\": [\"test desc\", \"test\"],\r\n  \"pricematrix\": [0, 1],\r\n  \"accreditationpricelist\": [\"Nabl\", \"Nabl\"],\r\n  \"locationpricelist\": [\"Site\", \"Lab\"],\r\n  \"daysrequiredpricelist\": [32, 23],\r\n  \"ratepricelist\": [34444, 1000],\r\n  \"currencypricelist\": [2, 2],\r\n\r\n  \"matrixno0\": [1],\r\n  \"unittype0\": [\"Pressure\"],\r\n  \"unit0\": [\"200\"],\r\n  \"mode0\": [\"\"],\r\n  \"instrangemin0\": [\"44\"],\r\n  \"instrangemax0\": [\"44\"],\r\n  \"tolerance0\": [\"44\"],\r\n  \"tolerancetype0\": [\"Fixed\"],\r\n\r\n  \"matrixno1\": [1],\r\n  \"unittype1\": [\"Mass\"],\r\n  \"unit1\": [\"200\"],\r\n  \"mode1\": [\"Measure\"],\r\n  \"instrangemin1\": [\"33\"],\r\n  \"instrangemax1\": [\"22\"],\r\n  \"tolerance1\": [\"33\"],\r\n  \"tolerancetype1\": [\"\"]\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://lims.kailtech.in/api/calibrationoperations/add-new-instrument",
+									"protocol": "https",
+									"host": [
+										"lims",
+										"kailtech",
+										"in"
+									],
+									"path": [
+										"api",
+										"calibrationoperations",
+										"add-new-instrument"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "list-of-instrument",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "https://lims.kailtech.in/api/calibrationoperations/list-of-instrument",
+									"protocol": "https",
+									"host": [
+										"lims",
+										"kailtech",
+										"in"
+									],
+									"path": [
+										"api",
+										"calibrationoperations",
+										"list-of-instrument"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update-instrument",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"name\": \"update  test\",\r\n  \"sop\": [\"63\"],\r\n  \"standard\": [\"95\"],\r\n  \"description\": \"test\",\r\n  \"vertical\": \"1\",\r\n  \"remark\": \"test\",\r\n  \"discipline\": \"test\",\r\n  \"groups\": \"test\",\r\n  \"range\": \"Yes\",\r\n  \"leastcount\": \"Yes\",\r\n  \"unittype\": \"Yes\",\r\n  \"mode\": \"Yes\",\r\n  \"supportmaster\": \"Yes\",\r\n  \"supportrange\": \"Yes\",\r\n  \"supportleastcount\": \"Yes\",\r\n  \"supportunittype\": \"Yes\",\r\n  \"supportmode\": \"Yes\",\r\n  \"scopematrixvalidation\": \"Yes\",\r\n  \"digitincmc\": \"2\",\r\n  \"biomedical\": \"No\",\r\n  \"showvisualtest\": \"No\",\r\n  \"showelectricalsafety\": \"No\",\r\n  \"showbasicsafety\": \"No\",\r\n  \"showperformancetest\": \"No\",\r\n  \"setpoint\": \"UUC\",\r\n  \"uuc\": \"1\",\r\n  \"master\": \"1\",\r\n  \"setpointheading\": \"Set Point\",\r\n  \"parameterheading\": \"test \",\r\n  \"uucheading\": \"Observation On UUC\",\r\n  \"masterheading\": \"Standard Reading\",\r\n  \"errorheading\": \"Error\",\r\n  \"remarkheading\": \"Remark\",\r\n  \"setpointtoshow\": \"Yes\",\r\n  \"parametertoshow\": \"Yes\",\r\n  \"uuctoshow\": \"Yes\",\r\n  \"mastertoshow\": \"Yes\",\r\n  \"errortoshow\": \"Yes\",\r\n  \"remarktoshow\": \"Yes\",\r\n  \"specificationtoshow\": \"Yes\",\r\n  \"specificationheading\": \"test\",\r\n  \"tempsite\": \"33\",\r\n  \"tempvariablesite\": \"2\",\r\n  \"humisite\": \"32\",\r\n  \"humivariablesite\": \"2\",\r\n  \"templab\": \"44\",\r\n  \"tempvariablelab\": \"3\",\r\n  \"humilab\": \"43\",\r\n  \"humivariablelab\": \"3\",\r\n  \"mastersincertificate\": \"Yes\",\r\n  \"uncertaintyincertificate\": \"Yes\",\r\n  \"allottolab\": \"\",\r\n  \"suffix\": \"apg\",\r\n  \"uncertaintytable\": \"apg\",\r\n\r\n  \"packagename\": [\"test\", \"test2\"],\r\n  \"packagedesc\": [\"test desc\", \"test\"],\r\n  \"pricematrix\": [0, 1],\r\n  \"accreditationpricelist\": [\"Nabl\", \"Nabl\"],\r\n  \"locationpricelist\": [\"Site\", \"Lab\"],\r\n  \"daysrequiredpricelist\": [32, 23],\r\n  \"ratepricelist\": [34444, 1000],\r\n  \"currencypricelist\": [2, 2],\r\n\r\n  \"matrixno0\": [1],\r\n  \"unittype0\": [\"Pressure\"],\r\n  \"unit0\": [\"200\"],\r\n  \"mode0\": [\"\"],\r\n  \"instrangemin0\": [\"44\"],\r\n  \"instrangemax0\": [\"44\"],\r\n  \"tolerance0\": [\"44\"],\r\n  \"tolerancetype0\": [\"Fixed\"],\r\n\r\n  \"matrixno1\": [1],\r\n  \"unittype1\": [\"Mass\"],\r\n  \"unit1\": [\"200\"],\r\n  \"mode1\": [\"Measure\"],\r\n  \"instrangemin1\": [\"33\"],\r\n  \"instrangemax1\": [\"22\"],\r\n  \"tolerance1\": [\"33\"],\r\n  \"tolerancetype1\": [\"\"]\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://lims.kailtech.in/api/calibrationoperations/update-instrument/234",
+									"protocol": "https",
+									"host": [
+										"lims",
+										"kailtech",
+										"in"
+									],
+									"path": [
+										"api",
+										"calibrationoperations",
+										"update-instrument",
+										"234"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete-instrument",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "https://lims.kailtech.in/api/calibrationoperations/delete-instrument/232",
+									"protocol": "https",
+									"host": [
+										"lims",
+										"kailtech",
+										"in"
+									],
+									"path": [
+										"api",
+										"calibrationoperations",
+										"delete-instrument",
+										"232"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Inventory",
+			"item": [
+				{
+					"name": "Categories",
+					"item": [
+						{
+							"name": "category-create",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "New ",
+											"type": "text"
+										},
+										{
+											"key": "code",
+											"value": "KTRC-PR",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/inventory/category-create",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"inventory",
+										"category-create"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "category-list",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/inventory/category-list",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"inventory",
+										"category-list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "category-byid",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/inventory/category-byid/24",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"inventory",
+										"category-byid",
+										"24"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "category-update",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "test update ",
+											"type": "text"
+										},
+										{
+											"key": "code",
+											"value": "KTRC-PRw",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/inventory/category-update/24",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"inventory",
+										"category-update",
+										"24"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "category-delete",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/inventory/category-delete/24",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"inventory",
+										"category-delete",
+										"24"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Product Type/ Subcategory",
+					"item": [
+						{
+							"name": "subcategory-create",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "category",
+											"value": "25",
+											"type": "text"
+										},
+										{
+											"key": "type",
+											"value": "5",
+											"type": "text"
+										},
+										{
+											"key": "instrumenttype",
+											"value": "5",
+											"type": "text"
+										},
+										{
+											"key": "name",
+											"value": "test",
+											"type": "text"
+										},
+										{
+											"key": "hsn",
+											"value": "test-25",
+											"type": "text"
+										},
+										{
+											"key": "critical",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "unit",
+											"value": "23",
+											"type": "text"
+										},
+										{
+											"key": "expiry",
+											"value": "20",
+											"type": "text"
+										},
+										{
+											"key": "reorder",
+											"value": "10",
+											"type": "text"
+										},
+										{
+											"key": "min",
+											"value": "2000",
+											"type": "text"
+										},
+										{
+											"key": "tax",
+											"value": "4",
+											"type": "text"
+										},
+										{
+											"key": "cost",
+											"value": "2500",
+											"type": "text"
+										},
+										{
+											"key": "thumb_image",
+											"value": "",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/inventory/subcategory-create",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"inventory",
+										"subcategory-create"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "subcategory-list",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/inventory/subcategory-list",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"inventory",
+										"subcategory-list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "subcategory-byid",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/inventory/subcategory-byid/2035",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"inventory",
+										"subcategory-byid",
+										"2035"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "subcategory-update",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "category",
+											"value": "32",
+											"type": "text"
+										},
+										{
+											"key": "type",
+											"value": "2",
+											"type": "text"
+										},
+										{
+											"key": "instrumenttype",
+											"value": "35",
+											"type": "text"
+										},
+										{
+											"key": "name",
+											"value": "test",
+											"type": "text"
+										},
+										{
+											"key": "hsn",
+											"value": "test-25",
+											"type": "text"
+										},
+										{
+											"key": "critical",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "unit",
+											"value": "23",
+											"type": "text"
+										},
+										{
+											"key": "expiry",
+											"value": "20",
+											"type": "text"
+										},
+										{
+											"key": "reorder",
+											"value": "10",
+											"type": "text"
+										},
+										{
+											"key": "min",
+											"value": "2000",
+											"type": "text"
+										},
+										{
+											"key": "tax",
+											"value": "3",
+											"type": "text"
+										},
+										{
+											"key": "cost",
+											"value": "2500",
+											"type": "text"
+										},
+										{
+											"key": "thumb_image",
+											"value": "",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/inventory/subcategory-update/2035",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"inventory",
+										"subcategory-update",
+										"2035"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "subcategory-delete",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/inventory/subcategory-delete/2035",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"inventory",
+										"subcategory-delete",
+										"2035"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "subcategory-by-catid",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/inventory/subcategory-by-catid/20",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"inventory",
+										"subcategory-by-catid",
+										"20"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Calibration Process",
+			"item": [
+				{
+					"name": "Inward Entry Lab",
+					"item": [
+						{
+							"name": "add-inward-entry",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer YOUR_API_TOKEN"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "caliblocation",
+											"value": "Lab",
+											"type": "text"
+										},
+										{
+											"key": "calibacc",
+											"value": "Nabl",
+											"type": "text"
+										},
+										{
+											"key": "inwarddate",
+											"value": "1-07-2025",
+											"type": "text"
+										},
+										{
+											"key": "sample_received_on",
+											"value": "15-07-2025",
+											"type": "text"
+										},
+										{
+											"key": "ctype",
+											"value": "2",
+											"type": "text"
+										},
+										{
+											"key": "customerid",
+											"value": "123",
+											"type": "text"
+										},
+										{
+											"key": "customername",
+											"value": "5",
+											"type": "text"
+										},
+										{
+											"key": "customeraddress",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "reportname",
+											"value": "3",
+											"type": "text"
+										},
+										{
+											"key": "reportaddress",
+											"value": "4",
+											"type": "text"
+										},
+										{
+											"key": "billingname",
+											"value": "7",
+											"type": "text"
+										},
+										{
+											"key": "billingaddress",
+											"value": "7",
+											"type": "text"
+										},
+										{
+											"key": "gstno",
+											"value": "29ABCDE1234F2Z5",
+											"type": "text"
+										},
+										{
+											"key": "concernpersonname",
+											"value": "7",
+											"type": "text"
+										},
+										{
+											"key": "specificpurpose",
+											"value": "7",
+											"type": "text"
+										},
+										{
+											"key": "concernpersondesignation",
+											"value": "5",
+											"type": "text"
+										},
+										{
+											"key": "concernpersonemail",
+											"value": "8",
+											"type": "text"
+										},
+										{
+											"key": "concernpersonmobile",
+											"value": "8",
+											"type": "text"
+										},
+										{
+											"key": "quotationid",
+											"value": "7",
+											"type": "text"
+										},
+										{
+											"key": "instrumentlocation",
+											"value": "On Site",
+											"type": "text"
+										},
+										{
+											"key": "bd",
+											"value": "8",
+											"type": "text"
+										},
+										{
+											"key": "promoter",
+											"value": "7",
+											"type": "text"
+										},
+										{
+											"key": "priority",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "approval",
+											"value": "3",
+											"type": "text"
+										},
+										{
+											"key": "paymentstatus",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "nablrequired",
+											"value": "Yes",
+											"type": "text"
+										},
+										{
+											"key": "pcharges",
+											"value": "1500",
+											"type": "text"
+										},
+										{
+											"key": "pchargestype",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "ponumber",
+											"value": "PO12345",
+											"type": "text"
+										},
+										{
+											"key": "wupload",
+											"type": "file",
+											"src": []
+										},
+										{
+											"key": "wstatus",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "modeofreciept",
+											"value": "2",
+											"type": "text"
+										},
+										{
+											"key": "couriernamerec",
+											"value": "2",
+											"type": "text"
+										},
+										{
+											"key": "dateofdispatchrec",
+											"value": "16-07-2025",
+											"type": "text"
+										},
+										{
+											"key": "docketnorec",
+											"value": "DOC123",
+											"type": "text"
+										},
+										{
+											"key": "localcontactrec",
+											"value": "Lokesh Kumar",
+											"type": "text"
+										},
+										{
+											"key": "modeofdispatch",
+											"value": "2",
+											"type": "text"
+										},
+										{
+											"key": "couriername",
+											"value": "FedEx",
+											"type": "text"
+										},
+										{
+											"key": "dateofdispatch",
+											"value": "18-07-2025",
+											"type": "text"
+										},
+										{
+											"key": "docketno",
+											"value": "DKT456",
+											"type": "text"
+										},
+										{
+											"key": "localcontact",
+											"value": "Vinay Kumar",
+											"type": "text"
+										},
+										{
+											"key": "certcollectiondetail",
+											"value": "By Hand",
+											"type": "text"
+										},
+										{
+											"key": "additionalemail",
+											"value": "extra@example.com",
+											"type": "text"
+										},
+										{
+											"key": "modeofpayment",
+											"value": "3",
+											"type": "text"
+										},
+										{
+											"key": "detailsofpayment",
+											"value": "Paid via UPI",
+											"type": "text"
+										},
+										{
+											"key": "paymentamount",
+											"value": "5000",
+											"type": "text"
+										},
+										{
+											"key": "certcollectionremark",
+											"value": "Delivered Safely",
+											"type": "text"
+										},
+										{
+											"key": "documents",
+											"value": "Invoice, Receipt",
+											"type": "text"
+										},
+										{
+											"key": "deadline",
+											"value": "25-07-2025",
+											"type": "text"
+										},
+										{
+											"key": "specialrequest",
+											"value": "Handle with care",
+											"type": "text"
+										},
+										{
+											"key": "notes",
+											"value": "Urgent processing needed.",
+											"type": "text"
+										},
+										{
+											"key": "rupload",
+											"type": "file",
+											"src": []
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/add-inward-entry",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"add-inward-entry"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get-instrument-byid",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "https://lims.kailtech.in/api/calibrationoperations/get-instrument-byid/234",
+									"protocol": "https",
+									"host": [
+										"lims",
+										"kailtech",
+										"in"
+									],
+									"path": [
+										"api",
+										"calibrationoperations",
+										"get-instrument-byid",
+										"234"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "New Request",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "common-api-in-calibration-process",
+					"item": [
+						{
+							"name": "save-inward-item",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvbGltcy5rYWlsdGVjaC5pblwvYXBpXC9sb2dpbiIsImlhdCI6MTc1MzA5MjU0OCwiZXhwIjoxNzUzMDk2MTQ4LCJuYmYiOjE3NTMwOTI1NDgsImp0aSI6ImNKZ2FianlmT05SQldyQ3giLCJzdWIiOjMxLCJwcnYiOiJkZjg4M2RiOTdiZDA1ZWY4ZmY4NTA4MmQ2ODZjNDVlODMyZTU5M2E5In0.PPWEFhg3aTm1fTd_DFEMZJpD6EqyxBYdHQSBH6UqukE",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \r\n  \"inwardid\": 101,\r\n  \"instid\": \"5\",\r\n  \"instno\": [\"1\", \"2\"],\r\n  \"hakuna\": \"5\",\r\n  \"matata\": \"1\",\r\n  \"quoteid\": \"QT2025-01\",\r\n  \"instlocation\": \"Lab\",\r\n  \"nabl\": \"Nabl\",\r\n\r\n  \"name1\": \"Digital Caliper\",\r\n  \"instid1\": \"5\",\r\n  \"make1\": \"Mitutoyo\",\r\n  \"model1\": \"500-197-30\",\r\n  \"serialno1\": \"SN001\",\r\n  \"idno1\": \"DC-001\",\r\n  \"accuracy1\": \"±0.02mm\",\r\n  \"location1\": \"Lab\",\r\n  \"calibrationvalidity1\": \"2025-12-31\",\r\n  \"sop1\": \"SOP-CAL-001\",\r\n  \"standard1\": [\"STD001\", \"STD002\"],\r\n  \"letterref1\": \"LTR123\",\r\n  \"accessories1\": \"Charger, Manual\",\r\n  \"conditiononrecieve1\": \"Good\",\r\n  \"conformitystatement1\": \"Within Tolerance\",\r\n  \"decisionrule1\": \"ILAC-G8\",\r\n  \"remark1\": \"First time calibration\",\r\n  \"newLocation1\": \"Lab-1\",\r\n  \"temp1\": \"22\",\r\n  \"tempvariable1\": \"±2\",\r\n  \"humi1\": \"50\",\r\n  \"humivariable1\": \"±5\",\r\n\r\n  \"pricematrixid1\": [11, 12],\r\n\r\n  \"price1packagename11\": [\"Standard Package\"],\r\n  \"price1packagedesc11\": [\"Basic calibration up to 200mm\"],\r\n  \"price1accreditation11\": [\"Nabl\"],\r\n  \"price1rate11\": [\"1500\"],\r\n  \"price1currency11\": [\"INR\"],\r\n  \"price1daysrequired11\": [\"Lab\"],\r\n\r\n  \"price1packagename12\": [\"Extended Package\"],\r\n  \"price1packagedesc12\": [\"Extended calibration range\"],\r\n  \"price1accreditation12\": [\"Nabl\"],\r\n  \"price1rate12\": [\"2000\"],\r\n  \"price1currency12\": [\"INR\"],\r\n  \"price1daysrequired12\": [\"Lab\"]\r\n}\r\n"
+								},
+								"url": {
+									"raw": "https://lims.kailtech.in/api/calibrationprocess/save-inward-item",
+									"protocol": "https",
+									"host": [
+										"lims",
+										"kailtech",
+										"in"
+									],
+									"path": [
+										"api",
+										"calibrationprocess",
+										"save-inward-item"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "instrument-details",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvbGltcy5rYWlsdGVjaC5pblwvYXBpXC9sb2dpbiIsImlhdCI6MTc1MzA5MzM1MywiZXhwIjoxNzUzMDk2OTUzLCJuYmYiOjE3NTMwOTMzNTMsImp0aSI6IkJoZko1YzhmdU1Gb2ZUdG0iLCJzdWIiOjMxLCJwcnYiOiJkZjg4M2RiOTdiZDA1ZWY4ZmY4NTA4MmQ2ODZjNDVlODMyZTU5M2E5In0.tr3UYQXCqqjR2TMVRCqUt0Chx02b5wmvAkHl9cSzjj4",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "inwardid",
+											"value": "3610",
+											"type": "text"
+										},
+										{
+											"key": "instno",
+											"value": "0",
+											"type": "text"
+										},
+										{
+											"key": "instid",
+											"value": "20",
+											"type": "text"
+										},
+										{
+											"key": "nabl",
+											"value": "Nabl",
+											"type": "text"
+										},
+										{
+											"key": "instlocation",
+											"value": "Lab",
+											"type": "text"
+										},
+										{
+											"key": "quoteid",
+											"value": "0",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://lims.kailtech.in/api/calibrationprocess/instrument-details",
+									"protocol": "https",
+									"host": [
+										"lims",
+										"kailtech",
+										"in"
+									],
+									"path": [
+										"api",
+										"calibrationprocess",
+										"instrument-details"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Material List",
+			"item": []
+		},
+		{
+			"name": "ReadAPI's",
+			"item": [
+				{
+					"name": "get-payment-mode",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/people/get-payment-mode",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"people",
+								"get-payment-mode"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-country",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/people/get-country",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"people",
+								"get-country"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-state",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/people/get-state",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"people",
+								"get-state"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "approved-by",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/approved-by",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"approved-by"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "mode-of-receipt",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/mode-of-receipt",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"mode-of-receipt"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "mode-of-payment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/mode-of-payment",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"mode-of-payment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-choices",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "61|bArIyaaEFBFUEMMYQO9bB3yuIPSbGPrs8K327yIXc235b81f",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://askinnovations.co.in/kisanadmin/public/api/get-choices",
+							"protocol": "https",
+							"host": [
+								"askinnovations",
+								"co",
+								"in"
+							],
+							"path": [
+								"kisanadmin",
+								"public",
+								"api",
+								"get-choices"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "certificate-collect-as",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/certificate-collect-as",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"certificate-collect-as"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-customers-address",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/people/get-customers-address/9",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"people",
+								"get-customers-address",
+								"9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-formate",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://lims.kailtech.in/api/get-formate",
+							"protocol": "https",
+							"host": [
+								"lims",
+								"kailtech",
+								"in"
+							],
+							"path": [
+								"api",
+								"get-formate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-uncertanity",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://lims.kailtech.in/api/get-uncertanity",
+							"protocol": "https",
+							"host": [
+								"lims",
+								"kailtech",
+								"in"
+							],
+							"path": [
+								"api",
+								"get-uncertanity"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "material/get-instruments-list",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{baseURL}}/api/material/get-instruments-list",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"material",
+						"get-instruments-list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "hrm/get-users-name",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "7|RxBbimrNqwrej78UzHDYyxbrNVVdGSwETkdHsUdJ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/api/hrm/get-users-name",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"hrm",
+						"get-users-name"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "https://lims.kailtech.in",
+			"type": "default"
+		}
+	]
+}

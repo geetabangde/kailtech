@@ -1,0 +1,3258 @@
+
+import { Navigate } from "react-router";
+
+// Local Imports
+import { AppLayout } from "app/layouts/AppLayout";
+import { DynamicLayout } from "app/layouts/DynamicLayout";
+import AuthGuard from "middleware/AuthGuard";
+
+
+// ----------------------------------------------------------------------
+
+const protectedRoutes = {
+  id: "protected",
+  Component: AuthGuard,
+  children: [
+    // The dynamic layout supports both the main layout and the sideblock.
+    {
+      Component: DynamicLayout,
+      children: [
+        {
+          index: true,
+          element: <Navigate to="/dashboards" />,
+        },
+        {
+          path: "dashboards",
+          children: [
+            {
+              index: true,
+              element: <Navigate to="/dashboards/home" />,
+            },
+            {
+              path: "home",
+              lazy: async () => ({
+                Component: (await import("app/pages/dashboards/home")).default,
+              }),
+            },
+            {
+              path: "reports",
+              lazy: async () => ({
+                Component: (await import("app/pages/dashboards/Reports"))
+                  .default,
+              }),
+            },
+            {
+              path: "material-list",
+              children: [
+                {
+                  path: "electro-technical",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/electro-technical"
+                          )
+                        ).default,
+                      }),
+                    },
+
+
+
+
+
+
+                    {
+                      path: "AddNewInstrument",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/electro-technical/AddNewInstrument"
+                          )
+                        ).default,
+                      }),
+                    },
+
+
+
+                    {
+                      path: "edit/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/electro-technical/Edit"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "view-equipment-history/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/electro-technical/ViewEquipmentHistory"
+                          )
+                        ).default,
+                      }),
+                    },
+
+                    //-----------------------newone---------------------
+                    {
+                      path: "maintenance-equipment-history",
+                      children: [
+                        {
+                          path: "",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/electro-technical/MaintenanceEquipmentHistory"
+                              )
+                            ).default,
+                          }),
+                        },
+                        {
+                          path: "view-review-form",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/electro-technical/MaintenanceEquipmentHistory/ViewReviewForm"
+                              )
+                            ).default,
+                          }),
+                        },
+
+                        {
+                          path: "edit-validity",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/electro-technical/MaintenanceEquipmentHistory/EditValidity"
+                              )
+                            ).default,
+                          }),
+                        },
+
+                        {
+                          path: "add-imc",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/electro-technical/MaintenanceEquipmentHistory/AddImc"
+                              )
+                            ).default,
+                          }),
+                        },
+                        {
+                          path: "add-new-equipment-history",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/electro-technical/MaintenanceEquipmentHistory/AddNewEquipmentHistory"
+                              )
+                            ).default,
+                          }),
+                        },
+                        {
+                          path: "clone-certificate-details",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/electro-technical/MaintenanceEquipmentHistory/CloneCertificateDetails"
+                              )
+                            ).default,
+                          }),
+                        },
+
+                        {
+                          path: "validity-detail",
+                          children: [
+                            {
+                              path: "",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/electro-technical/MaintenanceEquipmentHistory/ValidityDetail/index"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "add-new-master-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/electro-technical/MaintenanceEquipmentHistory/ValidityDetail/AddNewMasterMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "edit-new-master-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/electro-technical/MaintenanceEquipmentHistory/ValidityDetail/EditNewMasterMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "add-new-uncertinity-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/electro-technical/MaintenanceEquipmentHistory/ValidityDetail/AddNewUncertinityMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "edit-new-uncertinity-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/electro-technical/MaintenanceEquipmentHistory/ValidityDetail/EditNewUncertinityMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                          ]
+                        },
+
+
+                      ],
+                    },
+
+                    {
+                      path: "dump/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/electro-technical/dump"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "log-book/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/electro-technical/Logbook"
+                          )
+                        ).default,
+                      }),
+                    },
+
+
+
+
+
+                    {
+                      path: "view-verification-list/:id",
+
+
+
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/electro-technical/ViewVerificationList"
+                          )
+                        ).default,
+                      }),
+                    },
+
+                    {
+                      path: "verification-list", // nested child page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/electro-technical/VarificationList"
+                          )
+                        ).default,
+                      }),
+
+
+                    },
+
+
+                    {
+                      path: "view-checklist/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/electro-technical/ViewChecklist"
+                          )
+                        ).default,
+                      }),
+                    },
+
+
+
+
+                    {
+                      path: "add-new-master-matrix",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/electro-technical/AddNewMasterMatrix"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add-new-general-checklist-matrix",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/electro-technical/AddNewGeneralChecklistMatrix"
+                          )
+                        ).default,
+                      }),
+                    },
+
+                  ],
+
+                },
+
+
+
+
+
+
+
+
+
+
+
+                //---------------------------------site calibration------------------------
+
+                {
+                  path: "site-calibration",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/site-calibration"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "AddNewInstrument",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/site-calibration/AddNewInstrument"
+                          )
+                        ).default,
+                      }),
+                    },
+
+
+
+                    {
+                      path: "edit/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/site-calibration/Edit"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "view-equipment-history/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/site-calibration/ViewEquipmentHistory"
+                          )
+                        ).default,
+                      }),
+                    },
+
+                    {
+                      path: "maintenance-equipment-history",
+                      children: [
+                        {
+                          path: "",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/site-calibration/MaintenanceEquipmentHistory"
+                              )
+                            ).default,
+                          }),
+                        },
+                        {
+                          path: "view-review-form",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/site-calibration/MaintenanceEquipmentHistory/ViewReviewForm"
+                              )
+                            ).default,
+                          }),
+                        },
+
+                        {
+                          path: "edit-validity",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/site-calibration/MaintenanceEquipmentHistory/EditValidity"
+                              )
+                            ).default,
+                          }),
+                        },
+                        {
+                          path: "validity-detail",
+                          children: [
+                            {
+                              path: "",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/site-calibration/MaintenanceEquipmentHistory/ValidityDetail/index"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "add-new-master-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/site-calibration/MaintenanceEquipmentHistory/ValidityDetail/AddNewMasterMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "edit-new-master-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/site-calibration/MaintenanceEquipmentHistory/ValidityDetail/EditNewMasterMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "add-new-uncertinity-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/site-calibration/MaintenanceEquipmentHistory/ValidityDetail/AddNewUncertinityMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "edit-new-uncertinity-master-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/site-calibration/MaintenanceEquipmentHistory/ValidityDetail/EditNewUncertinityMasterMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                          ]
+                        },
+
+                        {
+                          path: "add-imc",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/site-calibration/MaintenanceEquipmentHistory/AddImc"
+                              )
+                            ).default,
+                          }),
+                        },
+                        {
+                          path: "clone-certificate-details",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/site-calibration/MaintenanceEquipmentHistory/CloneCertificateDetails"
+                              )
+                            ).default,
+                          }),
+                        },
+                        {
+                          path: "add-new-equipment-history",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/site-calibration/MaintenanceEquipmentHistory/AddNewEquipmentHistory"
+                              )
+                            ).default,
+                          }),
+                        },
+
+                      ],
+                    },
+
+
+                    {
+                      path: "dump/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/site-calibration/dump"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "log-book/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/site-calibration/Logbook"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "view-verification-list/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/site-calibration/ViewVerificationList"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "verification-list", // nested child page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/site-calibration/VarificationList"
+                          )
+                        ).default,
+                      }),
+
+
+                    },
+
+
+                    {
+                      path: "view-checklist/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/site-calibration/ViewChecklist"
+                          )
+                        ).default,
+                      }),
+                    },
+
+
+                    {
+                      path: "add-new-master-matrix",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/site-calibration/AddNewMasterMatrix"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add-new-general-checklist-matrix",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/site-calibration/AddNewGeneralChecklistMatrix"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+
+
+
+
+              
+
+
+                //------------------------calibration----------------------------
+
+                {
+                  path: "calibration",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/calibration"
+                          )
+                        ).default,
+                      }),
+                    },
+
+
+
+
+                    {
+                      path: "AddNewInstrument",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/calibration/AddNewInstrument"
+                          )
+                        ).default,
+                      }),
+                    },
+
+
+
+                    {
+                      path: "edit/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/calibration/Edit"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "view-equipment-history/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/calibration/ViewEquipmentHistory"
+                          )
+                        ).default,
+                      }),
+                    },
+
+
+                    {
+                      path: "dump/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/calibration/dump"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "log-book/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/calibration/Logbook"
+                          )
+                        ).default,
+                      }),
+                    },
+
+
+
+
+
+                    {
+                      path: "view-verification-list/:id",
+
+
+
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/calibration/ViewVerificationList"
+                          )
+                        ).default,
+                      }),
+                    },
+
+                    {
+                      path: "verification-list", // nested child page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/calibration/VarificationList"
+                          )
+                        ).default,
+                      }),
+
+
+                    },
+
+
+                    {
+                      path: "view-checklist/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/calibration/ViewChecklist"
+                          )
+                        ).default,
+                      }),
+                    },
+
+
+                    {
+                      path: "add-new-master-matrix",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/calibration/AddNewMasterMatrix"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add-new-general-checklist-matrix",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/calibration/AddNewGeneralChecklistMatrix"
+                          )
+                        ).default,
+                      }),
+                    },
+
+                    {
+                      path: "maintenance-equipment-history",
+                      children: [
+                        {
+                          path: "",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/calibration/MaintenanceEquipmentHistory"
+                              )
+                            ).default,
+                          }),
+                        },
+                        {
+                          path: "view-review-form",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/calibration/MaintenanceEquipmentHistory/ViewReviewForm"
+                              )
+                            ).default,
+                          }),
+                        },
+
+                        {
+                          path: "edit-validity",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/calibration/MaintenanceEquipmentHistory/EditValidity"
+                              )
+                            ).default,
+                          }),
+                        },
+
+
+
+                        {
+                          path: "validity-detail",
+                          children: [
+                            {
+                              path: "",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/calibration/MaintenanceEquipmentHistory/ValidityDetail/index"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "add-new-master-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/calibration/MaintenanceEquipmentHistory/ValidityDetail/AddNewMasterMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "edit-new-master-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/calibration/MaintenanceEquipmentHistory/ValidityDetail/EditNewMasterMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "add-new-uncertinity-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/calibration/MaintenanceEquipmentHistory/ValidityDetail/AddNewUncertinityMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "edit-new-uncertinity-master-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/calibration/MaintenanceEquipmentHistory/ValidityDetail/EditNewUncertinityMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                          ]
+                        },
+
+                        {
+                          path: "add-imc",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/calibration/MaintenanceEquipmentHistory/AddImc"
+                              )
+                            ).default,
+                          }),
+                        },
+
+                        {
+                          path: "clone-certificate-details",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/calibration/MaintenanceEquipmentHistory/CloneCertificateDetails"
+                              )
+                            ).default,
+                          }),
+                        },
+
+
+                      ],
+                    },
+                  ],
+                },
+
+
+
+
+
+
+
+
+                //-------------------  chemical   --------------------
+
+                {
+                  path: "chemical",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/chemical"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add-new-instrument",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/chemical/AddNewInstrument"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/chemical/Edit"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "view-equipment-history/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/chemical/ViewEquipmentHistory"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "dump/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/chemical/dump"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "log-book/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/chemical/Logbook"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "view-verification-list/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/chemical/ViewVerificationList"
+                          )
+                        ).default,
+                      }),
+                    },
+
+                    {
+                      path: "verification-list", // nested child page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/chemical/VarificationList"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "view-checklist/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/chemical/ViewChecklist"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add-new-master-matrix",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/chemical/AddNewMasterMatrix"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add-new-general-checklist-matrix",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/chemical/AddNewGeneralChecklistMatrix"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "maintenance-equipment-history",
+                      children: [
+                        {
+                          path: "",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/chemical/MaintenanceEquipmentHistory"
+                              )
+                            ).default,
+                          }),
+                        },
+                        {
+                          path: "view-review-form",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/chemical/MaintenanceEquipmentHistory/ViewReviewForm"
+                              )
+                            ).default,
+                          }),
+                        },
+
+                        {
+                          path: "edit-validity",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/chemical/MaintenanceEquipmentHistory/EditValidity"
+                              )
+                            ).default,
+                          }),
+                        },
+
+
+
+                        {
+                          path: "validity-detail",
+                          children: [
+                            {
+                              path: "",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/chemical/MaintenanceEquipmentHistory/ValidityDetail/index"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "add-new-master-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/chemical/MaintenanceEquipmentHistory/ValidityDetail/AddNewMasterMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "edit-new-master-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/chemical/MaintenanceEquipmentHistory/ValidityDetail/EditNewMasterMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "add-new-uncertinity-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/chemical/MaintenanceEquipmentHistory/ValidityDetail/AddNewUncertinityMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "edit-new-uncertinity-master-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/chemical/MaintenanceEquipmentHistory/ValidityDetail/EditNewUncertinityMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                          ]
+                        },
+
+                        {
+                          path: "add-imc",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/chemical/MaintenanceEquipmentHistory/AddImc"
+                              )
+                            ).default,
+                          }),
+                        },
+
+                        {
+                          path: "clone-certificate-details",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/chemical/MaintenanceEquipmentHistory/CloneCertificateDetails"
+                              )
+                            ).default,
+                          }),
+                        },
+
+
+                      ],
+                    },
+                  ],
+
+                },
+
+
+
+                //------------------- building-material  --------------------
+
+                {
+                  path: "building-material",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/building-material"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "AddNewInstrument",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/building-material/AddNewInstrument"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/building-material/Edit"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "view-equipment-history/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/building-material/ViewEquipmentHistory"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "dump/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/building-material/dump"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "log-book/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/building-material/Logbook"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "view-verification-list/:id",
+
+
+
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/building-material/ViewVerificationList"
+                          )
+                        ).default,
+                      }),
+                    },
+
+                    {
+                      path: "verification-list", // nested child page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/building-material/VarificationList"
+                          )
+                        ).default,
+                      }),
+
+
+                    },
+
+
+                    {
+                      path: "view-checklist/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/building-material/ViewChecklist"
+                          )
+                        ).default,
+                      }),
+                    },
+
+
+                    {
+                      path: "add-new-master-matrix",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/building-material/AddNewMasterMatrix"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add-new-general-checklist-matrix",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/building-material/AddNewGeneralChecklistMatrix"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+
+
+
+                //-------------------Reporting-------------------
+
+                {
+                  path: "reporting",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/reporting"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add-new-instrument",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/reporting/AddNewInstrument"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/reporting/Edit"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "view-equipment-history", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/reporting/ViewEquipmentHistory"
+                          )
+                        ).default,
+                      }),
+                    },
+
+                    //-----------------------newone---------------------
+                    {
+                      path: "maintenance-equipment-history",
+                      children: [
+                        {
+                          path: "",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/reporting/MaintenanceEquipmentHistory"
+                              )
+                            ).default,
+                          }),
+                        },
+                        {
+                          path: "view-review-form",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/reporting/MaintenanceEquipmentHistory/ViewReviewForm"
+                              )
+                            ).default,
+                          }),
+                        },
+
+                        {
+                          path: "edit-validity",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/reporting/MaintenanceEquipmentHistory/EditValidity"
+                              )
+                            ).default,
+                          }),
+                        },
+
+                        {
+                          path: "add-imc",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/reporting/MaintenanceEquipmentHistory/AddImc"
+                              )
+                            ).default,
+                          }),
+                        },
+                        {
+                          path: "add-new-equipment-history",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/reporting/MaintenanceEquipmentHistory/AddNewEquipmentHistory"
+                              )
+                            ).default,
+                          }),
+                        },
+                        {
+                          path: "clone-certificate-details",
+                          lazy: async () => ({
+                            Component: (
+                              await import(
+                                "app/pages/dashboards/material-list/reporting/MaintenanceEquipmentHistory/CloneCertificateDetails"
+                              )
+                            ).default,
+                          }),
+                        },
+
+                        {
+                          path: "validity-detail",
+                          children: [
+                            {
+                              path: "",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/reporting/MaintenanceEquipmentHistory/ValidityDetail/index"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "add-new-master-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/reporting/MaintenanceEquipmentHistory/ValidityDetail/AddNewMasterMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "edit-new-master-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/reporting/MaintenanceEquipmentHistory/ValidityDetail/EditNewMasterMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "add-new-uncertinity-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/reporting/MaintenanceEquipmentHistory/ValidityDetail/AddNewUncertinityMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                            {
+                              path: "edit-new-uncertinity-matrix",
+                              lazy: async () => ({
+                                Component: (
+                                  await import(
+                                    "app/pages/dashboards/material-list/reporting/MaintenanceEquipmentHistory/ValidityDetail/EditNewUncertinityMatrix"
+                                  )
+                                ).default,
+                              }),
+                            },
+                          ]
+                        },
+                      ],
+                    },
+
+                    {
+                      path: "dump",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/reporting/dump"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "log-book",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/reporting/Logbook"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "view-verification-list",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/reporting/ViewVerificationList"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "verification-list", // nested child page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/reporting/VarificationList"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "view-checklist",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/reporting/ViewChecklist"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add-new-master-matrix",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/reporting/AddNewMasterMatrix"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add-new-general-checklist-matrix",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/material-list/reporting/AddNewGeneralChecklistMatrix"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+
+
+                // {
+                //   path: "site-calibration",
+                //   children: [
+                //     {
+                //       path: "",
+                //       lazy: async () => ({
+                //         Component: (
+                //           await import(
+                //             "app/pages/dashboards/material-list/site-calibration"
+                //           )
+                //         ).default,
+                //       }),
+                //     },
+
+                //     {
+                //       path: "AddNewInstrument",
+                //       lazy: async () => ({
+                //         Component: (
+                //           await import(
+                //             "app/pages/dashboards/material-list/site-calibration/AddNewInstrument"
+                //           )
+                //         ).default,
+                //       }),
+                //     },
+                //   ],
+
+                // },
+                // {
+                //   path: "site-calibration",
+                //   lazy: async () => ({
+                //     Component: (
+                //       await import("app/pages/dashboards/material-list/site-calibration")).default,
+                //   }),
+                // },
+                // {
+                //   path: "calibration",
+                //   lazy: async () => ({
+                //     Component: (await import("app/pages/dashboards/material-list/Calibration")).default,
+                //   }),
+                // },
+                // {
+                //   path: "chemical",
+                //   lazy: async () => ({
+                //     Component: (await import("app/pages/dashboards/material-list/Chemical")).default,
+                //   }),
+                // },
+                // {
+                //   path: "building-material",
+                //   lazy: async () => ({
+                //     Component: (await import("app/pages/dashboards/material-list/BuildingMaterial")).default,
+                //   }),
+                // },
+                // {
+                //   path: "reporting",
+                //   lazy: async () => ({
+                //     Component: (await import("app/pages/dashboards/material-list/Reporting")).default,
+                //   }),
+                // },
+                // {
+                //   path: "calibration-mechanical",
+                //   lazy: async () => ({
+                //     Component: (await import("app/pages/dashboards/material-list/CalibrationMechanical")).default,
+                //   }),
+                // },
+                // {
+                //   path: "calibration-bio-medical",
+                //   lazy: async () => ({
+                //     Component: (await import("app/pages/dashboards/material-list/CalibrationBioMedical")).default,
+                //   }),
+                // },
+                // {
+                //   path: "quality-department",
+                //   lazy: async () => ({
+                //     Component: (await import("app/pages/dashboards/material-list/QualityDepartment")).default,
+                //   }),
+                // },
+                // {
+                //   path: "store-department",
+                //   lazy: async () => ({
+                //     Component: (await import("app/pages/dashboards/material-list/StoreDepartment")).default,
+                //   }),
+                // },
+                // {
+                //   path: "mechanical",
+                //   lazy: async () => ({
+                //     Component: (await import("app/pages/dashboards/material-list/Mechanical")).default,
+                //   }),
+                // },
+              ],
+            },
+
+
+
+
+
+
+              // {
+                //   path: "operations",
+                //   children: [
+                //     {
+                //       path: "",
+                //       lazy: async () => ({
+                //         Component: (
+                //           await import(
+                //             "app/pages/dashboards/Operations/observation-settings"
+                //           )
+                //         ).default,
+                //       }),
+                //     },
+                //     {
+                //       path: "observation-settings",
+                //       lazy: async () => ({
+                //         Component: (
+                //           await import(
+                //             "app/pages/dashboards/Operations/observation-settings"
+                //           )
+                //         ).default,
+                //       }),
+                //     },
+                //   ],
+                // },
+
+
+                  {
+              path: "operations",
+              children: [
+                {
+                  path: "observation-settings",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/Operations/observation-settings"
+                          )
+                        ).default,
+                      }),
+                    },
+                     {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/Operations/observation-settings/Edit"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ]
+                }
+              ]
+            },
+
+
+            {
+              path: "master-data",
+              children: [
+                {
+                  path: "unit-types",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/UnitTypes"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "create",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/UnitTypes/AddUnitType"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/UnitTypes/EditUnitType"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+                {
+                  path: "modes",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import("app/pages/dashboards/master-data/Modes")
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "create",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/Modes/AddModes"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/Modes/EditModes"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+
+                {
+                  path: "tax-slabs",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/TaxSlabs"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "create",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/TaxSlabs/AddTaxSlab"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/TaxSlabs/EditTaxSlab"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+
+                {
+                  path: "verticals",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/Verticals"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "create",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/Verticals/AddVertical"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/Verticals/EditVertical"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+                //----------------------------master document---------------------------------
+                {
+                  path: "document-master",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/master-data/MasterDocument")).default,
+                      }),
+                    },
+                    // {
+                    //   path: "view",
+                    //   lazy: async () => ({
+                    //     Component: (await import("app/pages/dashboards/master-data/MasterDocument/view")).default,
+                    //   }),
+                    // },
+                     {
+                      path: "add-master-document",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/master-data/MasterDocument/AddMasterDocument")).default,
+                      }),
+                    },
+                  ],
+                },
+
+
+
+
+
+                                //----------------------------Statuary Details---------------------------------
+                {
+                  path: "statuary-detail",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/master-data/StatuaryDetail")).default,
+                      }),
+                    },
+                    // {
+                    //   path: "view",
+                    //   lazy: async () => ({
+                    //     Component: (await import("app/pages/dashboards/master-data/MasterDocument/view")).default,
+                    //   }),
+                    // },
+                     {
+                      path: "edit",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/master-data/StatuaryDetail/Edit")).default,
+                      }),
+                    },
+                     {
+                      path: "add-new-statuary-detail",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/StatuaryDetail/AddNewStatuaryDetail")
+                      ).default,
+                      }),
+                    },
+                  ],
+                },
+
+
+                //---------------------------Master Calibration Return--------------
+
+                    {
+                  path: "master-calibration-return",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/master-data/MasterCalibrationReturn")).default,
+                      }),
+                    },
+                    {
+                      path: "fill-master-validity",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/master-data/MasterCalibrationReturn/FillMasterValidity")).default,
+                      }),
+                    },
+                    //  {
+                    //   path: "edit",
+                    //   lazy: async () => ({
+                    //     Component: (await import("app/pages/dashboards/master-data/StatuaryDetail/Edit")).default,
+                    //   }),
+                    // },
+                    //  {
+                    //   path: "add-new-statuary-detail",
+                    //   lazy: async () => ({
+                    //     Component: (
+                    //       await import(
+                    //         "app/pages/dashboards/master-data/StatuaryDetail/AddNewStatuaryDetail")
+                    //   ).default,
+                    //   }),
+                    // },
+                  ],
+                },
+
+
+                //----------------------------Unit Conversion---------------------
+                          {
+                  path: "units-conversion",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/master-data/UnitsConversion")).default,
+                      }),
+                    },
+                    {
+                      path: "add-new-unit-conversion",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/master-data/UnitsConversion/AddNewConversion")).default,
+                      }),
+                    },
+                    //  {
+                    //   path: "edit",
+                    //   lazy: async () => ({
+                    //     Component: (await import("app/pages/dashboards/master-data/StatuaryDetail/Edit")).default,
+                    //   }),
+                    // },
+                  
+                  ],
+                },
+
+
+                {
+                  path: "currencies",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/Currencies"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "create",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/Currencies/AddCurrency"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/Currencies/EditCurrency"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+                {
+                  path: "units",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import("app/pages/dashboards/master-data/Units")
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "create",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/Units/AddUnit"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/Units/EditUnit"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+
+
+                {
+                  path: "manage-labs",
+                  children: [
+                    {
+                      index: true,
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/ManageLabs"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "create",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/ManageLabs/AddLab"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/ManageLabs/EditLab"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "schedule/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/ManageLabs/Schedule"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "environmental-record/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/ManageLabs/EnvironmentalRecord"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "manage-Enviornmental-range/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/ManageLabs/ManageEnviornmentalRange"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+
+                // {
+                //   path: "activity-log",
+                //   lazy: async () => ({
+                //     Component: (await import("app/pages/dashboards/master-data/ViewActivityLog")).default,
+                //   }),
+                // },
+                // {
+                //   path: "master-calibration-return",
+                //   lazy: async () => ({
+                //     Component: (await import("app/pages/dashboards/master-data/MasterCalibrationReturn")).default,
+                //   }),
+                // },
+                // {
+                //   path: "general-checklists",
+                //   lazy: async () => ({
+                //     Component: (await import("app/pages/dashboards/master-data/GeneralChecklists")).default,
+                //   }),
+                // },
+              ],
+            },
+
+            {
+              path: "calibration-process",
+              children: [
+                {
+                  path: "inward-entry-lab",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "view-sticker/:inwardId/:instId",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/ViewSticker")).default,
+                      }),
+                    },
+                    {
+                      path: "view-multiple-traceability/:inwardId/:instIds",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/ViewMultipleTraceability")).default,
+                      }),
+                    },
+                    {
+                      path: "ViewMultiple/:inwardId/:instId?",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/ViewMultiple")).default,
+                      }),
+                    },
+                    {
+                      path: "view-multiple-approved-certificate/:inwardId/:instId",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/ViewMultipleApprovedCertificate")).default,
+                      }),
+                    },
+                    {
+                      path: "add", // Add Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/AddInwardEntryLab"
+                          )
+                        ).default,
+                      }),
+                    },
+
+                    {
+                      path: "edit-inward-entry/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/EditInwardEntryLab"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "quotation/view/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/QuotationDetails"
+                          )
+                        ).default,
+                      }),
+                    },
+
+                    {
+                      path: "add-inward-item/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/AddInwardItem"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit-bd-person/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/EditBdPerson"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "crf-view/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/CrfView"
+                          )
+                        ).default,
+                      }),
+                    },
+                     {
+                      path: "view-documents/:id/:itemId", 
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/ViewDocuments"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "srf-view/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/SrfView"
+                          )
+                        ).default,
+                      }),
+                    },
+
+                    {
+                      path: "edit-billing/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/EditBilling"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit-customer/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/EditCustomer"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "fill-feedback/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/FillFeedback"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "review-inward/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/ReviewInward"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit-work-order/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/EditWorkOrder"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "technical-acceptance/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/TechnicalAcceptance"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "sample-transfer-in-lab/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/TransferInLab"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "perform-calibration/:id", // Edit Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/PerformCalibration"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "perform-calibration/add-crf/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            ("app/pages/dashboards/calibration-process/inward-entry-lab/AddCrf")
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "calibrate-step1/:id/:itemId",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/CalibrateStep1")).default,
+                      }),
+                    },
+                    {
+                      path: "add-crf/:id/:itemId",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/AddCrf")).default,
+                      }),
+                    },
+                    {
+                      path: "calibrate-step2/:id/:itemId",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/CalibrateStep2")).default,
+                      }),
+                    },
+                    {
+                      path: "calibrate-step3/:id/:itemId",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/CalibrateStep3")).default,
+                      }),
+                    },
+                    {
+                      path: "edit-instrumental-crf/:id/:itemId",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/EditInstrumentalCrf")).default,
+                      }),
+                    },
+                    {
+                      path: "matrix/:id/:itemId",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/InstrumentMatrix ")).default,
+                      }),
+                    },
+                    {
+                      path: "review/:id/:itemId",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/Review")).default,
+                      }),
+                    },
+                    {
+                      path: "approve/:id/:itemId",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/Approve")).default,
+                      }),
+                    },
+                    {
+                      path: "clone-item/:id/:itemId",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/CloneItem")).default,
+                      }),
+                    },
+                    {
+                      path: "view-rawdata/:id/:itemId",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/ViewRawData")).default,
+                      }),
+                    },
+                    {
+                      path: "view-cmc-calculation/:id/:itemId",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/ViewCMCCalculation")).default,
+                      }),
+                    },
+                    {
+                      path: "view-certificate/:id/:itemId",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/ViewCertificate")).default,
+                      }),
+                    },
+                    {
+                      path: "view-certificate-with-lh/:id/:itemId",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/viewCertificateWithlh")).default,
+                      }),
+                    },
+                    {
+                      path: "regenerate-cache/:id/:itemId",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/RegenerateCache")).default,
+                      }),
+                    },
+                    {
+                      path: "view-traceability/:id/:itemId",
+                      lazy: async () => ({
+                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/ViewTraceability")).default,
+                      }),
+                    },
+
+
+                  ],
+                },
+              ],
+            },
+
+            {
+              path: "calibration-process",
+              children: [
+                {
+                  path: "dispatch-list",
+                  lazy: async () => ({
+                    Component: (
+                      await import("app/pages/dashboards/calibration-process/dispatch-list")
+                    ).default,
+                  }),
+                },
+
+                {
+                  path: "view-dispatch-form/:id",
+                  lazy: async () => ({
+                    Component: (
+                      await import(
+                        "app/pages/dashboards/calibration-process/dispatch-list/ViewDispatchForm"
+                      )
+                    ).default,
+                  }),
+                },
+              ],
+            },
+            {
+              path: "calibration-process",
+              children: [
+                {
+                  path: "dispatch-register",
+                  lazy: async () => ({
+                    Component: (
+                      await import("app/pages/dashboards/calibration-process/dispatch-register")
+                    ).default,
+                  }),
+                },
+
+
+              ],
+            },
+            {
+              path: "calibration-process",
+              children: [
+                {
+                  path: "lead-managements",
+                  lazy: async () => ({
+                    Component: (
+                      await import("app/pages/dashboards/calibration-process/lead-managements")
+                    ).default,
+                  }),
+                },
+
+                {
+                  path: "details/:id",
+                  lazy: async () => ({
+                    Component: (
+                      await import(
+                        "app/pages/dashboards/calibration-process/lead-managements/details"
+                      )
+                    ).default,
+                  }),
+                },
+
+
+              ],
+            },
+
+
+            {
+              path: "calibration-process",
+              children: [
+                {
+                  path: "ulr-list",
+                  lazy: async () => ({
+                    Component: (
+                      await import("app/pages/dashboards/calibration-process/ulr-list/ulr")
+                    ).default,
+                  }),
+                },
+                // {
+                //   path: "ulr-details",
+                //   lazy: async () => ({
+                //     Component: (
+                //       await import("app/pages/dashboards/calibration-process/ulr-list/UlrDetail")
+                //     ).default,
+                //   }),
+                // },
+                {
+                  path: "lrn-Brn-Register",
+                  lazy: async () => ({
+                    Component: (
+                      await import("app/pages/dashboards/calibration-process/lrnBrnRegister/lrn")
+                    ).default,
+                  }),
+                },
+
+                // {
+                //   path: "create",
+                //   lazy: async () => ({
+                //     Component: (
+                //       await import(
+                //         "app/pages/dashboards/master-data/Modes/AddModes"
+                //       )
+                //     ).default,
+                //   }),
+                // },
+
+              ],
+            },
+
+            {
+              path: "calibration-operations",
+              children: [
+                {
+                  path: "lrn-cancel-requests",
+                  lazy: async () => ({
+                    Component: (
+                      await import(
+                        "app/pages/dashboards/calibration-operations/lrn-cancel-requests/lrncancel"
+                      )
+                    ).default,
+                  }),
+                },
+                {
+                  path: "calibration-standards",
+                  children: [
+                    {
+                      path: "", // List Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/calibration-standards"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add", // Add Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/calibration-standards/AddCalibrationStandards"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/calibration-standards/EditCalibrationStandards"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+
+
+                {
+                  path: "cmc-scope-sheet",
+                  children: [
+                    {
+                      path: "", // List Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/cmc-scope-sheet"
+                          )
+                        ).default,
+                      }),
+                    },
+
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/cmc-scope-sheet/EditCmcScopeSheet"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add-new-cmc-scope",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/cmc-scope-sheet/AddNewCmcScope"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+
+                {
+                  path: "calibration-methods",
+                  children: [
+                    {
+                      path: "", // List Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/calibration-methods"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add", // Add Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/calibration-methods/AddCalibrationMethods"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/calibration-methods/EditCalibrationMethods"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+
+                //--------------------bio-medical-visual-test------------------
+
+                
+                {
+                  path: "bio-medical-visual-test",
+                  children: [
+                    {
+                      path: "", // List Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/Bio-medical-visual-test"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add-new-visual-test", // Add Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/Bio-medical-visual-test/AddVisualTest"
+                          )
+                        ).default,
+                      }),
+                    },
+                       {
+                      path: "edit-visual-test-form",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/Bio-medical-visual-test/EditVisualtestForm"
+                          )
+                        ).default,
+                      }),
+                    },
+                    
+                  ],
+                },
+
+
+                //--------------------bio-medical-safty-test------------------
+
+                
+                {
+                  path: "bio-medical-safety-test",
+                  children: [
+                    {
+                      path: "", // List Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/Bio-medical-safety-test"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add-new-visual-test", // Add Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/Bio-medical-safety-test/AddVisualTest"
+                          )
+                        ).default,
+                      }),
+                    },
+                       {
+                      path: "edit-visual-test-form",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/Bio-medical-safety-test/EditVisualtestForm"
+                          )
+                        ).default,
+                      }),
+                    },
+                    
+                  ],
+                },
+                  
+
+                //-------------------Revision request-----------------------
+
+                                {
+                  path: "revision-requests",
+                  children: [
+                    {
+                      path: "", // List Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/Revision-Request"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add-new-visual-test", // Add Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/Bio-medical-safety-test/AddVisualTest"
+                          )
+                        ).default,
+                      }),
+                    },
+                       {
+                      path: "edit-visual-test-form",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/Bio-medical-safety-test/EditVisualtestForm"
+                          )
+                        ).default,
+                      }),
+                    },
+                    
+                  ],
+                },
+
+
+
+                                //--------------------Discipline------------------
+
+                
+                {
+                  path: "discipline",
+                  children: [
+                    {
+                      path: "", // List Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/Discipline"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add-new-discipline", // Add Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/Discipline/AddNewDiscipline"
+                          )
+                        ).default,
+                      }),
+                    },
+                       {
+                      path: "edit-visual-test-form",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/Bio-medical-safety-test/EditVisualtestForm"
+                          )
+                        ).default,
+                      }),
+                    },
+                    
+                  ],
+                },
+
+
+
+
+                {
+                  path: "instrument-list",
+                  children: [
+                    {
+                      path: "", // List Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/instrument-list"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add", // Add Page
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/instrument-list/AddCalibrationInstrument"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-operations/instrument-list/EditCalibrationInstrumnet"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+
+              ],
+            },
+            {
+              path: "people",
+              children: [
+                {
+                  path: "customer-types",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/people/customer-types"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/people/customer-types/AddCustomerType"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/people/customer-types/EditCustomerType"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+
+                {
+                  path: "customer-categories",
+                  lazy: async () => ({
+                    Component: (
+                      await import(
+                        "app/pages/dashboards/people/customer-categories"
+                      )
+                    ).default,
+                  }),
+                },
+                {
+                  path: "customer-categories/add",
+                  lazy: async () => ({
+                    Component: (
+                      await import(
+                        "app/pages/dashboards/people/customer-categories/AddCustomerCategory"
+                      )
+                    ).default,
+                  }),
+                },
+
+                {
+                  path: "specific-purposes",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/people/specific-purposes"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/people/specific-purposes/AddSpecificPurpose"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/people/specific-purposes/EditSpecificPurpose"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+
+                {
+                  path: "customers",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import("app/pages/dashboards/people/customers")
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/people/customers/AddCustomer"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/people/customers/EditCustomer"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+
+                {
+                  path: "promoters",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import("app/pages/dashboards/people/promoters")
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/people/promoters/AddPromoter"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/people/promoters/EditPromoter"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+
+                {
+                  path: "suppliers",
+                  lazy: async () => ({
+                    Component: (
+                      await import("app/pages/dashboards/people/suppliers")
+                    ).default,
+                  }),
+                },
+                {
+                  path: "suppliers/add",
+                  lazy: async () => ({
+                    Component: (
+                      await import(
+                        "app/pages/dashboards/people/suppliers/AddSupplier"
+                      )
+                    ).default,
+                  }),
+                },
+
+                {
+                  path: "users",
+                  lazy: async () => ({
+                    Component: (
+                      await import("app/pages/dashboards/people/users")
+                    ).default,
+                  }),
+                },
+                {
+                  path: "users/add",
+                  lazy: async () => ({
+                    Component: (
+                      await import("app/pages/dashboards/people/users/AddUser")
+                    ).default,
+                  }),
+                },
+              ],
+            },
+            {
+              path: "inventory",
+              children: [
+                {
+                  path: "categories",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/inventory/categories"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/inventory/categories/AddCategories"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/inventory/categories/EditCategories"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+                {
+                  path: "subcategories",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/inventory/subcategories"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/inventory/subcategories/AddSubCategories"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/inventory/subcategories/EditSubCategories"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              path: "hrm",
+              children: [
+                {
+                  path: "manage-branch",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import("app/pages/dashboards/hrm/manage-branch")
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/hrm/manage-branch/AddManageBranch"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/hrm/manage-branch/EditManageBranch"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+                {
+                  path: "salary-structure-design",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/hrm/salary-structure-design"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/hrm/salary-structure-design/AddSalaryStructureDesign"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/hrm/salary-structure-design/EditSalaryStructureDesign"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+                {
+                  path: "manage-departments",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/hrm/manage-departments"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/hrm/manage-departments/AddManageDepartment"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/hrm/manage-departments/EditManageDepartments"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+                {
+                  path: "manage-designations",
+                  children: [
+                    {
+                      path: "",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/hrm/manage-designations"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "add",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/hrm/manage-designations/AddManageDesignations"
+                          )
+                        ).default,
+                      }),
+                    },
+                    {
+                      path: "edit/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/hrm/manage-designations/EditManageDesignations"
+                          )
+                        ).default,
+                      }),
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    // The app layout supports only the main layout. Avoid using it for other layouts.
+    {
+      Component: AppLayout,
+      children: [
+        {
+          path: "settings",
+          lazy: async () => ({
+            Component: (await import("app/pages/settings/Layout")).default,
+          }),
+          children: [
+            {
+              index: true,
+              element: <Navigate to="/settings/general" />,
+            },
+            {
+              path: "general",
+              lazy: async () => ({
+                Component: (await import("app/pages/settings/sections/General"))
+                  .default,
+              }),
+            },
+            {
+              path: "appearance",
+              lazy: async () => ({
+                Component: (
+                  await import("app/pages/settings/sections/Appearance")
+                ).default,
+              }),
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
+export { protectedRoutes };
