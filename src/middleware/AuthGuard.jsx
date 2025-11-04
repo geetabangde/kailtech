@@ -17,8 +17,6 @@ export default function AuthGuard() {
   location.pathname && location.pathname !== "/login" && location.pathname !== "/logout"
     ? location.pathname
     : ""; 
-
-
   if (!isAuthenticated) {
     return (
       <Navigate
@@ -27,6 +25,6 @@ export default function AuthGuard() {
   />
     );
   }
-
   return <>{outlet}</>;
+  
 }

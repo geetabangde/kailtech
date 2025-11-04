@@ -7,11 +7,10 @@ import {
   Transition,
 } from "@headlessui/react";
 import {
-
   EllipsisHorizontalIcon,
-
   PencilIcon,
   TrashIcon,
+  PlusCircleIcon, // ✅ new icon for Add Uncertainty
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { Fragment, useCallback, useState } from "react";
@@ -23,8 +22,6 @@ import { Button } from "components/ui";
 import axios from "utils/axios";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
-
-
 
 // ----------------------------------------------------------------------
 
@@ -39,19 +36,23 @@ const confirmMessages = {
 };
 
 export function RowActions({ row, table }) {
-  const navigate = useNavigate(); // 👈 Hook
-   const handleEdit = () => {
-    const id = row.original.id; // 👈 your API data should return "id"
+  const navigate = useNavigate();
+
+  const handleEdit = () => {
+    const id = row.original.id;
     navigate(`/dashboards/operations/observation-settings/edit/${id}`);
   };
 
+  // ✅ New handler for Add Uncertainty
+  const handleEditUncertainty = () => {
+    const id = row.original.id;
+    navigate(`/dashboards/operations/observation-settings/edit-uncertainty/${id}`);
+  };
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [confirmDeleteLoading, setConfirmDeleteLoading] = useState(false);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
   const [deleteError, setDeleteError] = useState(false);
-
-
 
   const closeModal = () => {
     setDeleteModalOpen(false);
@@ -64,35 +65,33 @@ export function RowActions({ row, table }) {
   };
 
   const handleDeleteRows = useCallback(async () => {
-  const id = row.original.id; // Assuming your row contains `id`
-  setConfirmDeleteLoading(true);
+    const id = row.original.id;
+    setConfirmDeleteLoading(true);
 
-  try {
-    await axios.delete(`/master/mode-delete/${id}`);
-    table.options.meta?.deleteRow(row); // remove row from UI
-    setDeleteSuccess(true);
-     toast.success("Unit type deleted successfully ✅", {
-      duration: 1000,
-      icon: "🗑️",
-    });
-  } catch (error) {
-    console.error("Delete failed:", error);
-    setDeleteError(true);
-     toast.error("Failed to delete unit type ❌", {
-      duration: 2000,
-    });
-  } finally {
-    setConfirmDeleteLoading(false);
-  }
-}, [row, table]);
+    try {
+      await axios.delete(`/master/mode-delete/${id}`);
+      table.options.meta?.deleteRow(row);
+      setDeleteSuccess(true);
+      toast.success("Unit type deleted successfully ✅", {
+        duration: 1000,
+        icon: "🗑️",
+      });
+    } catch (error) {
+      console.error("Delete failed:", error);
+      setDeleteError(true);
+      toast.error("Failed to delete unit type ❌", {
+        duration: 2000,
+      });
+    } finally {
+      setConfirmDeleteLoading(false);
+    }
+  }, [row, table]);
 
   const state = deleteError ? "error" : deleteSuccess ? "success" : "pending";
 
   return (
     <>
-      <div className="flex justify-center space-x-1.5 ">
-      
-
+      <div className="flex justify-center space-x-1.5">
         <Menu as="div" className="relative inline-block text-left">
           <MenuButton as={Button} isIcon className="size-8 rounded-full">
             <EllipsisHorizontalIcon className="size-4.5" />
@@ -108,16 +107,17 @@ export function RowActions({ row, table }) {
           >
             <MenuItems
               anchor={{ to: "bottom end", gap: 12 }}
-              className="absolute z-100 w-[10rem] rounded-lg border border-gray-300 bg-white py-1 shadow-lg shadow-gray-200/50 outline-hidden focus-visible:outline-hidden dark:border-dark-500 dark:bg-dark-750 dark:shadow-none ltr:right-0 rtl:left-0"
+              className="absolute z-100 w-[11rem] rounded-lg border border-gray-300 bg-white py-1 shadow-lg shadow-gray-200/50 outline-hidden focus-visible:outline-hidden dark:border-dark-500 dark:bg-dark-750 dark:shadow-none ltr:right-0 rtl:left-0"
             >
-              
+              {/* ✏️ Edit */}
               <MenuItem>
                 {({ focus }) => (
-                  <button onClick={handleEdit}
+                  <button
+                    onClick={handleEdit}
                     className={clsx(
-                      "flex h-9 w-full items-center space-x-3 px-3 tracking-wide outline-hidden transition-colors ",
+                      "flex h-9 w-full items-center space-x-3 px-3 tracking-wide outline-hidden transition-colors",
                       focus &&
-                        "bg-gray-100 text-gray-800 dark:bg-dark-600 dark:text-dark-100",
+                        "bg-gray-100 text-gray-800 dark:bg-dark-600 dark:text-dark-100"
                     )}
                   >
                     <PencilIcon className="size-4.5 stroke-1" />
@@ -125,13 +125,32 @@ export function RowActions({ row, table }) {
                   </button>
                 )}
               </MenuItem>
+
+              {/* ➕ Add Uncertainty */}
+              <MenuItem>
+                {({ focus }) => (
+                  <button
+                    onClick={handleEditUncertainty}
+                    className={clsx(
+                      "flex h-9 w-full items-center space-x-3 px-3 tracking-wide outline-hidden transition-colors",
+                      focus &&
+                        "bg-blue-50 text-blue-600 dark:bg-dark-600 dark:text-blue-400"
+                    )}
+                  >
+                    <PlusCircleIcon className="size-4.5 stroke-1" />
+                    <span>Edit Uncertainty</span>
+                  </button>
+                )}
+              </MenuItem>
+
+              {/* 🗑️ Delete */}
               <MenuItem>
                 {({ focus }) => (
                   <button
                     onClick={openModal}
                     className={clsx(
-                      "this:error flex h-9 w-full items-center space-x-3 px-3 tracking-wide text-this outline-hidden transition-colors dark:text-this-light ",
-                      focus && "bg-this/10 dark:bg-this-light/10",
+                      "this:error flex h-9 w-full items-center space-x-3 px-3 tracking-wide text-this outline-hidden transition-colors dark:text-this-light",
+                      focus && "bg-this/10 dark:bg-this-light/10"
                     )}
                   >
                     <TrashIcon className="size-4.5 stroke-1" />
@@ -144,6 +163,7 @@ export function RowActions({ row, table }) {
         </Menu>
       </div>
 
+      {/* Confirm Delete Modal */}
       <ConfirmModal
         show={deleteModalOpen}
         onClose={closeModal}
@@ -152,8 +172,6 @@ export function RowActions({ row, table }) {
         confirmLoading={confirmDeleteLoading}
         state={state}
       />
-
-    
     </>
   );
 }

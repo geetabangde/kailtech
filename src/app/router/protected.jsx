@@ -1736,6 +1736,16 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
+                                         {
+                      path: "edit-uncertainty/:id",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/Operations/observation-settings/EditUncertainity"
+                          )
+                        ).default,
+                      }),
+                    },
                   ]
                 }
               ]
