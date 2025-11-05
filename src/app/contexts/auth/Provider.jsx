@@ -70,7 +70,6 @@ const reducer = (state, action) => {
 
 export function AuthProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
-   
 
   useEffect(() => {
     const init = async () => {
@@ -136,9 +135,7 @@ export function AuthProvider({ children }) {
     formData.append("username", username);
     formData.append("password", password);
     formData.append("finyear", finyear);
-
     const response = await axios.post("/login", formData);
-  
 
     const { token, permissions, user } = response.data;
 
@@ -176,7 +173,7 @@ if (user && typeof user === "object") {
 }
 
     // console.log("✅ User data from API:", user);
-
+    
 
     setSession(token); // optionally set default header
 

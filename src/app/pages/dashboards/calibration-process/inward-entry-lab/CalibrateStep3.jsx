@@ -6405,10 +6405,12 @@ const [suffix, setSuffix] = useState('');
 
     console.log('📊 Dynamic Headings API Response:', response.data);
 
-    if (response.data.status === true && response.data.heading?.mainhading?.calibration_settings) {
-      const headings = response.data.heading.mainhading.calibration_settings;
-      console.log('✅ Dynamic headings fetched:', headings);
-      return headings;
+    if (response.data.status === true && response.data.heading) {
+      const fullHeading = response.data.heading;
+      
+      // ✅ Return complete heading structure including observation_heading
+      console.log('✅ Dynamic headings fetched:', fullHeading);
+      return fullHeading;
     } else {
       console.log('❌ No dynamic headings found in response');
       return null;
@@ -6619,26 +6621,48 @@ const generateDynamicTableStructure = useCallback((headings, template) => {
     if (heading.checkbox === 'yes') {
       const headerName = heading.field_heading || heading.fieldname;
       
-      // For observation columns, we need to handle subheaders
+      // Check if this is an observation/master column that needs subheaders
       if (heading.fieldname === 'master' || heading.fieldname.includes('observation')) {
-        // This is an observation column that might have multiple readings
-        // Determine observation count based on template
-        let observationCount = 3; // Default to 3 observations
-        if (template === 'observationmg') observationCount = 2;
-        if (template === 'observationppg') observationCount = 6;
-        if (template === 'observationdpg') observationCount = 3;
-        if (template === 'observationavg') observationCount = 2;
+        // ✅ NEW: Get observation count from dynamicHeadings
+        const observationSettings = dynamicHeadings?.observation_heading?.observation_settings || [];
+        const observationCount = observationSettings.filter(obs => obs.checkbox === 'yes').length;
         
-        headers.push({ name: headerName, colspan: observationCount });
+        console.log(`📊 Found ${observationCount} observation columns for ${heading.fieldname}`);
         
-        // Add subheaders for observations (M1, M2, etc.)
-        for (let i = 1; i <= observationCount; i++) {
-          let subHeaderName = `M${i}`;
-          // Add arrows for PPG
-          if (template === 'observationppg') {
-            subHeaderName += i % 2 === 1 ? ' (↑)' : ' (↓)';
+        if (observationCount > 0) {
+          // Add main header with colspan for all observations
+          headers.push({ name: headerName, colspan: observationCount });
+          
+          // ✅ Add dynamic subheaders from observation_settings
+          observationSettings.forEach((obsSetting) => {
+            if (obsSetting.checkbox === 'yes') {
+              let subHeaderName = obsSetting.field_heading || obsSetting.fieldname;
+              
+              // Add arrows for PPG template
+              if (template === 'observationppg') {
+                const obsNumber = parseInt(obsSetting.fieldname.replace('observation', ''));
+                if (!isNaN(obsNumber)) {
+                  subHeaderName += obsNumber % 2 === 1 ? ' (↑)' : ' (↓)';
+                }
+              }
+              
+              subHeadersRow.push(subHeaderName);
+            }
+          });
+        } else {
+          // Fallback: Use default count if no observation settings
+          let defaultCount = 3; // Default
+          if (template === 'observationmg' || template === 'observationavg') defaultCount = 2;
+          if (template === 'observationppg') defaultCount = 6;
+          
+          headers.push({ name: headerName, colspan: defaultCount });
+          for (let i = 1; i <= defaultCount; i++) {
+            let subHeaderName = `M${i}`;
+            if (template === 'observationppg') {
+              subHeaderName += i % 2 === 1 ? ' (↑)' : ' (↓)';
+            }
+            subHeadersRow.push(subHeaderName);
           }
-          subHeadersRow.push(subHeaderName);
         }
       } else {
         // Regular single column
@@ -6650,7 +6674,7 @@ const generateDynamicTableStructure = useCallback((headings, template) => {
 
   console.log('✅ Dynamic table structure generated:', { headers, subHeadersRow });
   return { headers, subHeadersRow };
-}, []);
+}, [dynamicHeadings]);
 
 
   const validateObservationFields = () => {
@@ -8542,7 +8566,6 @@ const generateDynamicTableStructure = useCallback((headings, template) => {
           'Sr. No.',
           'Range (UUC Unit)',
           'Nominal/ Set Value UUC (UUC Unit)',
-
         ],
         subHeaders: {
           'Observation on UUC': [
@@ -8678,8 +8701,12 @@ const generateDynamicTableStructure = useCallback((headings, template) => {
 // First code ke generateTableStructure function ko replace karein
 const generateTableStructure = () => {
   // ✅ FIRST PRIORITY: Use dynamic headings if available
-  if (dynamicHeadings && selectedTableData) {
-    const dynamicStructure = generateDynamicTableStructure(dynamicHeadings, selectedTableData.id);
+// ✅ FIRST PRIORITY: Use dynamic headings if available
+  if (dynamicHeadings?.mainhading?.calibration_settings && selectedTableData) {
+    const dynamicStructure = generateDynamicTableStructure(
+      dynamicHeadings.mainhading.calibration_settings, 
+      selectedTableData.id
+    );
     if (dynamicStructure) {
       console.log('✅ Using dynamic table structure');
       return dynamicStructure;
@@ -12339,15 +12366,13 @@ const generateTableStructure = () => {
 
                 {selectedTableData && tableStructure && (
                   <div className="space-y-6">
-
-                        {dynamicHeadings && (
-      <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-2">
-        <p className="text-sm text-green-800">
-          <strong>Dynamic Mode Active:</strong> Using custom column names for suffix &quot;{suffix}&quot;
-        </p>
-      </div>
-    )}
-
+                      {dynamicHeadings && (
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-2">
+                          <p className="text-sm text-green-800">
+                           <strong>Dynamic Mode Active:</strong> Using custom column names for suffix &quot;{suffix}&quot;
+                          </p>  
+                        </div>
+                      )}
 
                     {selectedTableData.id === 'observationmm' && selectedTableData.unitTypes ? (
                       // Render separate tables for each unit type in MM
