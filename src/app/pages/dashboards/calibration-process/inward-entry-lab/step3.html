@@ -1,18 +1,15 @@
+
+
+
+//---------------------------Prateek code jisme table name dynamic h-------------------------
+
 import { useState, useEffect,useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { Page } from 'components/shared/Page';
 import { Button } from 'components/ui/Button';
 import { toast } from 'sonner';
 import axios from 'utils/axios';
-// import Select from 'react-select';
-import InstrumentInfo from './components/InstrumentInfo';
-import MastersList from './components/MastersList';
-import SupportMastersList from './components/SupportMastersList';
-import ThermalCoefficientForm from './components/ThermalCoefficientForm';
-import EnvironmentalConditions from './components/EnvironmentalConditions';
-import DateNotesForm from './components/DateNotesForm';
-import ObservationTable from "./components/ObservationTable";
-import Notes from './components/Notes';
+import Select from 'react-select';
 
 const CalibrateStep3 = () => {
   const navigate = useNavigate();
@@ -43,7 +40,8 @@ const [suffix, setSuffix] = useState('');
     master: '',
     thickness_of_graduation: '',
   });
-// Dynamic Headings fetch karne ke liye function
+
+
   const fetchDynamicHeadings = useCallback(async (suffix) => {
   if (!suffix) {
     console.log('❌ No suffix provided for dynamic headings');
@@ -247,6 +245,11 @@ useEffect(() => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+
+
+  // First code mein ye function add karein (useEffect ke baad)
+
 
 // First code mein yeh function add karein (fetchDynamicHeadings ke baad)
 const generateDynamicTableStructure = useCallback((headings, template) => {
@@ -4880,12 +4883,55 @@ const generateTableStructure = () => {
     if (!selectedTableData?.structure?.thermalCoeff) return null;
 
     return (
-       <ThermalCoefficientForm
-          thermalCoeff={thermalCoeff}
-          setThermalCoeff={setThermalCoeff}
-          handleThermalCoeffBlur={handleThermalCoeffBlur}
-          observationType={selectedTableData?.id}
-        />
+      <div className="mb-6">
+        <h3 className="text-md font-medium text-gray-800 dark:text-white mb-2">Thermal Coefficient</h3>
+        <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded border border-gray-200 dark:border-gray-600">
+          <div className={`grid ${selectedTableData.id === 'observationmt' ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2'} gap-4`}>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                UUC Thermal Coefficient:
+              </label>
+              <input
+                type="text"
+                value={thermalCoeff.uuc}
+                onChange={(e) => setThermalCoeff((prev) => ({ ...prev, uuc: e.target.value }))}
+                onBlur={(e) => handleThermalCoeffBlur('thermalcoffuuc', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-600 text-gray-900 dark:text-white"
+                placeholder="Enter UUC thermal coefficient"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                Master Thermal Coefficient:
+              </label>
+              <input
+                type="text"
+                value={thermalCoeff.master}
+                onChange={(e) => setThermalCoeff((prev) => ({ ...prev, master: e.target.value }))}
+                onBlur={(e) => handleThermalCoeffBlur('thermalcoffmaster', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-600 text-gray-900 dark:text-white"
+                placeholder="Enter master thermal coefficient"
+              />
+            </div>
+            {/* Additional field for MT */}
+            {selectedTableData.id === 'observationmt' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                  Thickness of graduation Line:
+                </label>
+                <input
+                  type="text"
+                  value={thermalCoeff.thickness_of_graduation}
+                  onChange={(e) => setThermalCoeff((prev) => ({ ...prev, thickness_of_graduation: e.target.value }))}
+                  onBlur={(e) => handleThermalCoeffBlur('thicknessofgraduation', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-600 text-gray-900 dark:text-white"
+                  placeholder="Enter thickness"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     );
   };
 
@@ -4911,6 +4957,8 @@ const generateTableStructure = () => {
     }
 
     const token = localStorage.getItem('authToken');
+
+
     const calibrationPoints = [];
     const types = [];
     const repeatables = [];
@@ -5727,54 +5775,697 @@ const generateTableStructure = () => {
                 </Button>
               </div>
             </div>
-            <InstrumentInfo 
-              instrument={instrument}
-              inwardEntry={inwardEntry}
-              caliblocation={caliblocation}
-            />
+
+            <div className="p-6 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+              <div className="grid grid-cols-12 gap-4 text-sm">
+                <div className="col-span-6 space-y-2">
+                  <div className="flex">
+                    <span className="w-48 font-medium text-gray-700 dark:text-gray-200">
+                      Name Of The Equipment:
+                    </span>
+                    <span className="text-gray-900 dark:text-white">{instrument?.name || 'N/A'}</span>
+                  </div>
+                  <div className="text-blue-600 dark:text-blue-400 font-medium">
+                    PRESSURE, MASS & VOLUME LAB<br />
+                    Alloted Lab: {caliblocation}
+                  </div>
+                  <div className="flex">
+                    <span className="w-48 font-medium text-gray-700 dark:text-gray-200">Make:</span>
+                    <span className="text-gray-900 dark:text-white">{instrument?.make || 'N/A'}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-48 font-medium text-gray-700 dark:text-gray-200">Model:</span>
+                    <span className="text-gray-900 dark:text-white">{instrument?.model || 'N/A'}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-48 font-medium text-gray-700 dark:text-gray-200">SR no:</span>
+                    <span className="text-gray-900 dark:text-white">{instrument?.serialno || 'N/A'}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-48 font-medium text-gray-700 dark:text-gray-200">Id no:</span>
+                    <span className="text-gray-900 dark:text-white">{instrument?.idno || 'N/A'}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-48 font-medium text-gray-700 dark:text-gray-200">Calibrated On:</span>
+                    <span className="text-gray-900 dark:text-white">{instrument?.startdate || 'N/A'}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-48 font-medium text-gray-700 dark:text-gray-200">Issue Date:</span>
+                    <span className="text-gray-900 dark:text-white">{instrument?.issuedate || 'N/A'}</span>
+                  </div>
+                </div>
+                <div className="col-span-6 space-y-2">
+                  <div className="flex">
+                    <span className="w-32 font-medium text-gray-700 dark:text-gray-200">BRN No:</span>
+                    <span className="text-gray-900 dark:text-white">{instrument?.bookingrefno || 'N/A'}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-32 font-medium text-gray-700 dark:text-gray-200">Receive Date:</span>
+                    <span className="text-gray-900 dark:text-white">
+                      {inwardEntry?.sample_received_on || 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-32 font-medium text-gray-700 dark:text-gray-200">Range:</span>
+                    <span className="text-gray-900 dark:text-white">{instrument?.equipmentrange || 'N/A'}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-32 font-medium text-gray-700 dark:text-gray-200">Least Count:</span>
+                    <span className="text-gray-900 dark:text-white">{instrument?.leastcount || 'N/A'}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-32 font-medium text-gray-700 dark:text-gray-200">Condition Of UUC:</span>
+                    <span className="text-gray-900 dark:text-white">
+                      {instrument?.conditiononrecieve || 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-32 font-medium text-gray-700 dark:text-gray-200">
+                      Calibration performed At:
+                    </span>
+                    <span className="text-gray-900 dark:text-white">{instrument?.performedat || 'Lab'}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-32 font-medium text-gray-700 dark:text-gray-200">Temperature (°C):</span>
+                    <span className="text-gray-900 dark:text-white">{instrument?.temperature || 'N/A'}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-32 font-medium text-gray-700 dark:text-gray-200">Humidity (%RH):</span>
+                    <span className="text-gray-900 dark:text-white">{instrument?.humidity || 'N/A'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <form onSubmit={handleSubmit} className="p-6">
               <h2 className="text-lg font-medium text-gray-800 dark:text-white mb-4">Masters</h2>
-               <MastersList masters={masters} />
-            
+              <div className="mb-6">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm border-collapse border border-gray-300 dark:border-gray-600">
+                    <thead>
+                      <tr className="bg-gray-100 dark:bg-gray-700">
+                        <th className="p-2 border border-gray-300 dark:border-gray-600 font-medium text-left text-gray-800 dark:text-white">
+                          Reference Standard
+                        </th>
+                        <th className="p-2 border border-gray-300 dark:border-gray-600 font-medium text-left text-gray-800 dark:text-white">
+                          S.w/o
+                        </th>
+                        <th className="p-2 border border-gray-300 dark:border-gray-600 font-medium text-left text-gray-800 dark:text-white">
+                          LD.No.
+                        </th>
+                        <th className="p-2 border border-gray-300 dark:border-gray-600 font-medium text-left text-gray-800 dark:text-white">
+                          Certificate No.
+                        </th>
+                        <th className="p-2 border border-gray-300 dark:border-gray-600 font-medium text-left text-gray-800 dark:text-white">
+                          Valid Upto
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {masters && masters.length > 0 ? (
+                        masters.map((item, index) => (
+                          <tr key={index} className="dark:bg-gray-800">
+                            <td className="p-2 border border-gray-300 dark:border-gray-600 dark:text-white">
+                              {item.name}
+                            </td>
+                            <td className="p-2 border border-gray-300 dark:border-gray-600 dark:text-white">
+                              {item.serialno}
+                            </td>
+                            <td className="p-2 border border-gray-300 dark:border-gray-600 dark:text-white">
+                              {item.idno}
+                            </td>
+                            <td className="p-2 border border-gray-300 dark:border-gray-600 dark:text-white">
+                              {item.certificateno}
+                            </td>
+                            <td className="p-2 border border-gray-300 dark:border-gray-600 dark:text-white">
+                              {item.enddate}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td
+                            colSpan="5"
+                            className="p-2 border border-gray-300 dark:border-gray-600 text-center dark:text-white"
+                          >
+                            No data available
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
 
               <div className="mb-6">
                 <h2 className="text-md font-medium text-gray-800 dark:text-white mb-2">Support masters</h2>
-               <SupportMastersList supportMasters={supportMasters} />
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm border-collapse border border-gray-300 dark:border-gray-600">
+                    <thead>
+                      <tr className="bg-gray-100 dark:bg-gray-700">
+                        <th className="p-2 border border-gray-300 dark:border-gray-600 font-medium text-left text-gray-800 dark:text-white">
+                          Reference Standard
+                        </th>
+                        <th className="p-2 border border-gray-300 dark:border-gray-600 font-medium text-left text-gray-800 dark:text-white">
+                          S.w/o
+                        </th>
+                        <th className="p-2 border border-gray-300 dark:border-gray-600 font-medium text-left text-gray-800 dark:text-white">
+                          LD.No.
+                        </th>
+                        <th className="p-2 border border-gray-300 dark:border-gray-600 font-medium text-left text-gray-800 dark:text-white">
+                          Certificate No.
+                        </th>
+                        <th className="p-2 border border-gray-300 dark:border-gray-600 font-medium text-left text-gray-800 dark:text-white">
+                          Valid Upto
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {supportMasters && supportMasters.length > 0 ? (
+                        supportMasters.map((item, index) => (
+                          <tr key={index} className="dark:bg-gray-800">
+                            <td className="p-2 border border-gray-300 dark:border-gray-600 dark:text-white">
+                              {item.name}
+                            </td>
+                            <td className="p-2 border border-gray-300 dark:border-gray-600 dark:text-white">
+                              {item.serialno}
+                            </td>
+                            <td className="p-2 border border-gray-300 dark:border-gray-600 dark:text-white">
+                              {item.idno}
+                            </td>
+                            <td className="p-2 border border-gray-300 dark:border-gray-600 dark:text-white">
+                              {item.certificateno}
+                            </td>
+                            <td className="p-2 border border-gray-300 dark:border-gray-600 dark:text-white">
+                              {item.enddate}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td
+                            colSpan="5"
+                            className="p-2 border border-gray-300 dark:border-gray-600 text-center dark:text-white"
+                          >
+                            No data available
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-              <ObservationTable
-              observationTemplate={observationTemplate}
-              selectedTableData={selectedTableData}
-              tableStructure={tableStructure}
-              tableInputValues={tableInputValues}
-              observationErrors={observationErrors}
-              handleInputChange={handleInputChange}
-              handleObservationBlur={handleObservationBlur}
-              handleRowSave={handleRowSave}
-              unitsList={unitsList}
-              dynamicHeadings={dynamicHeadings}
-              suffix={suffix}
-              renderThermalCoefficientSection={renderThermalCoefficientSection}
-              setObservationErrors={setObservationErrors}          // ✅ Add This
-              observations={observations}                          // ✅ And This
-            />
-              <EnvironmentalConditions
-                formData={formData}
-                handleFormChange={handleFormChange}
-                errors={errors}
-                temperatureRange={temperatureRange}
-                humidityRange={humidityRange}
-              />
 
-              <DateNotesForm
-                formData={formData}
-                handleFormChange={handleFormChange}
-              />
+              {renderThermalCoefficientSection()}
 
-              <Notes 
-                formData={formData}
-                handleFormChange={handleFormChange}
-              />
+              <div className="mb-6">
+                <h2 className="text-md font-medium text-gray-800 dark:text-white mb-4">Observation Detail</h2>
+                {observationTemplate && (
+                  <div className="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-3 mb-4">
+                    <p className="text-sm text-blue-800 dark:text-blue-200">
+                      <strong>Current Observation Template:</strong> {observationTemplate}
+                    </p>
+                  </div>
+                )}
+
+                {selectedTableData && tableStructure && (
+                  <div className="space-y-6">
+                      {dynamicHeadings && (
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-2">
+                          <p className="text-sm text-green-800">
+                           <strong>Dynamic Mode Active:</strong> Using custom column names for suffix &quot;{suffix}&quot;
+                          </p>  
+                        </div>
+                      )}
+
+                    {selectedTableData.id === 'observationmm' && selectedTableData.unitTypes ? (
+                      // Render separate tables for each unit type in MM
+                      selectedTableData.unitTypes.map((unitTypeGroup, groupIndex) => {
+                        if (!unitTypeGroup || !unitTypeGroup.calibration_points) return null;
+
+                        // Calculate starting row index for this unit type group
+                        let startingRowIndex = 0;
+                        for (let i = 0; i < groupIndex; i++) {
+                          if (selectedTableData.unitTypes[i] && selectedTableData.unitTypes[i].calibration_points) {
+                            startingRowIndex += selectedTableData.unitTypes[i].calibration_points.length;
+                          }
+                        }
+
+                        const unitTypeRows = unitTypeGroup.calibration_points.map(point => {
+                          const observations = [];
+                          if (point.observations && Array.isArray(point.observations)) {
+                            for (let i = 0; i < 5; i++) {
+                              observations.push(point.observations[i]?.value || '');
+                            }
+                          }
+                          while (observations.length < 5) {
+                            observations.push('');
+                          }
+
+                          return [
+                            point.sequence_number?.toString() || '',
+                            point.mode || 'Measure',
+                            point.range || '',
+                            (point.nominal_values?.calculated_master?.value || ''),
+                            (point.nominal_values?.master?.value || '') ,
+                            ...observations,
+                            point.calculations?.average || '',
+                            point.calculations?.error || ''
+                          ];
+                        });
+
+                        return (
+                          <div key={groupIndex} className="mb-8">
+                            <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-3 bg-blue-50 dark:bg-blue-900 p-2 rounded">
+                              {unitTypeGroup.unit_type}
+                            </h3>
+
+
+                            
+                            <div className="overflow-x-auto border border-gray-200 dark:border-gray-600">
+                              <table className="w-full text-sm">
+                                <thead>
+                                  <tr className="bg-gray-100 dark:bg-gray-700 border-b border-gray-300 dark:border-gray-600">
+                                    {tableStructure.headers.map((header, index) => (
+                                      <th
+                                        key={index}
+                                        colSpan={header.colspan}
+                                        className="px-3 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600 last:border-r-0"
+                                      >
+                                        {header.name}
+                                      </th>
+                                    ))}
+                                  </tr>
+                                  {tableStructure.subHeadersRow.some((item) => item !== null) && (
+                                    <tr className="bg-gray-50 dark:bg-gray-600 border-b border-gray-300 dark:border-gray-600">
+                                      {tableStructure.subHeadersRow.map((subHeader, index) => (
+                                        <th
+                                          key={index}
+                                          className="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-300 border-r border-gray-300 dark:border-gray-600 last:border-r-0"
+                                        >
+                                          {subHeader}
+                                        </th>
+                                      ))}
+                                    </tr>
+                                  )}
+                                </thead>
+                                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                  {unitTypeRows.map((row, rowIndex) => {
+                                    // Fixed: Use correct row index for this specific unit type group
+                                    const actualRowIndex = startingRowIndex + rowIndex;
+
+                                    return (
+                                      <tr key={rowIndex} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        {row.map((cell, colIndex) => {
+                                          const key = `${actualRowIndex}-${colIndex}`;
+                                          const currentValue = tableInputValues[key] ?? (cell?.toString() || '');
+
+                                          const isDisabled =
+                                            colIndex === 0 || // SR No
+                                            colIndex === 1 || // Mode
+                                            colIndex === 3 || // Calculated master (read-only)
+                                            colIndex === 4 || // Master value (read-only)
+                                            colIndex === 10 || // Average
+                                            colIndex === 11; // Error
+
+                                          return (
+                                            <td
+                                              key={colIndex}
+                                              className="px-3 py-2 whitespace-nowrap text-sm border-r border-gray-200 dark:border-gray-600 last:border-r-0"
+                                            >
+                                              <input
+                                                type="text"
+                                                className={`w-full px-2 py-1 border rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-600 text-gray-900 dark:text-white ${isDisabled ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''
+                                                  } ${observationErrors[key] ? 'border-red-500' : 'border-gray-200 dark:border-gray-600'}`}
+                                                value={currentValue}
+                                                onChange={(e) => {
+                                                  if (isDisabled) return;
+                                                  handleInputChange(actualRowIndex, colIndex, e.target.value);
+                                                  // Clear error when user starts typing
+                                                  if (observationErrors[key]) {
+                                                    setObservationErrors(prev => {
+                                                      const newErrors = { ...prev };
+                                                      delete newErrors[key];
+                                                      return newErrors;
+                                                    });
+                                                  }
+                                                }}
+                                                onBlur={(e) => {
+                                                  if (isDisabled) return;
+                                                  handleObservationBlur(actualRowIndex, colIndex, e.target.value);
+                                                }}
+                                                disabled={isDisabled}
+                                              />
+                                              {observationErrors[key] && (
+                                                <div className="text-red-500 text-xs mt-1">{observationErrors[key]}</div>
+                                              )}
+                                            </td>
+                                          );
+                                        })}
+                                      </tr>
+                                    );
+                                  })}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      // Original single table rendering for other observation types
+
+
+                      
+                      <div className="overflow-x-auto border border-gray-200 dark:border-gray-600 gita">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="bg-gray-100 dark:bg-gray-700 border-b border-gray-300 dark:border-gray-600">
+                              {tableStructure.headers.map((header, index) => (
+                                <th
+                                  key={index}
+                                  colSpan={header.colspan}
+                                  className="px-3 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600 last:border-r-0"
+                                >
+                                  {header.name}
+                                </th>
+                              ))}
+                            </tr>
+                            {tableStructure.subHeadersRow.some((item) => item !== null) && (
+                              <tr className="bg-gray-50 dark:bg-gray-600 border-b border-gray-300 dark:border-gray-600">
+                                {tableStructure.subHeadersRow.map((subHeader, index) => (
+                                  <th
+                                    key={index}
+                                    className="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-300 border-r border-gray-300 dark:border-gray-600 last:border-r-0"
+                                  >
+                                    {subHeader}
+                                  </th>
+                                ))}
+                              </tr>
+                            )}
+                          </thead>
+                          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700 bangde">
+                            {(selectedTableData.staticRows?.length > 0
+                              ? selectedTableData.staticRows
+                              : [Array(tableStructure.subHeadersRow.length).fill('')]
+                            ).map((row, rowIndex) => (
+                              <tr key={rowIndex} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                {row.map((cell, colIndex) => {
+                                  const key = `${rowIndex}-${colIndex}`;
+                                  const currentValue = tableInputValues[key] ?? (cell?.toString() || '');
+
+                                  // ✅ ADD GTM UNIT SELECT HANDLING (BEFORE RTD WI)
+                                  if (selectedTableData.id === 'observationgtm' && cell === 'UNIT_SELECT') {
+                                    return (
+                                      <td key={colIndex} className="px-3 py-2 whitespace-nowrap text-sm border-r border-gray-200 dark:border-gray-600 last:border-r-0">
+                                        <Select
+                                          options={unitsList}
+                                          className="w-full text-sm"
+                                          classNamePrefix="select"
+                                          placeholder="Select unit..."
+                                          value={unitsList.find(u => u.label === currentValue)}
+                                          styles={{
+                                            control: (base) => ({
+                                              ...base,
+                                              minHeight: '32px',
+                                              fontSize: '0.875rem'
+                                            })
+                                          }}
+                                          onChange={(selected) => {
+                                            handleInputChange(rowIndex, colIndex, selected?.label || '');
+                                            handleObservationBlur(rowIndex, colIndex, selected?.value?.toString() || '');
+                                          }}
+                                        />
+                                      </td>
+                                    );
+                                  }
+
+                                  // ✅ ADD GTM STATIC TEXT HANDLING (BEFORE RTD WI)
+                                  if (selectedTableData.id === 'observationgtm' && (cell === '-' || cell === 'UUC' || cell === 'Master')) {
+                                    return (
+                                      <td key={colIndex} className="px-3 py-2 whitespace-nowrap text-sm border-r border-gray-200 dark:border-gray-600 last:border-r-0 text-center font-medium">
+                                        {cell}
+                                      </td>
+                                    );
+                                  }
+
+                                  // Special handling for UNIT_SELECT in observationrtdwi Master row
+                                  if (selectedTableData.id === 'observationrtdwi' && cell === 'UNIT_SELECT') {
+                                    return (
+                                      <td key={colIndex} className="px-3 py-2 whitespace-nowrap text-sm border-r border-gray-200 dark:border-gray-600 last:border-r-0">
+                                        <Select
+                                          options={unitsList}
+                                          className="w-full text-sm"
+                                          classNamePrefix="select"
+                                          placeholder="Select unit..."
+                                          value={unitsList.find(u => u.label === currentValue)}
+                                          styles={{
+                                            control: (base) => ({
+                                              ...base,
+                                              minHeight: '32px',
+                                              fontSize: '0.875rem'
+                                            })
+                                          }}
+                                          onChange={(selected) => {
+                                            handleInputChange(rowIndex, colIndex, selected?.label || '');
+                                            handleObservationBlur(rowIndex, colIndex, selected?.value?.toString() || '');
+                                          }}
+                                        />
+                                      </td>
+                                    );
+                                  }
+
+
+                                  if (selectedTableData.id === 'observationrtdwi' && (cell === '-' || cell === 'UUC' || cell === 'Master')) {
+                                    return (
+                                      <td key={colIndex} className="px-3 py-2 whitespace-nowrap text-sm border-r border-gray-200 dark:border-gray-600 last:border-r-0 text-center font-medium">
+                                        {cell}
+                                      </td>
+                                    );
+                                  }
+
+                                  let isDisabled = colIndex === 0;
+
+                                  if (selectedTableData.id === 'observationrtdwi') {
+                                    const rowType = row[2];
+                                    isDisabled = isDisabled || [2].includes(colIndex) || cell === '-';
+                                    if (rowType === 'UUC') {
+                                      isDisabled = isDisabled || [1, 10, 11, 12, 13, 14].includes(colIndex);
+                                    }
+                                    if (rowType === 'Master') {
+                                      if ([11].includes(colIndex)) {
+                                        isDisabled = false;
+                                      } else if ([0, 1, 4, 12, 13, 14].includes(colIndex)) {
+                                        isDisabled = true;
+                                      }
+                                    }
+                                  }
+
+                                  else if (selectedTableData.id === 'observationgtm') {
+                                    const rowType = row[2];
+                                    isDisabled = isDisabled || [2].includes(colIndex) || cell === '-';
+                                    if (rowType === 'UUC') {
+                                      // UUC row: SR No, Value Of, Sensitivity Coefficient, Average (Ω), Average (°C), Deviation disabled
+                                      isDisabled = isDisabled || [0, 1, 2, 4, 5, 11, 12, 13].includes(colIndex);
+                                    }
+                                    if (rowType === 'Master') {
+                                      // Master row: SR No, Set Point, Value Of, Range, Deviation disabled
+                                      isDisabled = isDisabled || [0, 1, 2, 3, 11, 13].includes(colIndex);
+                                    }
+                                  }// In the table rendering section, add DG disabled fields logic:
+
+                                  else if (selectedTableData.id === 'observationdg') {
+                                    // Sr No, and all calculated fields (cols 6-10) are disabled
+                                    isDisabled = isDisabled || [0, 1, 6, 7, 8, 9, 10].includes(colIndex);
+                                  }
+                                  else if (selectedTableData.id === 'observationdpg') {
+                                    isDisabled = isDisabled || [1, 2, 6, 7, 8, 9].includes(colIndex);
+                                  } else if (selectedTableData.id === 'observationodfm') {
+                                    isDisabled = isDisabled || [2, 8, 9].includes(colIndex);
+                                  } else if (selectedTableData.id === 'observationppg') {
+                                    isDisabled = isDisabled || [1, 2, 9, 10, 11, 12].includes(colIndex);
+                                  } else if (selectedTableData.id === 'observationapg') {
+                                    isDisabled = isDisabled || [1, 2, 5, 6, 7].includes(colIndex);
+                                  } else if (selectedTableData.id === 'observationctg') {
+                                    isDisabled = isDisabled || [1, 7, 8].includes(colIndex);
+                                  } else if (selectedTableData.id === 'observationmsr') {
+                                    isDisabled = isDisabled || [1, 7, 8].includes(colIndex);
+                                  } else if (selectedTableData.id === 'observationmg') {
+                                    isDisabled = isDisabled || [5, 6, 7].includes(colIndex);
+                                  } else if (selectedTableData.id === 'observationavg') {
+                                    isDisabled = isDisabled || [5, 6, 7].includes(colIndex);
+                                  } else if (selectedTableData.id === 'observationit') {
+                                    isDisabled = isDisabled || [1, 7, 8].includes(colIndex);
+                                  } else if (selectedTableData.id === 'observationexm') {
+                                    isDisabled = isDisabled || [1, 7, 8].includes(colIndex);
+                                  } else if (selectedTableData.id === 'observationfg') {
+                                    isDisabled = isDisabled || [7, 8].includes(colIndex);
+                                  } else if (selectedTableData.id === 'observationhg') {
+                                    isDisabled = isDisabled || [1, 7, 8].includes(colIndex);
+                                  } else if (selectedTableData.id === 'observationmt') {
+                                    isDisabled = isDisabled || [1, 7, 8].includes(colIndex);
+                                  }
+
+                                  return (
+                                    <td
+                                      key={colIndex}
+                                      className="px-3 py-2 whitespace-nowrap text-sm border-r border-gray-200 dark:border-gray-600 last:border-r-0"
+                                    >
+                                      <input
+                                        type="text"
+                                        className={`w-full px-2 py-1 border rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-600 text-gray-900 dark:text-white ${isDisabled ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''
+                                          } ${observationErrors[key] ? 'border-red-500' : 'border-gray-200 dark:border-gray-600'}`}
+                                        value={currentValue}
+                                        onChange={(e) => {
+                                          if (isDisabled) return;
+                                          handleInputChange(rowIndex, colIndex, e.target.value);
+                                          if (observationErrors[key]) {
+                                            setObservationErrors(prev => {
+                                              const newErrors = { ...prev };
+                                              delete newErrors[key];
+                                              return newErrors;
+                                            });
+                                          }
+                                        }}
+                                        onBlur={(e) => {
+                                          if (isDisabled) return;
+                                          if (selectedTableData.id === 'observationctg' ||
+                                            selectedTableData.id === 'observationdpg' ||
+                                            selectedTableData.id === 'observationodfm' ||
+                                            selectedTableData.id === 'observationmm' ||
+                                            selectedTableData.id === 'observationit' ||
+                                            selectedTableData.id === 'observationmt' ||
+                                            selectedTableData.id === 'observationmg' ||
+                                            selectedTableData.id === 'observationfg' ||
+                                            selectedTableData.id === 'observationhg' ||
+                                            selectedTableData.id === 'observationppg' ||
+                                            selectedTableData.id === 'observationexm' ||
+                                            selectedTableData.id === 'observationmsr' ||
+                                            selectedTableData.id === 'observationgtm' ||
+                                            selectedTableData.id === 'observationdg' ||
+                                            selectedTableData.id === 'observationrtdwi') {
+                                            handleObservationBlur(rowIndex, colIndex, e.target.value);
+                                          } else {
+                                            handleRowSave(rowIndex);
+                                          }
+                                        }}
+                                        disabled={isDisabled}
+                                      />
+                                      {observationErrors[key] && (
+                                        <div className="text-red-500 text-xs mt-1">{observationErrors[key]}</div>
+                                      )}
+                                    </td>
+                                  );
+                                })}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {observationTemplate && observations.length === 0 && (
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                    <p>No observations found for template: {observationTemplate}</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                    Temperature End (°C) <span className="text-red-500">*</span>:
+                  </label>
+                  <input
+                    type="text"
+                    name="tempend"
+                    value={formData.tempend}
+                    onChange={handleFormChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-600 text-gray-900 dark:text-white"
+                    placeholder="Enter temperature range"
+                  // required attribute removed
+                  />
+                  {errors.tempend && <p className="text-red-500 text-xs mt-1">{errors.tempend}</p>}
+                  {!errors.tempend && !formData.tempend && (
+                    <p className="text-red-500 text-xs mt-1">This field is required</p>
+                  )}
+                  {temperatureRange && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Range:{' '}
+                      {temperatureRange.min
+                        ? `${temperatureRange.min} - ${temperatureRange.max}`
+                        : temperatureRange.value || 'N/A'}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                    Humidity End (%RH) <span className="text-red-500">*</span>:
+                  </label>
+                  <input
+                    type="text"
+                    name="humiend"
+                    value={formData.humiend}
+                    onChange={handleFormChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-600 text-gray-900 dark:text-white"
+                    placeholder="Enter humidity range"
+                  // required attribute removed
+                  />
+                  {errors.humiend && <p className="text-red-500 text-xs mt-1">{errors.humiend}</p>}
+                  {!errors.humiend && !formData.humiend && (
+                    <p className="text-red-500 text-xs mt-1">This field is required</p>
+                  )}
+                  {humidityRange && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Range:{' '}
+                      {humidityRange.min
+                        ? `${humidityRange.min} - ${humidityRange.max}`
+                        : humidityRange.value || 'N/A'}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                    Calibration End Date/Done date:
+                  </label>
+                  <input
+                    type="date"
+                    name="enddate"
+                    value={formatDateForInput(formData.enddate)}
+                    onChange={handleFormChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-600 text-gray-900 dark:text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                    Suggested Due Date:
+                  </label>
+                  <input
+                    type="date"
+                    name="duedate"
+                    value={formatDateForInput(formData.duedate)}
+                    onChange={handleFormChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-600 text-gray-900 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Notes:</label>
+                <textarea
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleFormChange}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-600 text-gray-900 dark:text-white"
+                  placeholder="Enter notes"
+                />
+              </div>
 
               <div className="flex justify-end mt-8 mb-4">
                 <Button
@@ -5785,6 +6476,20 @@ const generateTableStructure = () => {
                 </Button>
               </div>
             </form>
+          </div>
+
+          <div className="flex items-center justify-between px-6 pb-6">
+            <div className="flex-1 mx-4">
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div
+                  className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                  style={{ width: '75%' }}
+                ></div>
+              </div>
+            </div>
+            <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+              ›
+            </button>
           </div>
         </div>
       </div>

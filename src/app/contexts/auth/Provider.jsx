@@ -211,8 +211,6 @@ if (user && typeof user === "object") {
       }
     };
 
-
-
   if (!children) {
     return null;
   }

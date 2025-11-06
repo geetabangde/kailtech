@@ -35,7 +35,6 @@ export default function EditCurrency() {
         setLoading(false);
       }
     };
-
     fetchEditCurrency();
   }, [id]);
 
