@@ -5755,8 +5755,8 @@ const generateTableStructure = () => {
               dynamicHeadings={dynamicHeadings}
               suffix={suffix}
               renderThermalCoefficientSection={renderThermalCoefficientSection}
-              setObservationErrors={setObservationErrors}          // ✅ Add This
-              observations={observations}                          // ✅ And This
+              setObservationErrors={setObservationErrors}          
+              observations={observations}                         
             />
               <EnvironmentalConditions
                 formData={formData}

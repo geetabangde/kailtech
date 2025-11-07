@@ -1,5 +1,6 @@
 import React from 'react'
 import Select from "react-select";
+import { TrashIcon } from "@heroicons/react/24/outline";
 
 function UncertaintyTable({
   rows,
@@ -24,140 +25,127 @@ function UncertaintyTable({
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full table-fixed">
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="w-16 px-2 py-3 text-left text-sm font-semibold text-gray-700 border-b">
-                      S.No
-                    </th>
-                    <th className="w-20 px-2 py-3 text-left text-sm font-semibold text-gray-700 border-b">
-                      Check
-                    </th>
-                    <th className="w-80 px-3 py-3 text-left text-sm font-semibold text-gray-700 border-b">
-                      Fieldname
-                    </th>
-                    <th className="w-40 px-3 py-3 text-left text-sm font-semibold text-gray-700 border-b">
-                      Set Variable
-                    </th>
-                    <th className="w-48 px-3 py-3 text-left text-sm font-semibold text-gray-700 border-b">
-                      Field Heading
-                    </th>
-                    <th className="w-28 px-3 py-3 text-left text-sm font-semibold text-gray-700 border-b">
-                      Position
-                    </th>
-                    <th className="flex-1 px-3 py-3 text-left text-sm font-semibold text-gray-700 border-b">
-                      Formula
-                    </th>
-                    <th className="w-24 px-2 py-3 text-left text-sm font-semibold text-gray-700 border-b">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row, index) => (
-                    <tr key={row.id} className="border-b hover:bg-gray-50">
-                      <td className="px-2 py-3 text-sm text-center">{index + 1}</td>
-                      <td className="px-2 py-3 text-center">
-                        <input
-                          type="checkbox"
-                          checked={row.checked}
-                          onChange={() => handleCheckbox(row.id)}
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+            <table className="min-w-[1300px] w-full table-fixed border">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="w-12 px-2 py-3 text-left text-sm font-semibold text-gray-700 border-b">S.No</th>
+                  <th className="w-16 px-2 py-3 text-left text-sm font-semibold text-gray-700 border-b">Check</th>
+                  <th className="w-[250px] px-3 py-3 text-left text-sm font-semibold text-gray-700 border-b">Fieldname</th>
+                  <th className="w-[160px] px-3 py-3 text-left text-sm font-semibold text-gray-700 border-b">Set Variable</th>
+                  <th className="w-[180px] px-3 py-3 text-left text-sm font-semibold text-gray-700 border-b">Field Heading</th>
+                  <th className="w-[100px] px-3 py-3 text-left text-sm font-semibold text-gray-700 border-b">Position</th>
+                  {/* 👇 Make formula column wider */}
+                  <th className="w-[400px] px-3 py-3 text-left text-sm font-semibold text-gray-700 border-b">Formula</th>
+                  <th className="w-[80px] px-2 py-3 text-left text-sm font-semibold text-gray-700 border-b">Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {rows.map((row, index) => (
+                  <tr key={row.id} className="border-b hover:bg-gray-50">
+                    <td className="w-12 px-2 py-3 text-sm text-center">{index + 1}</td>
+                    <td className="w-16 px-2 py-3 text-center">
+                      <input
+                        type="checkbox"
+                        checked={row.checked}
+                        onChange={() => handleCheckbox(row.id)}
+                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      />
+                    </td>
+
+                    {/* Fieldname column */}
+                    <td className="w-[250px] px-3 py-3">
+                      <div className="space-y-2">
+                        <Select
+                          value={row.selectedTable}
+                          onChange={(selectedOption) =>
+                            handleTableSelection(row.id, selectedOption)
+                          }
+                          options={tableList}
+                          placeholder="Select table..."
+                          isClearable
+                          styles={customSelectStyles}
+                          menuPortalTarget={document.body}
+                          menuPosition="fixed"
                         />
-                      </td>
-                      {/* ✅ Fieldname Column with nested dropdowns */}
-                      <td className="px-3 py-3">
-                        <div className="space-y-2">
-                          {/* First Dropdown: Table Selection */}
+                        {row.selectedTable && (
                           <Select
-                            value={row.selectedTable}
+                            value={row.fieldname}
                             onChange={(selectedOption) =>
-                              handleTableSelection(row.id, selectedOption)
+                              handleFieldnameChange(row.id, selectedOption)
                             }
-                            options={tableList}
-                            placeholder="Select table..."
+                            options={row.fieldnameOptions || []}
+                            placeholder="Select fieldname..."
                             isClearable
                             styles={customSelectStyles}
                             menuPortalTarget={document.body}
                             menuPosition="fixed"
                           />
-                          
-                          {/* Second Dropdown: Fieldname (appears after table selection) */}
-                          {row.selectedTable && (
-                            <Select
-                              value={row.fieldname}
-                              onChange={(selectedOption) =>
-                                handleFieldnameChange(row.id, selectedOption)
-                              }
-                              options={row.fieldnameOptions || []}
-                              placeholder="Select fieldname..."
-                              isClearable
-                              styles={customSelectStyles}
-                              menuPortalTarget={document.body}
-                              menuPosition="fixed"
-                            />
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-3 py-3">
-                        <input
-                          type="text"
-                          value={row.setVariable || ""}
-                          onChange={(e) =>
-                            handleInputChange(row.id, "setVariable", e.target.value)
-                          }
-                          className="w-full px-2 py-2 border rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                          placeholder="$variable"
-                        />
-                      </td>
-                      <td className="px-3 py-3">
-                        <input
-                          type="text"
-                          value={row.fieldHeading}
-                          onChange={(e) =>
-                            handleInputChange(row.id, "fieldHeading", e.target.value)
-                          }
-                          className="w-full px-2 py-2 border rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                          placeholder="Heading"
-                        />
-                      </td>
-                      <td className="px-3 py-3">
-                        <input
-                          type="number"
-                          value={row.fieldPosition}
-                          onChange={(e) =>
-                            handleInputChange(row.id, "fieldPosition", e.target.value)
-                          }
-                          className="w-full px-2 py-2 border rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                          placeholder="1"
-                        />
-                      </td>
-                      <td className="px-3 py-3">
-                        <textarea
-                          value={row.formula}
-                          onChange={(e) =>
-                            handleInputChange(row.id, "formula", e.target.value)
-                          }
-                          rows="2"
-                          className="w-full px-2 py-2 border rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
-                          placeholder="Formula"
-                        />
-                      </td>
-                      <td className="px-2 py-3 text-center">
-                        <button
-                          style={{ cursor: 'pointer' }}
-                          onClick={() => removeRow(row.id)}
-                          disabled={rows.length === 1}
-                          className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          Remove
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        )}
+                      </div>
+                    </td>
+
+                    <td className="w-[160px] px-3 py-3">
+                      <input
+                        type="text"
+                        value={row.setVariable || ""}
+                        onChange={(e) =>
+                          handleInputChange(row.id, "setVariable", e.target.value)
+                        }
+                        className="w-full px-2 py-2 border rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="$variable"
+                      />
+                    </td>
+
+                    <td className="w-[180px] px-3 py-3">
+                      <input
+                        type="text"
+                        value={row.fieldHeading}
+                        onChange={(e) =>
+                          handleInputChange(row.id, "fieldHeading", e.target.value)
+                        }
+                        className="w-full px-2 py-2 border rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Heading"
+                      />
+                    </td>
+
+                    <td className="w-[100px] px-3 py-3">
+                      <input
+                        type="number"
+                        value={row.fieldPosition}
+                        onChange={(e) =>
+                          handleInputChange(row.id, "fieldPosition", e.target.value)
+                        }
+                        className="w-full px-2 py-2 border rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="1"
+                      />
+                    </td>
+
+                    {/* ✅ Wider formula cell */}
+                    <td className="w-[450px] px-3 py-3 align-top">
+                      <textarea
+                        value={row.formula}
+                        onChange={(e) => handleInputChange(row.id, "formula", e.target.value)}
+                        rows="4" /* 👈 height increased from 2 to 4 */
+                        className="w-full h-[120px] px-2 py-2 border rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
+                        placeholder="Formula"
+                      />
+                    </td>
+
+                    <td className="w-[80px] px-2 py-3 text-center">
+                      <button
+                        onClick={() => removeRow(row.id)}
+                        disabled={rows.length === 1}
+                        className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <TrashIcon className="size-4.5 stroke-1" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
             <div className="p-4 border-t flex justify-end">
               <button 
