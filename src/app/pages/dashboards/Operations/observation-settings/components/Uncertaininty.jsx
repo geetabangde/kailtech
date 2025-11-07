@@ -46,7 +46,7 @@ function Uncertaininty({
                       <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">
                         Field Heading
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b w-80">
                         Formula
                       </th>
                       <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">
@@ -118,17 +118,7 @@ function Uncertaininty({
                             placeholder="heading"
                           />
                         </td>
-                        <td className="px-4 py-3">
-                          <input
-                            type="text"
-                            value={row.formula}
-                            onChange={(e) =>
-                              handleInputChange(row.id, "formula", e.target.value)
-                            }
-                            className="w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-blue-500"
-                            placeholder="formula"
-                          />
-                        </td>
+
                         <td className="px-4 py-3">
                           <input
                             type="text"
@@ -138,6 +128,17 @@ function Uncertaininty({
                             }
                             className="w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-blue-500"
                             placeholder="position"
+                          />
+                        </td>
+                        <td className="px-4 py-3">
+                          <input
+                            type="text"
+                            value={row.formula}
+                            onChange={(e) =>
+                              handleInputChange(row.id, "formula", e.target.value)
+                            }
+                            className="w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="formula"
                           />
                         </td>
                         <td className="px-4 py-3">

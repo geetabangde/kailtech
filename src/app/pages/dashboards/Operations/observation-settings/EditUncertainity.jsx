@@ -1,59 +1,86 @@
-
 import { useState, useEffect } from "react";
 import axios from "utils/axios";
 import { useParams, useNavigate } from "react-router-dom";
-import Uncertaininty from "./components/Uncertaininty";
+import UncertaintyTable from "./components/UncertaintyTable";
 
 export default function NewTableUI() {
   const { id: formatId } = useParams();
   const navigate = useNavigate();
 
-  // Helper: Create empty row
-  const createEmptyRow = (id) => ({
-    id,
-    checked: true,
-    fieldfrom: "",     
-    fieldname: null,
-    variable: "",                
-    fieldHeading: "",
-    formula: "",
-    fieldPosition: "",
-  });
+  // ✅ Table list
+  const tableList = [
+    { value: "mastermatrix", label: "Master Matrix" },
+    { value: "newcrfcalibrationpoint", label: "CRF Calibration Point" },
+    { value: "new_summary", label: "Summary" },
+    { value: "new_crfmatrix", label: "CRF Matrix" },
+  ];
 
-  // ✅ Initialize with one default row
-  const [rows, setRows] = useState([createEmptyRow(1)]);
-  const [fieldnameOptions, setFieldnameOptions] = useState([]);
+  // ✅ States
+  const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Auto-fetch data when formatId is available
+  // ✅ Helper: Create empty row
+  const createEmptyRow = (id) => ({
+    id,
+    checked: true,
+    selectedTable: null,
+    fieldname: null,
+    fieldfrom: "",
+    setVariable: "",
+    fieldHeading: "",
+    formula: "",
+    fieldPosition: "",
+    fieldnameOptions: [],
+  });
+
+  // ✅ Auto-fetch data when formatId is available
   useEffect(() => {
     if (formatId) {
       fetchUncertaintySettings(formatId);
     }
-    fetchFieldnameOptions();
   }, [formatId]);
 
-  const fetchFieldnameOptions = async () => {
+  // ✅ Fetch fieldname options based on selected table
+  const fetchFieldnameOptions = async (tableName) => {
+    if (!tableName) return [];
+    
     try {
+      let endpoint = '';
+      
+      switch(tableName) {
+        case 'new_summary':
+          endpoint = '/observationsetting/get-all-summary-type';
+          break;
+        case 'mastermatrix':
+          endpoint = '/observationsetting/get-all-mastermatrix-type';
+          break;
+        case 'newcrfcalibrationpoint':
+          endpoint = '/observationsetting/get-all-crfcalibration-type';
+          break;
+        case 'new_crfmatrix':
+          endpoint = '/observationsetting/get-all-crfmatrix-type';
+          break;
+        default:
+          return [];
+      }
 
-      const response = await axios.post(
-        '/observationsetting/get-all-summary-type',
-        {},
-      );
+      const response = await axios.post(endpoint, {});
 
       if (response.data.success && response.data.data) {
-        const options = response.data.data.map(fieldname => ({
+        return response.data.data.map(fieldname => ({
           value: fieldname,
           label: fieldname
         }));
-        setFieldnameOptions(options);
       }
+      return [];
     } catch (error) {
       console.error('Error fetching fieldname options:', error);
+      return [];
     }
   };
 
+  // ✅ Fetch uncertainty settings
   const fetchUncertaintySettings = async (fid) => {
     if (!fid) return;
 
@@ -68,35 +95,45 @@ export default function NewTableUI() {
         console.log('Fetched uncertainty settings:', data);
         
         if (data.uncertaintysetting && data.uncertaintysetting.uncertaintysetting && data.uncertaintysetting.uncertaintysetting.length > 0) {
-          const uncertaintyData = data.uncertaintysetting.uncertaintysetting.map((item, index) => ({
-            id: index + 1,
-            checked: item.checkbox === 'yes',
-            fieldname: item.fieldname ? { value: item.fieldname, label: item.fieldname } : null,
-            fieldHeading: item.field_heading,
-            formula: item.formula,
-            fieldPosition: item.field_position.toString(),
-            setVariable: item.variable || "",  
-            fieldfrom: "new_summary",    
-          }));
+          const uncertaintyData = await Promise.all(
+            data.uncertaintysetting.uncertaintysetting.map(async (item, index) => {
+              const tableObj = tableList.find(t => t.value === item.fieldfrom);
+              
+              let fieldnameOptions = [];
+              if (item.fieldfrom) {
+                fieldnameOptions = await fetchFieldnameOptions(item.fieldfrom);
+              }
+
+              return {
+                id: index + 1,
+                checked: item.checkbox === 'yes',
+                selectedTable: tableObj || null,
+                fieldname: item.fieldname ? { value: item.fieldname, label: item.fieldname } : null,
+                fieldfrom: item.fieldfrom || "",
+                fieldHeading: item.field_heading || "",
+                formula: item.formula || "",
+                fieldPosition: item.field_position ? item.field_position.toString() : "",
+                setVariable: item.variable || "",
+                fieldnameOptions: fieldnameOptions,
+              };
+            })
+          );
           setRows(uncertaintyData);
         } else {
-          // No data → show 1 empty row
           setRows([createEmptyRow(1)]);
         }
-          } else {
-            // No data → show 1 empty row
-            setRows([createEmptyRow(1)]);
-          }
-        } catch (error) {
-          console.error('Error fetching uncertainty settings:', error);
-          // On error → show 1 empty row
-          setRows([createEmptyRow(1)]);
-        } finally {
-          setLoading(false);
-        }
+      } else {
+        setRows([createEmptyRow(1)]);
+      }
+    } catch (error) {
+      console.error('Error fetching uncertainty settings:', error);
+      setRows([createEmptyRow(1)]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Custom styles for React Select
+  // ✅ Custom styles for React Select
   const customSelectStyles = {
     control: (base, state) => ({
       ...base,
@@ -115,7 +152,7 @@ export default function NewTableUI() {
     }),
   };
 
-  // Handlers
+  // ✅ Handlers
   const handleCheckbox = (id) => {
     setRows((prevRows) =>
       prevRows.map((row) =>
@@ -132,10 +169,44 @@ export default function NewTableUI() {
     );
   };
 
-  const handleSelectChange = (id, field, selectedOption) => {
+  const handleTableSelection = async (id, selectedOption) => {
+    if (selectedOption) {
+      const options = await fetchFieldnameOptions(selectedOption.value);
+      
+      setRows((prevRows) =>
+        prevRows.map((row) =>
+          row.id === id 
+            ? { 
+                ...row, 
+                selectedTable: selectedOption,
+                fieldfrom: selectedOption.value,
+                fieldname: null,
+                fieldnameOptions: options 
+              } 
+            : row
+        )
+      );
+    } else {
+      setRows((prevRows) =>
+        prevRows.map((row) =>
+          row.id === id 
+            ? { 
+                ...row, 
+                selectedTable: null,
+                fieldfrom: "",
+                fieldname: null,
+                fieldnameOptions: [] 
+              } 
+            : row
+        )
+      );
+    }
+  };
+
+  const handleFieldnameChange = (id, selectedOption) => {
     setRows((prevRows) =>
       prevRows.map((row) =>
-        row.id === id ? { ...row, [field]: selectedOption } : row
+        row.id === id ? { ...row, fieldname: selectedOption } : row
       )
     );
   };
@@ -145,9 +216,7 @@ export default function NewTableUI() {
     setRows([...rows, createEmptyRow(newId)]);
   };
 
-  // ✅ Remove row handler
   const removeRow = (id) => {
-    // Ensure at least one row remains
     if (rows.length === 1) {
       alert('At least one row is required!');
       return;
@@ -155,11 +224,11 @@ export default function NewTableUI() {
     setRows((prevRows) => prevRows.filter((row) => row.id !== id));
   };
 
-  // ✅ Back button handler
   const handleBack = () => {
-    navigate("/dashboards/operations/observation-settings"); // Go back to previous page
+    navigate("/dashboards/operations/observation-settings");
   };
 
+  // ✅ Save handler - EXACTLY like cURL API
   const handleSave = async () => {
     if (!formatId) {
       alert('Format ID is missing! Please check the URL parameter.');
@@ -176,25 +245,17 @@ export default function NewTableUI() {
         return;
       }
 
-      // Transform rows data - EXACTLY like Postman payload
-      const uncertaintysetting = rows
-        .filter(row => row.fieldname && row.fieldname.value) // Only rows with fieldname
-        .map(row => ({
-          fieldname: row.fieldname.value,
-          field_heading: row.fieldHeading,
-          field_position: parseInt(row.fieldPosition) || 0,
-          formula: row.formula,
-          checkbox: row.checked ? 'yes' : 'no'
-        }));
+      // ✅ Filter and map rows - allowing empty fieldfrom/fieldname like in cURL
+      const uncertaintysetting = rows.map(row => ({
+        fieldfrom: row.fieldfrom || "",
+        fieldname: row.fieldname?.value || "",
+        variable: row.setVariable || "",
+        field_heading: row.fieldHeading || "",
+        field_position: parseInt(row.fieldPosition) || 1,
+        formula: row.formula || "",
+        checkbox: row.checked ? 'yes' : 'no'
+      }));
 
-      // Check if there's data to send
-      if (uncertaintysetting.length === 0) {
-        alert('Please fill at least one row with fieldname before saving!');
-        setLoading(false);
-        return;
-      }
-
-      // Prepare payload - EXACTLY like your Postman
       const payload = {
         observation_id: parseInt(formatId),
         resultsetting: {
@@ -205,7 +266,6 @@ export default function NewTableUI() {
       console.log('=== SENDING PAYLOAD ===');
       console.log(JSON.stringify(payload, null, 2));
 
-      // Make POST request
       const response = await axios.post(
         '/observationsetting/set-uncertainty-setting',
         payload,
@@ -228,7 +288,6 @@ export default function NewTableUI() {
         alert('Failed to save data. Please try again.');
       }
     } catch (error) {
-      
       console.error('=== ERROR ===', error);
       alert(`Error: ${error.response?.data?.message || error.message || 'Failed to save data'}`);
     } finally {
@@ -242,11 +301,12 @@ export default function NewTableUI() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="max-w-[98%] mx-auto space-y-6">
         
         {/* Back Button */}
         <div className="flex items-center justify-start gap-4">
           <button
+            style={{ cursor: 'pointer' }}
             onClick={handleBack}
             className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 font-medium transition"
           >
@@ -266,13 +326,15 @@ export default function NewTableUI() {
           </button>
         </div>
 
-        <Uncertaininty
+        {/* Table Component */}
+        <UncertaintyTable
           rows={rows}
-          fieldnameOptions={fieldnameOptions}
+          tableList={tableList}
           customSelectStyles={customSelectStyles}
           handleCheckbox={handleCheckbox}
           handleInputChange={handleInputChange}
-          handleSelectChange={handleSelectChange}
+          handleTableSelection={handleTableSelection}
+          handleFieldnameChange={handleFieldnameChange}
           addRow={addRow}
           removeRow={removeRow}
           loading={loading}
@@ -284,6 +346,7 @@ export default function NewTableUI() {
             <button
               onClick={handleSave}
               disabled={loading}
+              style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
               className="px-8 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium text-lg shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
               {loading ? 'Saving...' : 'Save All'}
