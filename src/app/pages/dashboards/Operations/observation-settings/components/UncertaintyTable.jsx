@@ -113,11 +113,12 @@ function UncertaintyTable({
                       <input
                         type="number"
                         value={row.fieldPosition}
+                        
                         onChange={(e) =>
                           handleInputChange(row.id, "fieldPosition", e.target.value)
                         }
                         className="w-full px-2 py-2 border rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                        placeholder="1"
+                        placeholder="Position"
                       />
                     </td>
 

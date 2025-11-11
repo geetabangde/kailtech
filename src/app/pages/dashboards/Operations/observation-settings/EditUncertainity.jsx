@@ -13,6 +13,7 @@ export default function NewTableUI() {
     { value: "newcrfcalibrationpoint", label: "CRF Calibration Point" },
     { value: "new_summary", label: "Summary" },
     { value: "new_crfmatrix", label: "CRF Matrix" },
+    { value: "cmcscope", label: "CMC Scope" },
   ];
 
   // ✅ States
@@ -42,43 +43,57 @@ export default function NewTableUI() {
   }, [formatId]);
 
   // ✅ Fetch fieldname options based on selected table
-  const fetchFieldnameOptions = async (tableName) => {
-    if (!tableName) return [];
-    
-    try {
-      let endpoint = '';
-      
-      switch(tableName) {
-        case 'new_summary':
-          endpoint = '/observationsetting/get-all-summary-type';
-          break;
-        case 'mastermatrix':
-          endpoint = '/observationsetting/get-all-mastermatrix-type';
-          break;
-        case 'newcrfcalibrationpoint':
-          endpoint = '/observationsetting/get-all-crfcalibration-type';
-          break;
-        case 'new_crfmatrix':
-          endpoint = '/observationsetting/get-all-crfmatrix-type';
-          break;
-        default:
-          return [];
-      }
+  // ✅ Fetch fieldname options (All in One API)
+const fetchFieldnameOptions = async (tableName) => {
+  if (!tableName) return [];
 
-      const response = await axios.post(endpoint, {});
+  try {
+    // Call only ONCE the unified API that returns all 5 lists
+    const response = await axios.get('/observationsetting/get-all-summary-type');
+   
+    // 👆 this API should return your provided JSON (new_summary, mastermatrix, etc.)
 
-      if (response.data.success && response.data.data) {
-        return response.data.data.map(fieldname => ({
-          value: fieldname,
-          label: fieldname
-        }));
-      }
-      return [];
-    } catch (error) {
-      console.error('Error fetching fieldname options:', error);
-      return [];
+    if (!response.data.success) return [];
+
+    const data = response.data;
+
+    // 🔁 Map tableName to the correct list
+    let targetList = [];
+    switch (tableName) {
+      case 'new_summary':
+        targetList = data.new_summary;
+        break;
+      case 'mastermatrix':
+        targetList = data.mastermatrix;
+        break;
+      case 'newcrfcalibrationpoint':
+        targetList = data.newcrfcalibrationpoint;
+        break;
+      case 'new_crfmatrix':
+        targetList = data.new_crfmatrix;
+        break;
+      case 'cmcscope':
+        targetList = data.cmcscope;
+        break;
+      default:
+        targetList = [];
     }
-  };
+
+    // ✅ Return formatted options for React Select
+    if (Array.isArray(targetList)) {
+      return targetList.map((fieldname) => ({
+        value: fieldname,
+        label: fieldname,
+      }));
+    }
+
+    return [];
+  } catch (error) {
+    console.error("Error fetching fieldname options:", error);
+    return [];
+  }
+};
+
 
   // ✅ Fetch uncertainty settings
   const fetchUncertaintySettings = async (fid) => {
@@ -153,13 +168,25 @@ export default function NewTableUI() {
   };
 
   // ✅ Handlers
-  const handleCheckbox = (id) => {
-    setRows((prevRows) =>
-      prevRows.map((row) =>
-        row.id === id ? { ...row, checked: !row.checked } : row
-      )
-    );
-  };
+const handleCheckbox = (id) => {
+  setRows((prevRows) =>
+    prevRows.map((row) => {
+      if (row.id === id) {
+        const newChecked = !row.checked;
+
+        return {
+          ...row,
+          checked: newChecked,
+          fieldPosition: newChecked
+            ? (row.fieldPosition === "0" || row.fieldPosition === 0 ? "1" : row.fieldPosition)
+            : "0", // ✅ Uncheck → position = 0
+        };
+      }
+      return row;
+    })
+  );
+};
+
 
   const handleInputChange = (id, field, value) => {
     setRows((prevRows) =>
@@ -251,7 +278,7 @@ export default function NewTableUI() {
         fieldname: row.fieldname?.value || "",
         variable: row.setVariable || "",
         field_heading: row.fieldHeading || "",
-        field_position: parseInt(row.fieldPosition) || 1,
+        field_position: parseInt(row.fieldPosition) || "0",
         formula: row.formula || "",
         checkbox: row.checked ? 'yes' : 'no'
       }));

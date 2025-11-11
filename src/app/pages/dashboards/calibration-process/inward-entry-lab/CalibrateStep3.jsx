@@ -54,7 +54,7 @@ const [suffix, setSuffix] = useState('');
     console.log('🔍 Fetching dynamic headings for suffix:', suffix);
     
     const response = await axios.post(
-      'https://lims.kailtech.in/api/observationsetting/get-custome-observation',
+      '/observationsetting/get-custome-observation',
       {
         inwardid: inwardId,
         instid: instId,
@@ -501,15 +501,54 @@ const generateDynamicTableStructure = useCallback((headings, template) => {
           }
         });
       } else if (selectedTableData.id === 'observationmg') {
-        // SET PRESSURE ON UUC (columns 1, 2) and M1, M2 (columns 3, 4) are required
-        for (let col = 1; col <= 4; col++) {
-          const key = `${rowIndex}-${col}`;
-          const value = tableInputValues[key] ?? (row[col]?.toString() || '');
-          if (!value.trim()) {
-            newErrors[key] = 'This field is required';
+        if (dynamicHeadings?.mainhading?.calibration_settings) {
+          // ✅ Dynamic validation based on API settings
+          const sortedSettings = [...dynamicHeadings.mainhading.calibration_settings]
+            .filter(col => col.checkbox === 'yes')
+            .sort((a, b) => a.field_position - b.field_position);
+          
+          let colIndex = 1; // Start after SR NO (col 0)
+          
+          sortedSettings.forEach((setting) => {
+            if (setting.fieldname === 'master') {
+              // Dynamic observation count
+              const obsSettings = dynamicHeadings?.observation_heading?.observation_settings || [];
+              const obsCount = obsSettings.filter(obs => obs.checkbox === 'yes').length;
+              
+              for (let i = 0; i < obsCount; i++) {
+                const key = `${rowIndex}-${colIndex}`;
+                const value = tableInputValues[key] ?? (row[colIndex]?.toString() || '');
+                if (!value.trim()) {
+                  newErrors[key] = 'This field is required';
+                }
+                colIndex++;
+              }
+            } else {
+              // Single column fields
+              const key = `${rowIndex}-${colIndex}`;
+              const value = tableInputValues[key] ?? (row[colIndex]?.toString() || '');
+              
+              // Skip validation for calculated fields
+              if (!['averagemaster', 'error', 'hysterisis'].includes(setting.fieldname)) {
+                if (!value.trim()) {
+                  newErrors[key] = 'This field is required';
+                }
+              }
+              colIndex++;
+            }
+          });
+        } else {
+          // ✅ Fallback to hardcoded validation
+          for (let col = 1; col <= 4; col++) {
+            const key = `${rowIndex}-${col}`;
+            const value = tableInputValues[key] ?? (row[col]?.toString() || '');
+            if (!value.trim()) {
+              newErrors[key] = 'This field is required';
+            }
           }
         }
-      } else if (selectedTableData.id === 'observationmt') {
+      } else
+    if (selectedTableData.id === 'observationmt') {
         // Nominal value (column 1) and Observations 1-5 (columns 2-6) are required
         selectedTableData.staticRows.forEach((row, rowIndex) => {
           // Nominal value
@@ -1685,6 +1724,55 @@ const generateDynamicTableStructure = useCallback((headings, template) => {
         values.push(setPoint || "0");
       });
     }
+    // ✅ DYNAMIC ROW BUILDER - Add this BEFORE the hardcoded MG case
+    if (template === 'observationmg' && dynamicHeadings?.mainhading?.calibration_settings) {
+      console.log('🎯 Using DYNAMIC row builder for MG');
+      
+      const sortedSettings = [...dynamicHeadings.mainhading.calibration_settings]
+        .filter(col => col.checkbox === 'yes')
+        .sort((a, b) => a.field_position - b.field_position);
+
+      dataArray.forEach((point) => {
+        const row = [point.sequence_number?.toString() || '']; // SR NO always first
+        
+        sortedSettings.forEach((setting) => {
+          const fieldname = setting.fieldname;
+          
+          if (fieldname === 'uuc') {
+            row.push(safeGetValue(point.set_pressure?.uuc_value || point.uuc_value));
+          }
+          else if (fieldname === 'calculatedmaster') {
+            row.push(safeGetValue(point.set_pressure?.converted_value || point.converted_uuc_value));
+          }
+          else if (fieldname === 'master') {
+            // ✅ Dynamic observation count
+            const obsSettings = dynamicHeadings?.observation_heading?.observation_settings || [];
+            const obsCount = obsSettings.filter(obs => obs.checkbox === 'yes').length;
+            
+            for (let i = 1; i <= obsCount; i++) {
+              row.push(safeGetValue(point.observations?.[`master_${i}`] || point[`m${i}`]));
+            }
+          }
+          else if (fieldname === 'averagemaster') {
+            row.push(safeGetValue(point.calculations?.mean || point.average_master));
+          }
+          else if (fieldname === 'error') {
+            row.push(safeGetValue(point.calculations?.error));
+          }
+          else if (fieldname === 'hysterisis') {
+            row.push(safeGetValue(point.calculations?.hysteresis || point.hysterisis));
+          }
+        });
+        
+        rows.push(row);
+        calibrationPoints.push(point.point_id?.toString() || '');
+        types.push('master');
+        repeatables.push('0');
+        values.push(safeGetValue(point.set_pressure?.uuc_value) || '0');
+      });
+      
+      return { rows, hiddenInputs: { calibrationPoints, types, repeatables, values } };
+    }
     else if (template === 'observationmg') {
       dataArray.forEach((point) => {
         if (!point) return;
@@ -1821,8 +1909,6 @@ const generateDynamicTableStructure = useCallback((headings, template) => {
         unitTypes: unitTypes // This ensures all unit types are available
       };
     }
-
-
     else if (template === 'observationexm') {
       dataArray.forEach((point) => {
         if (!point) return;
@@ -1976,7 +2062,6 @@ const generateDynamicTableStructure = useCallback((headings, template) => {
         values.push(safeGetValue(point.nominal_value || point.test_point) || '0');
       });
     }
-
 
     else if (template === 'observationctg') {
       dataArray.forEach((point) => {
