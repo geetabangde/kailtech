@@ -13,89 +13,36 @@ export default function ViewInwardEntrySrf() {
 
   const [data, setData] = useState([]);
   const [headings, setHeadings] = useState([]);
+  const [fieldKeys, setFieldKeys] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Normalize heading for comparison
-  const normalizeHeading = (heading) => {
-    return heading.toLowerCase().trim().replace(/\s+/g, ' ');
-  };
-
-  // Map heading to uncertainty_calculations field
-  const getFieldKeyFromHeading = (heading) => {
-    const normalized = normalizeHeading(heading);
-    
-    // Comprehensive mapping based on API response
-    const mappings = {
-      'set uuc': 'uuc',
-      'uuc': 'uuc',
-      'set pressure': 'uuc',
-      'master one': 'master1',
-      'master1': 'master1',
-      'master 1': 'master1',
-      'master two': 'master2',
-      'master2': 'master2',
-      'master 2': 'master2',
-      'average master': 'averagemaster',
-      'mean master': 'averagemaster',
-      'error': 'error',
-      'max zerro': 'maxzeroerror',
-      'max zero': 'maxzeroerror',
-      'max zero error': 'maxzeroerror',
-      'hysterisis': 'hysterisis',
-      'hysteresis': 'hysterisis',
-      'repeatablelity': 'repeatability',
-      'repeatability': 'repeatability',
-      'leastcount': 'leastcount',
-      'least count': 'leastcount',
-      'least count uuc': 'leastcount',
-      'master unc': 'masterunc',
-      'uncertainty master': 'masterunc',
-      'master uncertainty': 'masterunc',
-      'combine uncertinity': 'combineuncertinity',
-      'combined uncertainty': 'combineuncertinity',
-      'dof': 'dof',
-      'degree of freedom': 'dof',
-      'coverage factor': 'coveragefactor',
-      'expandeduncertainty': 'expandeduncertainty',
-      'expanded uncertainty': 'expandeduncertainty',
-      'cmc taken': 'cmc_taken',
-      'cmc': 'cmc_taken',
-    };
-
-    return mappings[normalized] || null;
-  };
-
-  // Format value based on field type
-  const formatValue = (value, fieldKey) => {
+  // ✅ Formatting Function
+  const formatValue = (value, key) => {
     if (value === null || value === undefined) return "-";
-    
-    // Special handling for DOF showing "-" for 0
-    if (fieldKey === 'dof' && (value === 0 || value === "-")) {
-      return "-";
-    }
 
-    // If not a number, return as is
+    if (key === "dof" && (value === 0 || value === "0")) return "0";
+
     if (typeof value !== "number") return value;
 
-    // Determine decimal places based on field
     const decimalMap = {
-      'maxzeroerror': 4,
-      'repeatability': 6,
-      'masterunc': 6,
-      'combineuncertinity': 6,
-      'expandeduncertainty': 6,
-      'cmc_taken': 6,
-      'averagemaster': 2,
-      'error': 2,
-      'hysterisis': 2,
-      'coveragefactor': 2,
-      'dof': 2,
+      maxzeroerror: 4,
+      repeatability: 6,
+      masterunc: 6,
+      combineuncertinity: 6,
+      expandeduncertainty: 6,
+      cmc_taken: 6,
+      averagemaster: 2,
+      error: 2,
+      hysterisis: 2,
+      coveragefactor: 2,
+      dof: 2,
     };
 
-    const decimals = decimalMap[fieldKey] || 2;
+    const decimals = decimalMap[key] || 2;
     return value.toFixed(decimals);
   };
 
+  // ✅ Fetch API Data
   useEffect(() => {
     const fetchUncertainty = async () => {
       try {
@@ -108,26 +55,37 @@ export default function ViewInwardEntrySrf() {
         );
 
         if (response.data?.status === true) {
-          const apiHeadings = response.data.data?.heading || [];
-          setHeadings(apiHeadings);
-          
+          let apiHeadings = response.data.data?.heading || [];
           const calibrationPoints = response.data.data?.calibration_points || [];
+
+          if (calibrationPoints.length > 0) {
+            const keys = Object.keys(
+              calibrationPoints[0].uncertainty_calculations
+            );
+
+            setFieldKeys(keys);
+
+            // ✅ FIX: DOF auto-insert if missing
+            if (apiHeadings.length === keys.length - 1) {
+              apiHeadings.splice(12, 0, "DOF");
+            }
+          }
+
+          setHeadings(apiHeadings);
+
           const mappedData = calibrationPoints.map((point, index) => ({
             srNo: index + 1,
             id: point.id,
-            // Store entire uncertainty_calculations for dynamic access
             uncertaintyCalculations: point.uncertainty_calculations || {},
           }));
-          
+
           setData(mappedData);
         } else {
           toast.error("No data found");
-          setData([]);
         }
       } catch (error) {
-        console.error("Error fetching uncertainty:", error);
         toast.error("Failed to fetch data");
-        setData([]);
+        console.error(error);
       } finally {
         setLoading(false);
       }
@@ -138,86 +96,65 @@ export default function ViewInwardEntrySrf() {
 
   const handleBackToPerformCalibration = () => {
     navigate(
-      `/dashboards/calibration-process/inward-entry-lab/perform-calibration/${inwardId}?caliblocation=${caliblocation}&calibacc=${calibacc}`,
+      `/dashboards/calibration-process/inward-entry-lab/perform-calibration/${inwardId}?caliblocation=${caliblocation}&calibacc=${calibacc}`
     );
   };
 
   const handleBackToInwardList = () => {
     navigate(
-      `/dashboards/calibration-process/inward-entry-lab?caliblocation=${caliblocation}&calibacc=${calibacc}`,
+      `/dashboards/calibration-process/inward-entry-lab?caliblocation=${caliblocation}&calibacc=${calibacc}`
     );
   };
 
   const handlePrint = () => {
-    setTimeout(() => {
-      window.print();
-    }, 1000);
+    setTimeout(() => window.print(), 1000);
   };
 
-  const renderMgTable = () => {
-    
-    return (
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-max border-collapse text-[12px] text-gray-700">
-          <thead>
-            <tr className="bg-gray-200 text-center text-xs font-medium">
-              <th rowSpan="2" className="border border-gray-300 px-2 py-2">
-                Sr no
+  // ✅ Render Table (INDEX MAPPING)
+  const renderMgTable = () => (
+    <div className="overflow-x-auto">
+      <table className="w-full min-w-max border-collapse text-[12px] text-gray-700">
+        <thead>
+          <tr className="bg-gray-200 text-center text-xs font-medium">
+            <th rowSpan="2" className="border border-gray-300 px-2 py-2">
+              Sr no
+            </th>
+            {headings.map((heading, index) => (
+              <th
+                key={`heading-${index}`}
+                rowSpan="2"
+                className="border border-gray-300 px-2 py-2 capitalize"
+              >
+                {heading}
               </th>
-              {headings.map((heading, index) => (
-                <th
-                  key={`heading-${index}`}
-                  rowSpan="2"
-                  className="border border-gray-300 px-2 py-2 capitalize"
-                >
-                  {heading}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((row, rowIndex) => (
-              <tr key={rowIndex} className="text-center hover:bg-gray-50">
-                {/* Sr No */}
-                <td className="border border-gray-300 px-2 py-2">
-                  {row.srNo}
-                </td>
-                
-                {/* Dynamic columns based on API headings */}
-                {headings.map((heading, colIndex) => {
-                  const fieldKey = getFieldKeyFromHeading(heading);
-                  
-                  if (!fieldKey) {
-                    // If mapping not found, show "-"
-                    return (
-                      <td
-                        key={`${rowIndex}-${colIndex}`}
-                        className="border border-gray-300 px-2 py-2"
-                      >
-                        -
-                      </td>
-                    );
-                  }
-
-                  // Get value from uncertainty_calculations
-                  const value = row.uncertaintyCalculations[fieldKey];
-                  
-                  return (
-                    <td
-                      key={`${rowIndex}-${colIndex}`}
-                      className="border border-gray-300 px-2 py-2"
-                    >
-                      {formatValue(value, fieldKey)}
-                    </td>
-                  );
-                })}
-              </tr>
             ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
+          </tr>
+        </thead>
+
+        <tbody>
+          {data.map((row, rowIndex) => (
+            <tr key={rowIndex} className="text-center hover:bg-gray-50">
+              <td className="border border-gray-300 px-2 py-2">{row.srNo}</td>
+
+              {headings.map((heading, colIndex) => {
+                const fieldKey = fieldKeys[colIndex];
+                const value = row.uncertaintyCalculations[fieldKey];
+
+                return (
+                  <td
+                    key={`${rowIndex}-${colIndex}`}
+                    className="border border-gray-300 px-2 py-2"
+                  >
+                    {formatValue(value, fieldKey)}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 
   if (loading) {
     return (
@@ -249,8 +186,9 @@ export default function ViewInwardEntrySrf() {
     <div className="p-4">
       <div className="mb-6 flex items-center justify-between rounded-lg border-b bg-white p-4 shadow-sm">
         <h1 className="text-2xl font-semibold text-gray-800">
-          Uncertainty Calculation 
+          Uncertainty Calculation
         </h1>
+
         <div className="space-x-2">
           <Button
             onClick={handleBackToInwardList}
@@ -258,6 +196,7 @@ export default function ViewInwardEntrySrf() {
           >
             &lt;&lt; Back to Inward Entry List
           </Button>
+
           <Button
             onClick={handleBackToPerformCalibration}
             className="rounded bg-indigo-500 px-4 py-2 text-white hover:bg-indigo-600"
@@ -271,9 +210,7 @@ export default function ViewInwardEntrySrf() {
         {data.length > 0 ? (
           renderMgTable()
         ) : (
-          <div className="py-8 text-center text-gray-500">
-            No data available
-          </div>
+          <div className="py-8 text-center text-gray-500">No data available</div>
         )}
       </div>
 
