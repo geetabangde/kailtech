@@ -13,8 +13,88 @@ export default function ViewInwardEntrySrf() {
 
   const [data, setData] = useState([]);
   const [headings, setHeadings] = useState([]);
-  // const [suffix, setSuffix] = useState("");
   const [loading, setLoading] = useState(true);
+
+  // Normalize heading for comparison
+  const normalizeHeading = (heading) => {
+    return heading.toLowerCase().trim().replace(/\s+/g, ' ');
+  };
+
+  // Map heading to uncertainty_calculations field
+  const getFieldKeyFromHeading = (heading) => {
+    const normalized = normalizeHeading(heading);
+    
+    // Comprehensive mapping based on API response
+    const mappings = {
+      'set uuc': 'uuc',
+      'uuc': 'uuc',
+      'set pressure': 'uuc',
+      'master one': 'master1',
+      'master1': 'master1',
+      'master 1': 'master1',
+      'master two': 'master2',
+      'master2': 'master2',
+      'master 2': 'master2',
+      'average master': 'averagemaster',
+      'mean master': 'averagemaster',
+      'error': 'error',
+      'max zerro': 'maxzeroerror',
+      'max zero': 'maxzeroerror',
+      'max zero error': 'maxzeroerror',
+      'hysterisis': 'hysterisis',
+      'hysteresis': 'hysterisis',
+      'repeatablelity': 'repeatability',
+      'repeatability': 'repeatability',
+      'leastcount': 'leastcount',
+      'least count': 'leastcount',
+      'least count uuc': 'leastcount',
+      'master unc': 'masterunc',
+      'uncertainty master': 'masterunc',
+      'master uncertainty': 'masterunc',
+      'combine uncertinity': 'combineuncertinity',
+      'combined uncertainty': 'combineuncertinity',
+      'dof': 'dof',
+      'degree of freedom': 'dof',
+      'coverage factor': 'coveragefactor',
+      'expandeduncertainty': 'expandeduncertainty',
+      'expanded uncertainty': 'expandeduncertainty',
+      'cmc taken': 'cmc_taken',
+      'cmc': 'cmc_taken',
+    };
+
+    return mappings[normalized] || null;
+  };
+
+  // Format value based on field type
+  const formatValue = (value, fieldKey) => {
+    if (value === null || value === undefined) return "-";
+    
+    // Special handling for DOF showing "-" for 0
+    if (fieldKey === 'dof' && (value === 0 || value === "-")) {
+      return "-";
+    }
+
+    // If not a number, return as is
+    if (typeof value !== "number") return value;
+
+    // Determine decimal places based on field
+    const decimalMap = {
+      'maxzeroerror': 4,
+      'repeatability': 6,
+      'masterunc': 6,
+      'combineuncertinity': 6,
+      'expandeduncertainty': 6,
+      'cmc_taken': 6,
+      'averagemaster': 2,
+      'error': 2,
+      'hysterisis': 2,
+      'coveragefactor': 2,
+      'dof': 2,
+    };
+
+    const decimals = decimalMap[fieldKey] || 2;
+    return value.toFixed(decimals);
+  };
 
   useEffect(() => {
     const fetchUncertainty = async () => {
@@ -24,37 +104,19 @@ export default function ViewInwardEntrySrf() {
           {
             instid: instId,
             inwardid: inwardId,
-            // suffix: "mg"
           }
         );
 
         if (response.data?.status === true) {
-          // setSuffix("mg");
-          
-          // Set headings from API
           const apiHeadings = response.data.data?.heading || [];
           setHeadings(apiHeadings);
           
-          // Set calibration points data
           const calibrationPoints = response.data.data?.calibration_points || [];
           const mappedData = calibrationPoints.map((point, index) => ({
             srNo: index + 1,
             id: point.id,
-            setPressure: point.uncertainty_calculations?.uuc || "",
-            masterObservationM1: point.uncertainty_calculations?.master1 || 0,
-            masterObservationM2: point.uncertainty_calculations?.master2 || 0,
-            meanMaster: point.uncertainty_calculations?.averagemaster,
-            error: point.uncertainty_calculations?.error || 0,
-            maxZeroError: point.uncertainty_calculations?.maxzeroerror || 0,
-            hysterisis: point.uncertainty_calculations?.hysterisis || 0,
-            repeatability: point.uncertainty_calculations?.repeatability || 0,
-            leastCountUuc: point.uncertainty_calculations?.leastcount || 0,
-            uncertaintyMaster: point.uncertainty_calculations?.masterunc || 0,
-            combinedUncertainty: point.uncertainty_calculations?.combineuncertinity || 0,
-            degreeOfFreedom: point.uncertainty_calculations?.dof || 0,
-            coverageFactor: point.uncertainty_calculations?.coveragefactor || 0,
-            expandedUncertainty: point.uncertainty_calculations?.expandeduncertainty || 0,
-            cmcTaken: point.uncertainty_calculations?.cmc_taken || 0,
+            // Store entire uncertainty_calculations for dynamic access
+            uncertaintyCalculations: point.uncertainty_calculations || {},
           }));
           
           setData(mappedData);
@@ -92,33 +154,17 @@ export default function ViewInwardEntrySrf() {
     }, 1000);
   };
 
-  const renderMgTable = () => (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-max border-collapse text-[12px] text-gray-700">
-        <thead>
-          <tr className="bg-gray-200 text-center text-xs font-medium">
-            <th rowSpan="2" className="border border-gray-300 px-2 py-2">
-              Sr no
-            </th>
-            {headings.map((heading, index) => {
-              // For "observation master" columns, use colspan
-              if (heading === "observation master") {
-                if (index === 1) {
-                  // First observation master column
-                  return (
-                    <th
-                      key={`heading-${index}`}
-                      colSpan="2"
-                      className="border border-gray-300 bg-gray-300 px-2 py-2"
-                    >
-                      Observation on master (Pa)
-                    </th>
-                  );
-                }
-                // Skip second observation master as it's covered by colspan
-                return null;
-              }
-              return (
+  const renderMgTable = () => {
+    
+    return (
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-max border-collapse text-[12px] text-gray-700">
+          <thead>
+            <tr className="bg-gray-200 text-center text-xs font-medium">
+              <th rowSpan="2" className="border border-gray-300 px-2 py-2">
+                Sr no
+              </th>
+              {headings.map((heading, index) => (
                 <th
                   key={`heading-${index}`}
                   rowSpan="2"
@@ -126,92 +172,52 @@ export default function ViewInwardEntrySrf() {
                 >
                   {heading}
                 </th>
-              );
-            })}
-          </tr>
-          
-        </thead>
-        <tbody>
-          {data.map((row, i) => (
-            <tr key={i} className="text-center hover:bg-gray-50">
-              <td className="border border-gray-300 px-2 py-2">{row.srNo}</td>
-              <td className="border border-gray-300 px-2 py-2">
-                {row.setPressure}
-              </td>
-              <td className="border border-gray-300 px-2 py-2">
-                {row.masterObservationM1}
-              </td>
-              <td className="border border-gray-300 px-2 py-2">
-                {row.masterObservationM2}
-              </td>
-              <td className="border border-gray-300 px-2 py-2">
-                {row.meanMaster !== null && row.meanMaster !== undefined
-                  ? typeof row.meanMaster === "number"
-                    ? row.meanMaster.toFixed(2)
-                    : row.meanMaster
-                  : "-"}
-              </td>
-              <td className="border border-gray-300 px-2 py-2">
-                {typeof row.error === "number"
-                  ? row.error.toFixed(2)
-                  : row.error}
-              </td>
-              <td className="border border-gray-300 px-2 py-2">
-                {typeof row.maxZeroError === "number"
-                  ? row.maxZeroError.toFixed(4)
-                  : row.maxZeroError}
-              </td>
-              <td className="border border-gray-300 px-2 py-2">
-                {typeof row.hysterisis === "number"
-                  ? row.hysterisis.toFixed(2)
-                  : row.hysterisis}
-              </td>
-              <td className="border border-gray-300 px-2 py-2">
-                {typeof row.repeatability === "number"
-                  ? row.repeatability.toFixed(6)
-                  : row.repeatability}
-              </td>
-              <td className="border border-gray-300 px-2 py-2">
-                {row.leastCountUuc}
-              </td>
-              <td className="border border-gray-300 px-2 py-2">
-                {typeof row.uncertaintyMaster === "number"
-                  ? row.uncertaintyMaster.toFixed(6)
-                  : row.uncertaintyMaster}
-              </td>
-              <td className="border border-gray-300 px-2 py-2">
-                {typeof row.combinedUncertainty === "number"
-                  ? row.combinedUncertainty.toFixed(6)
-                  : row.combinedUncertainty}
-              </td>
-              <td className="border border-gray-300 px-2 py-2">
-                {row.degreeOfFreedom === 0 || row.degreeOfFreedom === "-"
-                  ? "-"
-                  : typeof row.degreeOfFreedom === "number"
-                    ? row.degreeOfFreedom.toFixed(2)
-                    : row.degreeOfFreedom}
-              </td>
-              <td className="border border-gray-300 px-2 py-2">
-                {typeof row.coverageFactor === "number"
-                  ? row.coverageFactor.toFixed(2)
-                  : row.coverageFactor}
-              </td>
-              <td className="border border-gray-300 px-2 py-2">
-                {typeof row.expandedUncertainty === "number"
-                  ? row.expandedUncertainty.toFixed(6)
-                  : row.expandedUncertainty}
-              </td>
-              <td className="border border-gray-300 px-2 py-2">
-                {typeof row.cmcTaken === "number"
-                  ? row.cmcTaken.toFixed(6)
-                  : row.cmcTaken}
-              </td>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+          </thead>
+          <tbody>
+            {data.map((row, rowIndex) => (
+              <tr key={rowIndex} className="text-center hover:bg-gray-50">
+                {/* Sr No */}
+                <td className="border border-gray-300 px-2 py-2">
+                  {row.srNo}
+                </td>
+                
+                {/* Dynamic columns based on API headings */}
+                {headings.map((heading, colIndex) => {
+                  const fieldKey = getFieldKeyFromHeading(heading);
+                  
+                  if (!fieldKey) {
+                    // If mapping not found, show "-"
+                    return (
+                      <td
+                        key={`${rowIndex}-${colIndex}`}
+                        className="border border-gray-300 px-2 py-2"
+                      >
+                        -
+                      </td>
+                    );
+                  }
+
+                  // Get value from uncertainty_calculations
+                  const value = row.uncertaintyCalculations[fieldKey];
+                  
+                  return (
+                    <td
+                      key={`${rowIndex}-${colIndex}`}
+                      className="border border-gray-300 px-2 py-2"
+                    >
+                      {formatValue(value, fieldKey)}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
 
   if (loading) {
     return (
@@ -266,7 +272,7 @@ export default function ViewInwardEntrySrf() {
           renderMgTable()
         ) : (
           <div className="py-8 text-center text-gray-500">
-            No data available for Magnehelic Gauge
+            No data available
           </div>
         )}
       </div>
