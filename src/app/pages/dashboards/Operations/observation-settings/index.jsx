@@ -12,7 +12,7 @@ import {
 } from "@tanstack/react-table";
 import clsx from "clsx";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "utils/axios";
 
 // Local Imports
 import { Table, Card, THead, TBody, Th, Tr, Td } from "components/ui";
@@ -50,7 +50,7 @@ export default function OrdersDatatableV1() {
       // Get token from localStorage
       const token = localStorage.getItem('authToken'); 
       
-      const response = await axios.get("https://lims.kailtech.in/api/get-formate", {
+      const response = await axios.get("/get-formate", {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

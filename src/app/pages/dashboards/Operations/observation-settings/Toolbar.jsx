@@ -41,8 +41,15 @@ export function Toolbar({ table }) {
             Observation Settings
             </h2>
           </div>
-
-         
+          {/* ADD BUTTON */}
+          <div className="flex items-center space-x-3">
+            <Button 
+            onClick={() => window.location.href="/dashboards/Operations/observation-settings/create"}
+            variant="solid" className="btn-base btn bg-indigo-500  text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+            color="primary" >
+              + Add New Observation
+            </Button>
+          </div>
         </div>
         
         {isXs ? (

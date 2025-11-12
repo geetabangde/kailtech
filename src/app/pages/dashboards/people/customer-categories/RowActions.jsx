@@ -40,9 +40,7 @@ export function RowActions({ row, table }) {
   const [confirmDeleteLoading, setConfirmDeleteLoading] = useState(false);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
   const [deleteError, setDeleteError] = useState(false);
-
-
-
+  
   const closeModal = () => {
     setDeleteModalOpen(false);
   };

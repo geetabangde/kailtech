@@ -48,7 +48,7 @@ function MultiUnitTable({
         <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-3 bg-blue-50 dark:bg-blue-900 p-2 rounded">
           {unitTypeGroup.unit_type}
         </h3>
-        <div className="overflow-x-auto border border-gray-200 dark:border-gray-600">
+        <div className="overflow-x-auto border border-gray-200 dark:border-gray-600 kjjkh">
           <table className="w-full text-sm">
             <TableHeader tableStructure={tableStructure} />
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">

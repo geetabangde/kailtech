@@ -121,7 +121,7 @@ export function RowActions({ row, table }) {
                     )}
                   >
                     <PencilIcon className="size-4.5 stroke-1" />
-                    <span>Edit</span>
+                    <span>Edit Calibration </span>
                   </button>
                 )}
               </MenuItem>

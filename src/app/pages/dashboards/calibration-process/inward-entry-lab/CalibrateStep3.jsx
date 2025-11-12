@@ -5010,7 +5010,7 @@ const generateTableStructure = () => {
       selectedTableData.id === 'observationexm' ||
       selectedTableData.id === 'observationfg' ||
       selectedTableData.id === 'observationhg' ||
-      selectedTableData.id === 'observationdg' ||  // ✅ ADD THIS LINE
+      selectedTableData.id === 'observationdg' ||  
       selectedTableData.id === 'observationmsr') {
 
       calibrationPoints.push(firstRowCalibPointId);

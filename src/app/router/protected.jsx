@@ -1726,6 +1726,16 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
+                    {
+                      path: "create",
+                      lazy: async () => ({
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/Operations/observation-settings/Add"
+                          )
+                        ).default,
+                      }),
+                    },
                      {
                       path: "edit/:id",
                       lazy: async () => ({
