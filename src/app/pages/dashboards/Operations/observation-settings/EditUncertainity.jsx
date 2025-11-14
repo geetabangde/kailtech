@@ -409,7 +409,7 @@ export default function NewTableUI() {
           <button
             style={{ cursor: "pointer" }}
             onClick={handleBack}
-            className="flex items-center gap-2 rounded-md bg-gray-600 px-4 py-2 font-medium text-white transition hover:bg-gray-700"
+            className="flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

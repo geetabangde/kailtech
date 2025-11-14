@@ -28,10 +28,10 @@ import { useNavigate } from "react-router";
 const confirmMessages = {
   pending: {
     description:
-      "Are you sure you want to delete this modes? Once deleted, it cannot be restored.",
+      "Are you sure you want to delete this Observation? Once deleted, it cannot be restored.",
   },
   success: {
-    title: "modes Deleted",
+    title: "Observation Deleted",
   },
 };
 

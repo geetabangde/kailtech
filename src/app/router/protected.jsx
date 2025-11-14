@@ -1,11 +1,9 @@
-
 import { Navigate } from "react-router";
 
 // Local Imports
 import { AppLayout } from "app/layouts/AppLayout";
 import { DynamicLayout } from "app/layouts/DynamicLayout";
 import AuthGuard from "middleware/AuthGuard";
-
 
 // ----------------------------------------------------------------------
 
@@ -58,11 +56,6 @@ const protectedRoutes = {
                       }),
                     },
 
-
-
-
-
-
                     {
                       path: "AddNewInstrument",
                       lazy: async () => ({
@@ -73,8 +66,6 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-
-
 
                     {
                       path: "edit/:id", // Edit Page
@@ -217,10 +208,8 @@ const protectedRoutes = {
                                 ).default,
                               }),
                             },
-                          ]
+                          ],
                         },
-
-
                       ],
                     },
 
@@ -245,14 +234,8 @@ const protectedRoutes = {
                       }),
                     },
 
-
-
-
-
                     {
                       path: "view-verification-list/:id",
-
-
 
                       lazy: async () => ({
                         Component: (
@@ -272,11 +255,7 @@ const protectedRoutes = {
                           )
                         ).default,
                       }),
-
-
                     },
-
-
                     {
                       path: "view-checklist/:id",
                       lazy: async () => ({
@@ -287,10 +266,6 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-
-
-
-
                     {
                       path: "add-new-master-matrix",
                       lazy: async () => ({
@@ -311,20 +286,8 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-
                   ],
-
                 },
-
-
-
-
-
-
-
-
-
-
 
                 //---------------------------------site calibration------------------------
 
@@ -351,8 +314,6 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-
-
 
                     {
                       path: "edit/:id", // Edit Page
@@ -462,7 +423,7 @@ const protectedRoutes = {
                                 ).default,
                               }),
                             },
-                          ]
+                          ],
                         },
 
                         {
@@ -495,10 +456,8 @@ const protectedRoutes = {
                             ).default,
                           }),
                         },
-
                       ],
                     },
-
 
                     {
                       path: "dump/:id",
@@ -539,10 +498,7 @@ const protectedRoutes = {
                           )
                         ).default,
                       }),
-
-
                     },
-
 
                     {
                       path: "view-checklist/:id",
@@ -554,7 +510,6 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-
 
                     {
                       path: "add-new-master-matrix",
@@ -579,12 +534,6 @@ const protectedRoutes = {
                   ],
                 },
 
-
-
-
-              
-
-
                 //------------------------calibration----------------------------
 
                 {
@@ -601,9 +550,6 @@ const protectedRoutes = {
                       }),
                     },
 
-
-
-
                     {
                       path: "AddNewInstrument",
                       lazy: async () => ({
@@ -614,8 +560,6 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-
-
 
                     {
                       path: "edit/:id", // Edit Page
@@ -638,7 +582,6 @@ const protectedRoutes = {
                       }),
                     },
 
-
                     {
                       path: "dump/:id",
                       lazy: async () => ({
@@ -660,14 +603,8 @@ const protectedRoutes = {
                       }),
                     },
 
-
-
-
-
                     {
                       path: "view-verification-list/:id",
-
-
 
                       lazy: async () => ({
                         Component: (
@@ -687,10 +624,7 @@ const protectedRoutes = {
                           )
                         ).default,
                       }),
-
-
                     },
-
 
                     {
                       path: "view-checklist/:id",
@@ -702,7 +636,6 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-
 
                     {
                       path: "add-new-master-matrix",
@@ -760,8 +693,6 @@ const protectedRoutes = {
                           }),
                         },
 
-
-
                         {
                           path: "validity-detail",
                           children: [
@@ -815,7 +746,7 @@ const protectedRoutes = {
                                 ).default,
                               }),
                             },
-                          ]
+                          ],
                         },
 
                         {
@@ -839,19 +770,10 @@ const protectedRoutes = {
                             ).default,
                           }),
                         },
-
-
                       ],
                     },
                   ],
                 },
-
-
-
-
-
-
-
 
                 //-------------------  chemical   --------------------
 
@@ -1004,8 +926,6 @@ const protectedRoutes = {
                           }),
                         },
 
-
-
                         {
                           path: "validity-detail",
                           children: [
@@ -1059,7 +979,7 @@ const protectedRoutes = {
                                 ).default,
                               }),
                             },
-                          ]
+                          ],
                         },
 
                         {
@@ -1083,15 +1003,10 @@ const protectedRoutes = {
                             ).default,
                           }),
                         },
-
-
                       ],
                     },
                   ],
-
                 },
-
-
 
                 //------------------- building-material  --------------------
 
@@ -1161,8 +1076,6 @@ const protectedRoutes = {
                     {
                       path: "view-verification-list/:id",
 
-
-
                       lazy: async () => ({
                         Component: (
                           await import(
@@ -1181,10 +1094,7 @@ const protectedRoutes = {
                           )
                         ).default,
                       }),
-
-
                     },
-
 
                     {
                       path: "view-checklist/:id",
@@ -1196,7 +1106,6 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-
 
                     {
                       path: "add-new-master-matrix",
@@ -1219,7 +1128,7 @@ const protectedRoutes = {
                       }),
                     },
 
-                          {
+                    {
                       path: "maintenance-equipment-history",
                       children: [
                         {
@@ -1253,8 +1162,6 @@ const protectedRoutes = {
                             ).default,
                           }),
                         },
-
-
 
                         {
                           path: "validity-detail",
@@ -1309,7 +1216,7 @@ const protectedRoutes = {
                                 ).default,
                               }),
                             },
-                          ]
+                          ],
                         },
 
                         {
@@ -1333,14 +1240,10 @@ const protectedRoutes = {
                             ).default,
                           }),
                         },
-
-
                       ],
                     },
                   ],
                 },
-
-
 
                 //-------------------Reporting-------------------
 
@@ -1508,7 +1411,7 @@ const protectedRoutes = {
                                 ).default,
                               }),
                             },
-                          ]
+                          ],
                         },
                       ],
                     },
@@ -1585,132 +1488,9 @@ const protectedRoutes = {
                     },
                   ],
                 },
-
-
-                // {
-                //   path: "site-calibration",
-                //   children: [
-                //     {
-                //       path: "",
-                //       lazy: async () => ({
-                //         Component: (
-                //           await import(
-                //             "app/pages/dashboards/material-list/site-calibration"
-                //           )
-                //         ).default,
-                //       }),
-                //     },
-
-                //     {
-                //       path: "AddNewInstrument",
-                //       lazy: async () => ({
-                //         Component: (
-                //           await import(
-                //             "app/pages/dashboards/material-list/site-calibration/AddNewInstrument"
-                //           )
-                //         ).default,
-                //       }),
-                //     },
-                //   ],
-
-                // },
-                // {
-                //   path: "site-calibration",
-                //   lazy: async () => ({
-                //     Component: (
-                //       await import("app/pages/dashboards/material-list/site-calibration")).default,
-                //   }),
-                // },
-                // {
-                //   path: "calibration",
-                //   lazy: async () => ({
-                //     Component: (await import("app/pages/dashboards/material-list/Calibration")).default,
-                //   }),
-                // },
-                // {
-                //   path: "chemical",
-                //   lazy: async () => ({
-                //     Component: (await import("app/pages/dashboards/material-list/Chemical")).default,
-                //   }),
-                // },
-                // {
-                //   path: "building-material",
-                //   lazy: async () => ({
-                //     Component: (await import("app/pages/dashboards/material-list/BuildingMaterial")).default,
-                //   }),
-                // },
-                // {
-                //   path: "reporting",
-                //   lazy: async () => ({
-                //     Component: (await import("app/pages/dashboards/material-list/Reporting")).default,
-                //   }),
-                // },
-                // {
-                //   path: "calibration-mechanical",
-                //   lazy: async () => ({
-                //     Component: (await import("app/pages/dashboards/material-list/CalibrationMechanical")).default,
-                //   }),
-                // },
-                // {
-                //   path: "calibration-bio-medical",
-                //   lazy: async () => ({
-                //     Component: (await import("app/pages/dashboards/material-list/CalibrationBioMedical")).default,
-                //   }),
-                // },
-                // {
-                //   path: "quality-department",
-                //   lazy: async () => ({
-                //     Component: (await import("app/pages/dashboards/material-list/QualityDepartment")).default,
-                //   }),
-                // },
-                // {
-                //   path: "store-department",
-                //   lazy: async () => ({
-                //     Component: (await import("app/pages/dashboards/material-list/StoreDepartment")).default,
-                //   }),
-                // },
-                // {
-                //   path: "mechanical",
-                //   lazy: async () => ({
-                //     Component: (await import("app/pages/dashboards/material-list/Mechanical")).default,
-                //   }),
-                // },
               ],
             },
-
-
-
-
-
-
-              // {
-                //   path: "operations",
-                //   children: [
-                //     {
-                //       path: "",
-                //       lazy: async () => ({
-                //         Component: (
-                //           await import(
-                //             "app/pages/dashboards/Operations/observation-settings"
-                //           )
-                //         ).default,
-                //       }),
-                //     },
-                //     {
-                //       path: "observation-settings",
-                //       lazy: async () => ({
-                //         Component: (
-                //           await import(
-                //             "app/pages/dashboards/Operations/observation-settings"
-                //           )
-                //         ).default,
-                //       }),
-                //     },
-                //   ],
-                // },
-
-
-                  {
+            {
               path: "operations",
               children: [
                 {
@@ -1736,7 +1516,7 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-                     {
+                    {
                       path: "edit/:id",
                       lazy: async () => ({
                         Component: (
@@ -1746,7 +1526,7 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-                                         {
+                    {
                       path: "edit-uncertainty/:id",
                       lazy: async () => ({
                         Component: (
@@ -1756,11 +1536,10 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-                  ]
-                }
-              ]
+                  ],
+                },
+              ],
             },
-
 
             {
               path: "master-data",
@@ -1912,7 +1691,11 @@ const protectedRoutes = {
                     {
                       path: "",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/master-data/MasterDocument")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/MasterDocument"
+                          )
+                        ).default,
                       }),
                     },
                     // {
@@ -1921,27 +1704,31 @@ const protectedRoutes = {
                     //     Component: (await import("app/pages/dashboards/master-data/MasterDocument/view")).default,
                     //   }),
                     // },
-                     {
+                    {
                       path: "add-master-document",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/master-data/MasterDocument/AddMasterDocument")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/MasterDocument/AddMasterDocument"
+                          )
+                        ).default,
                       }),
                     },
                   ],
                 },
 
-
-
-
-
-                                //----------------------------Statuary Details---------------------------------
+                //----------------------------Statuary Details---------------------------------
                 {
                   path: "statuary-detail",
                   children: [
                     {
                       path: "",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/master-data/StatuaryDetail")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/StatuaryDetail"
+                          )
+                        ).default,
                       }),
                     },
                     // {
@@ -1950,40 +1737,52 @@ const protectedRoutes = {
                     //     Component: (await import("app/pages/dashboards/master-data/MasterDocument/view")).default,
                     //   }),
                     // },
-                     {
+                    {
                       path: "edit",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/master-data/StatuaryDetail/Edit")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/StatuaryDetail/Edit"
+                          )
+                        ).default,
                       }),
                     },
-                     {
+                    {
                       path: "add-new-statuary-detail",
                       lazy: async () => ({
                         Component: (
                           await import(
-                            "app/pages/dashboards/master-data/StatuaryDetail/AddNewStatuaryDetail")
-                      ).default,
+                            "app/pages/dashboards/master-data/StatuaryDetail/AddNewStatuaryDetail"
+                          )
+                        ).default,
                       }),
                     },
                   ],
                 },
 
-
                 //---------------------------Master Calibration Return--------------
 
-                    {
+                {
                   path: "master-calibration-return",
                   children: [
                     {
                       path: "",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/master-data/MasterCalibrationReturn")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/MasterCalibrationReturn"
+                          )
+                        ).default,
                       }),
                     },
                     {
                       path: "fill-master-validity",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/master-data/MasterCalibrationReturn/FillMasterValidity")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/MasterCalibrationReturn/FillMasterValidity"
+                          )
+                        ).default,
                       }),
                     },
                     //  {
@@ -2004,21 +1803,28 @@ const protectedRoutes = {
                   ],
                 },
 
-
                 //----------------------------Unit Conversion---------------------
-                          {
+                {
                   path: "units-conversion",
                   children: [
                     {
                       path: "",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/master-data/UnitsConversion")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/UnitsConversion"
+                          )
+                        ).default,
                       }),
                     },
                     {
                       path: "add-new-unit-conversion",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/master-data/UnitsConversion/AddNewConversion")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/master-data/UnitsConversion/AddNewConversion"
+                          )
+                        ).default,
                       }),
                     },
                     //  {
@@ -2027,10 +1833,8 @@ const protectedRoutes = {
                     //     Component: (await import("app/pages/dashboards/master-data/StatuaryDetail/Edit")).default,
                     //   }),
                     // },
-                  
                   ],
                 },
-
 
                 {
                   path: "currencies",
@@ -2100,7 +1904,6 @@ const protectedRoutes = {
                     },
                   ],
                 },
-
 
                 {
                   path: "manage-labs",
@@ -2208,25 +2011,41 @@ const protectedRoutes = {
                     {
                       path: "view-sticker/:inwardId/:instId",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/ViewSticker")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/ViewSticker"
+                          )
+                        ).default,
                       }),
                     },
                     {
                       path: "view-multiple-traceability/:inwardId/:instIds",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/ViewMultipleTraceability")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/ViewMultipleTraceability"
+                          )
+                        ).default,
                       }),
                     },
                     {
                       path: "ViewMultiple/:inwardId/:instId?",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/ViewMultiple")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/ViewMultiple"
+                          )
+                        ).default,
                       }),
                     },
                     {
                       path: "view-multiple-approved-certificate/:inwardId/:instId",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/ViewMultipleApprovedCertificate")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/ViewMultipleApprovedCertificate"
+                          )
+                        ).default,
                       }),
                     },
                     {
@@ -2291,8 +2110,8 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-                     {
-                      path: "view-documents/:id/:itemId", 
+                    {
+                      path: "view-documents/:id/:itemId",
                       lazy: async () => ({
                         Component: (
                           await import(
@@ -2397,7 +2216,7 @@ const protectedRoutes = {
                       lazy: async () => ({
                         Component: (
                           await import(
-                            ("app/pages/dashboards/calibration-process/inward-entry-lab/AddCrf")
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/AddCrf"
                           )
                         ).default,
                       }),
@@ -2405,95 +2224,153 @@ const protectedRoutes = {
                     {
                       path: "calibrate-step1/:id/:itemId",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/CalibrateStep1")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/CalibrateStep1"
+                          )
+                        ).default,
                       }),
                     },
                     {
                       path: "add-crf/:id/:itemId",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/AddCrf")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/AddCrf"
+                          )
+                        ).default,
                       }),
                     },
                     {
                       path: "calibrate-step2/:id/:itemId",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/CalibrateStep2")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/CalibrateStep2"
+                          )
+                        ).default,
                       }),
                     },
                     {
                       path: "calibrate-step3/:id/:itemId",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/CalibrateStep3")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/CalibrateStep3"
+                          )
+                        ).default,
                       }),
                     },
                     {
                       path: "edit-instrumental-crf/:id/:itemId",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/EditInstrumentalCrf")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/EditInstrumentalCrf"
+                          )
+                        ).default,
                       }),
                     },
                     {
                       path: "matrix/:id/:itemId",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/InstrumentMatrix ")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/InstrumentMatrix "
+                          )
+                        ).default,
                       }),
                     },
                     {
                       path: "review/:id/:itemId",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/Review")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/Review"
+                          )
+                        ).default,
                       }),
                     },
                     {
                       path: "approve/:id/:itemId",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/Approve")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/Approve"
+                          )
+                        ).default,
                       }),
                     },
                     {
                       path: "clone-item/:id/:itemId",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/CloneItem")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/CloneItem"
+                          )
+                        ).default,
                       }),
                     },
                     {
                       path: "view-rawdata/:id/:itemId",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/ViewRawData")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/ViewRawData"
+                          )
+                        ).default,
                       }),
                     },
                     {
                       path: "view-cmc-calculation/:id/:itemId",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/ViewCMCCalculation")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/ViewCMCCalculation"
+                          )
+                        ).default,
                       }),
                     },
                     {
                       path: "view-certificate/:id/:itemId",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/ViewCertificate")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/ViewCertificate"
+                          )
+                        ).default,
                       }),
                     },
                     {
                       path: "view-certificate-with-lh/:id/:itemId",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/viewCertificateWithlh")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/viewCertificateWithlh"
+                          )
+                        ).default,
                       }),
                     },
                     {
                       path: "regenerate-cache/:id/:itemId",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/RegenerateCache")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/RegenerateCache"
+                          )
+                        ).default,
                       }),
                     },
                     {
                       path: "view-traceability/:id/:itemId",
                       lazy: async () => ({
-                        Component: (await import("app/pages/dashboards/calibration-process/inward-entry-lab/ViewTraceability")).default,
+                        Component: (
+                          await import(
+                            "app/pages/dashboards/calibration-process/inward-entry-lab/ViewTraceability"
+                          )
+                        ).default,
                       }),
                     },
-
-
                   ],
                 },
               ],
@@ -2506,7 +2383,9 @@ const protectedRoutes = {
                   path: "dispatch-list",
                   lazy: async () => ({
                     Component: (
-                      await import("app/pages/dashboards/calibration-process/dispatch-list")
+                      await import(
+                        "app/pages/dashboards/calibration-process/dispatch-list"
+                      )
                     ).default,
                   }),
                 },
@@ -2530,12 +2409,12 @@ const protectedRoutes = {
                   path: "dispatch-register",
                   lazy: async () => ({
                     Component: (
-                      await import("app/pages/dashboards/calibration-process/dispatch-register")
+                      await import(
+                        "app/pages/dashboards/calibration-process/dispatch-register"
+                      )
                     ).default,
                   }),
                 },
-
-
               ],
             },
             {
@@ -2545,7 +2424,9 @@ const protectedRoutes = {
                   path: "lead-managements",
                   lazy: async () => ({
                     Component: (
-                      await import("app/pages/dashboards/calibration-process/lead-managements")
+                      await import(
+                        "app/pages/dashboards/calibration-process/lead-managements"
+                      )
                     ).default,
                   }),
                 },
@@ -2560,11 +2441,8 @@ const protectedRoutes = {
                     ).default,
                   }),
                 },
-
-
               ],
             },
-
 
             {
               path: "calibration-process",
@@ -2573,7 +2451,9 @@ const protectedRoutes = {
                   path: "ulr-list",
                   lazy: async () => ({
                     Component: (
-                      await import("app/pages/dashboards/calibration-process/ulr-list/ulr")
+                      await import(
+                        "app/pages/dashboards/calibration-process/ulr-list/ulr"
+                      )
                     ).default,
                   }),
                 },
@@ -2589,7 +2469,9 @@ const protectedRoutes = {
                   path: "lrn-Brn-Register",
                   lazy: async () => ({
                     Component: (
-                      await import("app/pages/dashboards/calibration-process/lrnBrnRegister/lrn")
+                      await import(
+                        "app/pages/dashboards/calibration-process/lrnBrnRegister/lrn"
+                      )
                     ).default,
                   }),
                 },
@@ -2604,7 +2486,6 @@ const protectedRoutes = {
                 //     ).default,
                 //   }),
                 // },
-
               ],
             },
 
@@ -2656,7 +2537,6 @@ const protectedRoutes = {
                     },
                   ],
                 },
-
 
                 {
                   path: "cmc-scope-sheet",
@@ -2733,7 +2613,6 @@ const protectedRoutes = {
 
                 //--------------------bio-medical-visual-test------------------
 
-                
                 {
                   path: "bio-medical-visual-test",
                   children: [
@@ -2757,7 +2636,7 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-                       {
+                    {
                       path: "edit-visual-test-form",
                       lazy: async () => ({
                         Component: (
@@ -2767,14 +2646,11 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-                    
                   ],
                 },
 
-
                 //--------------------bio-medical-safty-test------------------
 
-                
                 {
                   path: "bio-medical-safety-test",
                   children: [
@@ -2798,7 +2674,7 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-                       {
+                    {
                       path: "edit-visual-test-form",
                       lazy: async () => ({
                         Component: (
@@ -2808,14 +2684,12 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-                    
                   ],
                 },
-                  
 
                 //-------------------Revision request-----------------------
 
-                                {
+                {
                   path: "revision-requests",
                   children: [
                     {
@@ -2838,7 +2712,7 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-                       {
+                    {
                       path: "edit-visual-test-form",
                       lazy: async () => ({
                         Component: (
@@ -2848,15 +2722,11 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-                    
                   ],
                 },
 
+                //--------------------Discipline------------------
 
-
-                                //--------------------Discipline------------------
-
-                
                 {
                   path: "discipline",
                   children: [
@@ -2880,7 +2750,7 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-                       {
+                    {
                       path: "edit-visual-test-form",
                       lazy: async () => ({
                         Component: (
@@ -2890,12 +2760,8 @@ const protectedRoutes = {
                         ).default,
                       }),
                     },
-                    
                   ],
                 },
-
-
-
 
                 {
                   path: "instrument-list",
@@ -2932,7 +2798,6 @@ const protectedRoutes = {
                     },
                   ],
                 },
-
               ],
             },
             {

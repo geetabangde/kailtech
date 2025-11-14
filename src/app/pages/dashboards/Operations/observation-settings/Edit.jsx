@@ -424,7 +424,7 @@ export default function ExcelTableUI() {
             <button
               style={{ cursor: "pointer" }}
               onClick={() => window.history.back()}
-              className="flex items-center gap-2 rounded-md bg-gray-600 px-4 py-2 font-medium text-white transition hover:bg-gray-700"
+              className="flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -789,7 +789,7 @@ export default function ExcelTableUI() {
                       <th className="border-b px-4 py-3 text-left text-sm font-semibold text-gray-700">
                         Set Variable
                       </th>
-                      {/* <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">Field Heading</th> */}
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">Field Heading</th>
 
                       <th className="border-b px-4 py-3 text-left text-sm font-semibold text-gray-700">
                         Action
@@ -839,14 +839,14 @@ export default function ExcelTableUI() {
                             placeholder="Set Variable"
                           />
                         </td>
-                        {/* <td className="px-4 py-3">
+                        <td className="px-4 py-3">
                           <input
                             type="text"
                             value={row.fieldHeading}
                             onChange={(e) => handleInputChange2(row.id, 'fieldHeading', e.target.value)}
                             className="w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-blue-500"
                           />
-                        </td> */}
+                        </td>
                         <td className="w-[80px] px-2 py-3 text-center">
                           <button
                             onClick={() => removeRow2(row.id)}

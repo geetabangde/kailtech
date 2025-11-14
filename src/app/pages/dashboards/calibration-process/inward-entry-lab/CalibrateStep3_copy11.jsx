@@ -2488,8 +2488,7 @@ const generateTableStructure = () => {
           }
         }
       }
-
-
+      
       // ✅ NEW: Real-time validation for observationctg
       if (selectedTableData.id === 'observationctg' && colIndex >= 2 && colIndex <= 6) {
         const calibPointId = selectedTableData.hiddenInputs?.calibrationPoints?.[rowIndex];
@@ -5010,7 +5009,7 @@ const generateTableStructure = () => {
       selectedTableData.id === 'observationexm' ||
       selectedTableData.id === 'observationfg' ||
       selectedTableData.id === 'observationhg' ||
-      selectedTableData.id === 'observationdg' ||  // ✅ ADD THIS LINE
+      selectedTableData.id === 'observationdg' ||  
       selectedTableData.id === 'observationmsr') {
 
       calibrationPoints.push(firstRowCalibPointId);
