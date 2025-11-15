@@ -1,12 +1,17 @@
 import { useState, useEffect } from "react";
 import axios from "utils/axios";
-import { useParams, useNavigate } from "react-router-dom";
-import UncertaintyTable from "./components/UncertaintyTable";
+import { useNavigate } from "react-router-dom";
+import UncertaintyTable from "../../../Operations/observation-settings/components/UncertaintyTable";
 import { EyeIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { toast } from "react-hot-toast";
+import { Button } from "components/ui/button";
 
-export default function NewTableUI() {
-  const { id: formatId } = useParams();
+export default function AddUncertainty({ formatId, onComplete, onBack }) {
+  // const { id: formatId } = useParams();
   const navigate = useNavigate();
+  
+
+  console.log("Instrument ID from URL:", formatId);
 
   // ✅ Table list
   const tableList = [
@@ -99,8 +104,11 @@ export default function NewTableUI() {
 
   // ✅ Auto-fetch data when formatId is available
   useEffect(() => {
+    console.log("EditUncertainty received formatId:", formatId);
     if (formatId) {
       fetchUncertaintySettings(formatId);
+    } else {
+      console.error("No formatId provided to EditUncertainty component");
     }
   }, [formatId]);
 
@@ -330,6 +338,8 @@ export default function NewTableUI() {
 
   // ✅ Save handler - EXACTLY like cURL API
   const handleSave = async () => {
+    toast.success("Uncertainty settings saved!");
+    onComplete(); // Complete all steps
     if (!formatId) {
       alert("Format ID is missing! Please check the URL parameter.");
       return;
@@ -498,13 +508,15 @@ export default function NewTableUI() {
         {/* Save Button */}
         <div className="flex flex-col items-end gap-2">
           <div>
+            <Button onClick={onBack} variant="outline" className="mt-2 mb-2 rounded-md bg-blue-600 px-8 py-3 text-lg font-medium text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">← Back</Button>
+            <br />
             <button
               onClick={handleSave}
               disabled={loading}
               style={{ cursor: loading ? "not-allowed" : "pointer" }}
               className="rounded-md bg-blue-600 px-8 py-3 text-lg font-medium text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading ? "Saving..." : "Save All"}
+              Complete & Finish
             </button>
           </div>
         </div>

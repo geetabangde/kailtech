@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import axios from "utils/axios";
-import { useParams } from "react-router-dom";
+// import { useParams } from "react-router-dom";
 import Select from "react-select";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { EyeIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { toast } from "react-hot-toast";
+import { Button } from "components/ui/button";
 
-export default function ExcelTableUI() {
-  const { id: formatId } = useParams();
+export default function AddCalibration({ formatId, onNext, onBack }) {
+  // const { id: formatId } = useParams();
   const [rows1, setRows1] = useState([]);
   const [rows2, setRows2] = useState([]);
   const [rows3, setRows3] = useState([]);
@@ -114,10 +116,14 @@ export default function ExcelTableUI() {
       zIndex: 50,
     }),
   };
+  
 
   useEffect(() => {
+    console.log("Edit component received formatId:", formatId);
     if (formatId) {
       fetchObservationSettings(formatId);
+    } else {
+      console.error("No formatId provided to Edit component");
     }
     fetchLabOptions();
     fetchFieldnameOptions();
@@ -341,6 +347,8 @@ export default function ExcelTableUI() {
   };
 
   const handleSave = async () => {
+    toast.success("Calibration settings saved!");
+    onNext(); // Move to step 3
     if (!formatId) {
       alert("Format ID is missing!");
       return;
@@ -877,13 +885,14 @@ export default function ExcelTableUI() {
         </div>
 
         <div className="flex flex-col items-end gap-2">
+         <Button onClick={onBack} variant="outline" className="mt-2 mb-2 rounded-md bg-blue-600 px-8 py-3 text-lg font-medium text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">← Back</Button>
           <button
             style={{ cursor: "pointer" }}
             onClick={handleSave}
             disabled={loading}
             className="rounded-md bg-blue-600 px-8 py-3 text-lg font-medium text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {loading ? "Saving..." : "Save All"}
+            Save & Next →
           </button>
         </div>
       </div>

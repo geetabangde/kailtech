@@ -1531,7 +1531,7 @@ const protectedRoutes = {
                       lazy: async () => ({
                         Component: (
                           await import(
-                            "app/pages/dashboards/Operations/observation-settings/EditUncertainity"
+                            "app/pages/dashboards/Operations/observation-settings/EditUncertainty"
                           )
                         ).default,
                       }),
