@@ -7,7 +7,7 @@ import { EyeIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-hot-toast";
 import { Button } from "components/ui/button";
 
-export default function AddCalibration({ formatId, onNext, onBack }) {
+export default function AddCalibration({ instid, instrumentId, formatId, onNext, onBack }) {
   // const { id: formatId } = useParams();
   const [rows1, setRows1] = useState([]);
   const [rows2, setRows2] = useState([]);
@@ -118,16 +118,29 @@ export default function AddCalibration({ formatId, onNext, onBack }) {
   };
   
 
+  // useEffect(() => {
+  //   console.log("Edit component received formatId:", formatId);
+  //   if (formatId) {
+  //     fetchObservationSettings(formatId);
+  //   } else {
+  //     console.error("No formatId provided to Edit component");
+  //   }
+  //   fetchLabOptions();
+  //   fetchFieldnameOptions();
+  // }, [formatId]);
+
   useEffect(() => {
-    console.log("Edit component received formatId:", formatId);
-    if (formatId) {
-      fetchObservationSettings(formatId);
-    } else {
-      console.error("No formatId provided to Edit component");
-    }
-    fetchLabOptions();
-    fetchFieldnameOptions();
-  }, [formatId]);
+  console.log("Edit component received formatId:", formatId);
+  console.log("Edit component received instrumentId:", instrumentId);
+  
+  if (instrumentId) {  // ✅ Check instrumentId instead of formatId
+    fetchObservationSettings(instrumentId);  // ✅ Pass instrumentId
+  } else {
+    console.error("No instrumentId provided to Edit component");
+  }
+  fetchLabOptions();
+  fetchFieldnameOptions();
+}, [instrumentId]);  // ✅ Add instrumentId to dependency array
 
   const fetchLabOptions = async () => {
     try {
@@ -187,7 +200,7 @@ export default function AddCalibration({ formatId, onNext, onBack }) {
     try {
       const authToken = localStorage.getItem("authToken");
       const response = await axios.get(
-        `/observationsetting/get-observation-setting/${fid}`,
+        `/observationsetting/get-observation-setting/${instrumentId}`,
         {
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -380,6 +393,8 @@ export default function AddCalibration({ formatId, onNext, onBack }) {
         }));
 
       const payload = {
+        instrument_id: instrumentId,
+        instid: instid,
         observation_id: parseInt(formatId),
         setpoint: rows3[0]?.setpoint?.value || "",
         uuc: rows3[0]?.uucRepeatable || "",

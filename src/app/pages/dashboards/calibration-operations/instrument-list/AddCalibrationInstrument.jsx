@@ -17,6 +17,8 @@ export default function AddInstrument() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [savedInstrumentId, setSavedInstrumentId] = useState(null);
+  const [savedFormatId, setSavedFormatId] = useState(null);
+  const [savedUncertaintyId, setSavedUncertaintyId] = useState(null);
   // Step 1 - Add Instrument States
   const [formData, setFormData] = useState({
     name: "",
@@ -157,7 +159,8 @@ export default function AddInstrument() {
         setStandardOptions(safeArray(standardRes.data.data).map((item) => ({ label: item.name, value: item.id.toString() })));
         setSubcategoryOne(safeArray(subcategoryoneRes.data.data).map((item) => ({ label: item.name, value: item.id.toString() })));
         setSubcategoryTwo(safeArray(subcategorytwoRes.data.data).map((item) => ({ label: item.name, value: item.id.toString() })));
-        setFormateOptions(safeArray(formatelist.data.data).map((item) => ({ label: item.name, value: item.description.toString() })));
+        setFormateOptions(safeArray(formatelist.data.data).map((item) => ({ label: item.name, value: item.id.toString() })));
+        // setFormateOptions(safeArray(formatelist.data.data).map((item) => ({ label: item.name, value: item.description.toString() })));
         setLabOptions(safeArray(lablist.data.data).map((item) => ({ label: item.name, value: item.id.toString() })));
         setCurrencyOptions(safeArray(currencylist.data.data).map((item) => ({ label: `${item.name} (${item.description})`, value: item.id.toString() })));
         setUnitTypeOptions(unitTypeRes.data.data?.map((item) => ({ label: item.name, value: item.name })) || []);
@@ -186,17 +189,21 @@ export default function AddInstrument() {
   };
 
   const handleMultiSelectChange = (selectedOptions, name) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: selectedOptions ? selectedOptions.map((opt) => opt.value) : [],
-    }));
-
-    // Clear error when user makes selection
-    if (errors[name]) {
-      setErrors(prev => ({
+    if (name === 'suffix') {
+      const value = selectedOptions && selectedOptions.length > 0 ? selectedOptions[0].value : "";
+      setFormData((prev) => ({
         ...prev,
-        [name]: false
+        [name]: value ? [value] : [],
       }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: selectedOptions ? selectedOptions.map((opt) => opt.value) : [],
+      }));
+    }
+
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: false }));
     }
   };
 
@@ -433,48 +440,94 @@ export default function AddInstrument() {
     // DEBUGGING: Log complete response
       console.log("=== COMPLETE API RESPONSE ===");
       console.log("Response Data:", response.data);
+      console.log("=== END OF RESPONSE ===");
+      // ✅ STEP 1: Get Instrument ID from API response (instid: 259)
+      const instrumentId = response.data?.instid;
+      console.log("📌 Instrument ID from API (instid):", instrumentId);
+
       
-      // FIXED: Save instrument ID from response - check all possible locations
-      let instrumentId = null;
+      // ✅ STEP 2: Get Format ID from suffix field (user selection)
+      let formatId = null;
+      if (formData.suffix && Array.isArray(formData.suffix) && formData.suffix.length > 0) {
+        formatId = formData.suffix[0];
+      } else if (typeof formData.suffix === 'string' && formData.suffix) {
+        formatId = formData.suffix;
+      }
+      console.log("📌 Format ID from suffix field:", formatId);
+
+     
+      // ✅ STEP 3: Get Uncertainty Sheet ID (optional)
+      let uncertaintyId = null;
+      if (formData.uncertaintytable && Array.isArray(formData.uncertaintytable) && formData.uncertaintytable.length > 0) {
+        uncertaintyId = formData.uncertaintytable[0];
+      } else if (typeof formData.uncertaintytable === 'string' && formData.uncertaintytable) {
+        uncertaintyId = formData.uncertaintytable;
+      }
+      console.log("📌 Uncertainty Sheet ID:", uncertaintyId);
       
-      // Try different response structures
-      if (response.data) {
-        instrumentId = 
-          response.data.id || 
-          response.data.data?.id || 
-          response.data.instrumentId ||
-          response.data.instrument_id ||
-          response.data.formatId ||
-          response.data.format_id;
+       // ✅ VALIDATION: Check both IDs are present
+      if (instrumentId && formatId) {
+        // Convert to numbers
+        const finalInstrumentId = typeof instrumentId === 'string' 
+          ? parseInt(instrumentId, 10) 
+          : instrumentId;
+        
+        const finalFormatId = typeof formatId === 'string' 
+          ? parseInt(formatId, 10) 
+          : formatId;
+        
+        if (!isNaN(finalInstrumentId) && finalInstrumentId > 0 && 
+            !isNaN(finalFormatId) && finalFormatId > 0) {
+          
+          console.log("✅ Valid Instrument ID:", finalInstrumentId);
+          console.log("✅ Valid Format ID:", finalFormatId);
+          
+          // ✅ Save both IDs
+          setSavedInstrumentId(finalInstrumentId);
+          setSavedFormatId(finalFormatId);
+          
+          // Save Uncertainty ID if provided
+          if (uncertaintyId) {
+            const finalUncertaintyId = typeof uncertaintyId === 'string' 
+              ? parseInt(uncertaintyId, 10) 
+              : uncertaintyId;
+            
+            if (!isNaN(finalUncertaintyId) && finalUncertaintyId > 0) {
+              setSavedUncertaintyId(finalUncertaintyId);
+              console.log("✅ Valid Uncertainty ID:", finalUncertaintyId);
+            }
+          }
+          
+          toast.success(
+            `Step 1 Complete! Instrument ID: ${finalInstrumentId}, Format ID: ${finalFormatId}` +
+            (uncertaintyId ? `, Uncertainty ID: ${uncertaintyId}` : "")
+          );
+          
+          // Move to Step 2
+          setTimeout(() => {
+            console.log("🚀 Moving to Step 2 with:", {
+              instrumentId: finalInstrumentId,
+              formatId: finalFormatId,
+              uncertaintyId
+            });
+            setCurrentStep(2);
+          }, 100);
+          
+        } else {
+          toast.error("Invalid ID received. Please try again.");
+          console.error("Invalid IDs:", { finalInstrumentId, finalFormatId });
+        }
+      } else {
+        if (!instrumentId) {
+          toast.error("Instrument ID not received from server");
+          console.error("Missing instid in response");
+        }
+        if (!formatId) {
+          toast.error("Please select a Format before proceeding");
+          console.error("No Format ID found in suffix field");
+        }
       }
       
-      console.log("Extracted Instrument ID:", instrumentId);
-      console.log("Type of ID:", typeof instrumentId);
-      
-      if (instrumentId) {
-        // Convert to number if it's a string
-        const finalId = typeof instrumentId === 'string' ? parseInt(instrumentId) : instrumentId;
-        console.log("Final Instrument ID (converted):", finalId);
-        
-        setSavedInstrumentId(finalId);
-        toast.success("Step 1: Instrument added successfully!");
-        
-        // Small delay to ensure state is updated
-        setTimeout(() => {
-          console.log("Moving to Step 2 with ID:", finalId);
-          setCurrentStep(2);
-        }, 100);
-      } else // ⚠️ TEMPORARY: Use static ID for testing
-        console.warn("⚠️ No ID found in response! Using STATIC ID = 1 for testing");
-        const testId = 1; // CHANGE THIS to test different instruments
-        
-        setSavedInstrumentId(testId);
-        toast.success("Step 1: Instrument added! (Using test ID: " + testId + ")");
-        
-        setTimeout(() => {
-          setCurrentStep(2);
-      }, 100);
-
     } catch (err) {
       console.error("API Error:", err);
       toast.error(err.response?.data?.message || "Error adding instrument");
@@ -482,7 +535,6 @@ export default function AddInstrument() {
       setLoading(false);
     }
   };
-
   // Step Progress Indicator
   const renderStepIndicator = () => (
     <div className="mb-6 flex items-center justify-center">
@@ -628,18 +680,23 @@ export default function AddInstrument() {
         )}
         
         
-        {/* Step 2: Calibration Results Settings */}
+        {/* ✅ Step 2: Pass BOTH instrumentId AND formatId */}
         {currentStep === 2 && (
           <div>
-            {savedInstrumentId ? (
+            {savedInstrumentId && savedFormatId ? (
               <AddCalibration
-                formatId={savedInstrumentId}
+                instid={savedInstrumentId}
+                instrumentId={savedInstrumentId}
+                formatId={savedFormatId}
                 onNext={() => setCurrentStep(3)}
                 onBack={() => setCurrentStep(1)}
               />
             ) : (
               <div className="text-center p-8">
-                <p className="text-red-600">Error: Instrument ID not found. Please go back and try again.</p>
+                <p className="text-red-600">
+                  Error: {!savedInstrumentId ? "Instrument ID" : "Format ID"} not found. 
+                  Please go back and try again.
+                </p>
                 <Button 
                   onClick={() => setCurrentStep(1)}
                   className="mt-4"
@@ -650,13 +707,17 @@ export default function AddInstrument() {
             )}
           </div>
         )}
+
         
-        {/* Step 3: Uncertainty Settings */}
+        {/* ✅ Step 3: Pass BOTH instrumentId AND formatId */}
         {currentStep === 3 && (
           <div>
-            {savedInstrumentId ? (
+            {savedInstrumentId && savedFormatId ? (
               <AddUncertainty
-                formatId={savedInstrumentId}
+                instid={savedInstrumentId}
+                instrumentId={savedInstrumentId}
+                formatId={savedFormatId}
+                uncertaintyId={savedUncertaintyId}
                 onComplete={() => {
                   toast.success("All steps completed successfully!");
                   navigate("/dashboards/calibration-operations/instrument-list");
@@ -665,7 +726,10 @@ export default function AddInstrument() {
               />
             ) : (
               <div className="text-center p-8">
-                <p className="text-red-600">Error: Instrument ID not found. Please start from Step 1.</p>
+                <p className="text-red-600">
+                  Error: {!savedInstrumentId ? "Instrument ID" : "Format ID"} not found. 
+                  Please start from Step 1.
+                </p>
                 <Button 
                   onClick={() => setCurrentStep(1)}
                   className="mt-4"

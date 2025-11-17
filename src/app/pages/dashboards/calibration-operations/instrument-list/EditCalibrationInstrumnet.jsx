@@ -2,13 +2,25 @@ import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router";
 import axios from "utils/axios";
 import { toast } from "sonner";
-import { Button, Input, Select } from "components/ui";
+import { Button } from "components/ui";
 import { Page } from "components/shared/Page";
-import ReactSelect from "react-select";
+import Instrument from "./components/Instrument"; 
+import ValidationFields from "./components/ValidationFields";
+import BiomedicalFields from "./components/BiomedicalFields";
+import CustomFormatFields from "./components/CustomFormatFields";
+import EnvironmentalFields from "./components/EnvironmentalFields";
+import PriceListSection from "./components/PriceListSection";
+import AddCalibration from "./components/AddCalibration";
+import AddUncertainty from "./components/AddUncertainty ";
 
-export default function EditInstrument() {
+export default function EditCalibrationInstrumnet() {
   const navigate = useNavigate();
   const { id } = useParams();
+  
+  const [currentStep, setCurrentStep] = useState(1);
+  const [savedFormatId, setSavedFormatId] = useState(null);
+  const [savedUncertaintyId, setSavedUncertaintyId] = useState(null);
+  const [savedInstrumentId, setSavedInstrumentId] = useState(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -96,7 +108,6 @@ export default function EditInstrument() {
     humilab: "Humidity Range for Lab",
   };
 
-  // Required fields for price lists
   const requiredPriceFields = {
     packagename: "Package Name",
     packagedesc: "Package Description",
@@ -104,12 +115,22 @@ export default function EditInstrument() {
     rate: "Rate",
   };
 
+  // Fetch all data on mount
   useEffect(() => {
     const fetchAllData = async () => {
       try {
         setLoading(true);
         
-        // Fetch all dropdown data and instrument data
+      
+        // ✅ Set the instrument ID from URL params immediately
+        if (id) {
+          const instrumentIdFromUrl = typeof id === 'string' ? parseInt(id, 10) : id;
+          if (!isNaN(instrumentIdFromUrl) && instrumentIdFromUrl > 0) {
+            setSavedInstrumentId(instrumentIdFromUrl);
+            console.log("✅ Set Instrument ID from URL:", instrumentIdFromUrl);
+          }
+        }
+        
         const [
           sopRes,
           standardRes,
@@ -143,7 +164,7 @@ export default function EditInstrument() {
         setStandardOptions(safeArray(standardRes.data.data).map((item) => ({ label: item.name, value: item.id.toString() })));
         setSubcategoryOne(safeArray(subcategoryoneRes.data.data).map((item) => ({ label: item.name, value: item.id.toString() })));
         setSubcategoryTwo(safeArray(subcategorytwoRes.data.data).map((item) => ({ label: item.name, value: item.id.toString() })));
-        setFormateOptions(safeArray(formatelist.data.data).map((item) => ({ label: item.name, value: item.description.toString() })));
+        setFormateOptions(safeArray(formatelist.data.data).map((item) => ({ label: item.name, value: item.id.toString() })));
         setLabOptions(safeArray(lablist.data.data).map((item) => ({ label: item.name, value: item.id.toString() })));
         setCurrencyOptions(safeArray(currencylist.data.data).map((item) => ({ label: `${item.name} (${item.description})`, value: item.id.toString() })));
         setUnitTypeOptions(safeArray(unitTypeRes.data.data).map((item) => ({ label: item.name, value: item.name })));
@@ -215,6 +236,26 @@ export default function EditInstrument() {
           vertical: safeString(instrumentData.instrument.vertical || "1"),
         }));
 
+        // Extract and save Format ID and Uncertainty ID from loaded data
+        const suffixData = safeArrayData(instrumentData.instrument.suffix);
+        if (suffixData && suffixData.length > 0) {
+          const formatId = typeof suffixData[0] === 'string' ? parseInt(suffixData[0], 10) : suffixData[0];
+          if (!isNaN(formatId) && formatId > 0) {
+            setSavedFormatId(formatId);
+            console.log("✅ Loaded Format ID:", formatId);
+          }
+        }
+
+        const uncertaintyData = safeArrayData(instrumentData.instrument.uncertaintytable);
+        if (uncertaintyData && uncertaintyData.length > 0) {
+          const uncertaintyId = typeof uncertaintyData[0] === 'string' ? parseInt(uncertaintyData[0], 10) : uncertaintyData[0];
+          if (!isNaN(uncertaintyId) && uncertaintyId > 0) {
+            setSavedUncertaintyId(uncertaintyId);
+            console.log("✅ Loaded Uncertainty ID:", uncertaintyId);
+          }
+        }
+
+        // Set price lists
         const priceMatrix = Array.isArray(instrumentData.pricematrix) ? instrumentData.pricematrix : [];
         const fetchedPriceLists = priceMatrix.length > 0
           ? priceMatrix.map((price) => ({
@@ -255,24 +296,30 @@ export default function EditInstrument() {
     fetchAllData();
   }, [id]);
 
-  const clearFieldError = (fieldName) => {
-    if (errors[fieldName]) {
-      setErrors(prev => ({ ...prev, [fieldName]: false }));
-    }
-  };
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    clearFieldError(name);
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: false }));
+    }
   };
 
   const handleMultiSelectChange = (selectedOptions, name) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: selectedOptions ? selectedOptions.map((opt) => opt.value) : [],
-    }));
-    clearFieldError(name);
+    if (name === 'suffix') {
+      const value = selectedOptions && selectedOptions.length > 0 ? selectedOptions[0].value : "";
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value ? [value] : [],
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: selectedOptions ? selectedOptions.map((opt) => opt.value) : [],
+      }));
+    }
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: false }));
+    }
   };
 
   const handleSingleSelectChange = (selectedOption, fieldName) => {
@@ -280,23 +327,27 @@ export default function EditInstrument() {
       ...prev,
       [fieldName]: selectedOption?.value || "",
     }));
-    clearFieldError(fieldName);
+    if (errors[fieldName]) {
+      setErrors(prev => ({ ...prev, [fieldName]: false }));
+    }
   };
 
   const handlePriceListChange = (index, e) => {
     const { name, value } = e.target;
     setPriceLists((prev) => {
       const updated = [...prev];
-      updated[index] = { ...updated[index], [name]: value };
+      updated[index][name] = value;
       return updated;
     });
-    clearFieldError(`pricelist_${index}_${name}`);
+    if (errors[`price_${index}_${name}`]) {
+      setErrors(prev => ({ ...prev, [`price_${index}_${name}`]: false }));
+    }
   };
 
   const handlePriceCurrencyChange = (selected, index) => {
     setPriceLists((prev) => {
       const updated = [...prev];
-      updated[index] = { ...updated[index], currency: selected || null };
+      updated[index].currency = selected;
       return updated;
     });
   };
@@ -305,39 +356,12 @@ export default function EditInstrument() {
     const { name, value } = e.target;
     setPriceLists((prev) => {
       const updated = [...prev];
-      updated[priceIndex].matrices = updated[priceIndex].matrices.map((matrix, i) =>
-        i === matrixIndex ? { ...matrix, [name]: value } : matrix
-      );
+      updated[priceIndex].matrices[matrixIndex][name] = value;
       return updated;
     });
   };
 
-  const addPriceList = useCallback(() => {
-    const newPrice = {
-      id: "",
-      packagename: "",
-      packagedesc: "",
-      accreditation: "",
-      location: "",
-      daysrequired: "",
-      rate: "",
-      currency: null,
-      matrices: [],
-    };
-    setPriceLists((prev) => {
-      if (prev.length > 0 && JSON.stringify(prev[prev.length - 1]) === JSON.stringify(newPrice)) {
-        console.warn("Duplicate price list addition prevented");
-        return prev;
-      }
-      return [...prev, newPrice];
-    });
-  }, []);
-
-  const removePriceList = (index) => {
-    setPriceLists((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const addMatrix = (priceIndex) => {
+  const addMatrix = useCallback((priceIndex) => {
     setPriceLists((prev) => {
       const updated = [...prev];
       const selectedPrice = { ...updated[priceIndex] };
@@ -345,7 +369,6 @@ export default function EditInstrument() {
 
       const newMatrix = {
         id: "",
-        matrixno: newMatrices.length + 1,
         unittype: "",
         unit: "",
         mode: "",
@@ -355,28 +378,53 @@ export default function EditInstrument() {
         tolerancetype: "",
       };
 
+      if (
+        newMatrices.length > 0 &&
+        JSON.stringify(newMatrices[newMatrices.length - 1]) === JSON.stringify(newMatrix)
+      ) {
+        return prev;
+      }
+
       newMatrices.push(newMatrix);
       selectedPrice.matrices = newMatrices;
       updated[priceIndex] = selectedPrice;
 
       return updated;
     });
-  };
+  }, []);
 
   const removeMatrix = (priceIndex, matrixIndex) => {
     setPriceLists((prev) => {
       const updated = [...prev];
-      updated[priceIndex].matrices = updated[priceIndex].matrices
-        .filter((_, i) => i !== matrixIndex)
-        .map((matrix, i) => ({ ...matrix, matrixno: i + 1 }));
+      updated[priceIndex].matrices = updated[priceIndex].matrices.filter((_, i) => i !== matrixIndex);
       return updated;
     });
   };
 
+  const addPriceList = () => {
+    setPriceLists((prev) => [
+      ...prev,
+      {
+        id: "",
+        packagename: "",
+        packagedesc: "",
+        accreditation: "Non Nabl",
+        location: "Site",
+        currency: null,
+        rate: "",
+        daysrequired: "",
+        matrices: [],
+      },
+    ]);
+  };
+
+  const removePriceList = (index) => {
+    setPriceLists((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const validateForm = () => {
     const newErrors = {};
-    
-    // Check main form required fields
+
     Object.keys(requiredFields).forEach(field => {
       if (field === 'sop') {
         if (!formData[field] || formData[field].length === 0) {
@@ -389,30 +437,28 @@ export default function EditInstrument() {
       }
     });
 
-    // Check price list required fields
-    priceLists.forEach((price, priceIndex) => {
+    priceLists.forEach((price, index) => {
       Object.keys(requiredPriceFields).forEach(field => {
         if (!price[field] || price[field].toString().trim() === '') {
-          newErrors[`pricelist_${priceIndex}_${field}`] = true;
+          newErrors[`price_${index}_${field}`] = true;
         }
       });
     });
 
     setErrors(newErrors);
 
-    // Focus on first error field
     if (Object.keys(newErrors).length > 0) {
       const firstErrorField = Object.keys(newErrors)[0];
       let element;
-      
-      if (firstErrorField.startsWith('pricelist_')) {
-        // Handle price list field errors
-        const [, priceIndex, fieldName] = firstErrorField.split('_');
-        element = document.querySelector(`[name="${fieldName}"][data-price-index="${priceIndex}"]`);
+
+      if (firstErrorField.startsWith('price_')) {
+        const fieldParts = firstErrorField.split('_');
+        const fieldName = fieldParts[2];
+        element = document.querySelector(`input[name="${fieldName}"]`);
       } else {
         element = document.querySelector(`[name="${firstErrorField}"]`);
       }
-      
+
       if (element) {
         element.focus();
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -423,9 +469,10 @@ export default function EditInstrument() {
     return true;
   };
 
+  // Step 1: Update Instrument Details
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       toast.error("Please fill all required fields");
       return;
@@ -435,62 +482,13 @@ export default function EditInstrument() {
 
     try {
       const payload = {
-        name: formData.name,
-        sop: formData.sop,
-        standard: formData.standard,
-        typeofsupport: formData.typeofsupport,
-        typeofmaster: formData.typeofmaster,
-        description: formData.description,
-        discipline: formData.discipline,
-        groups: formData.groups,
-        remark: formData.remark,
-        range: formData.range,
-        leastcount: formData.leastcount,
-        unittype: formData.unittype,
-        mode: formData.mode,
-        supportmaster: formData.supportmaster,
-        supportrange: formData.supportrange,
-        supportleastcount: formData.supportleastcount,
-        supportunittype: formData.supportunittype,
-        supportmode: formData.supportmode,
-        scopematrixvalidation: formData.scopematrixvalidation,
-        digitincmc: formData.digitincmc,
-        biomedical: formData.biomedical,
-        showvisualtest: formData.showvisualtest,
-        showelectricalsafety: formData.showelectricalsafety,
-        showbasicsafety: formData.showbasicsafety,
-        showperformancetest: formData.showperformancetest,
-        setpoint: formData.setpoint,
-        uuc: formData.uuc,
-        master: formData.master,
-        setpointheading: formData.setpointheading,
-        parameterheading: formData.parameterheading,
-        uucheading: formData.uucheading,
-        masterheading: formData.masterheading,
-        errorheading: formData.errorheading,
-        remarkheading: formData.remarkheading,
-        setpointtoshow: formData.setpointtoshow,
-        parametertoshow: formData.parametertoshow,
-        uuctoshow: formData.uuctoshow,
-        mastertoshow: formData.mastertoshow,
-        errortoshow: formData.errortoshow,
-        remarktoshow: formData.remarktoshow,
-        specificationtoshow: formData.specificationtoshow,
-        specificationheading: formData.specificationheading,
-        tempsite: formData.tempsite,
-        tempvariablesite: formData.tempvariablesite,
-        humisite: formData.humisite,
-        humivariablesite: formData.humivariablesite,
-        templab: formData.templab,
-        tempvariablelab: formData.tempvariablelab,
-        humilab: formData.humilab,
-        humivariablelab: formData.humivariablelab,
-        mastersincertificate: formData.mastersincertificate,
-        uncertaintyincertificate: formData.uncertaintyincertificate,
-        allottolab: formData.allottolab,
-        suffix: Array.isArray(formData.suffix) ? formData.suffix[0] || "" : formData.suffix || "",
-        uncertaintytable: Array.isArray(formData.uncertaintytable) ? formData.uncertaintytable : [],
-        vertical: formData.vertical,
+        ...formData,
+        suffix: Array.isArray(formData.suffix)
+          ? formData.suffix[0] || ""
+          : formData.suffix || "",
+        uncertaintytable: Array.isArray(formData.uncertaintytable)
+          ? formData.uncertaintytable[0] || ""
+          : formData.uncertaintytable || "",
         matrixidpricelist: [],
         pricematrixno: [],
         packagename: [],
@@ -526,8 +524,8 @@ export default function EditInstrument() {
         payload[`tolerance${priceIndex}`] = [];
         payload[`tolerancetype${priceIndex}`] = [];
 
-        (price.matrices || []).forEach((matrix) => {
-          payload[`matrixno${priceIndex}`].push(matrix.matrixno.toString());
+        (price.matrices || []).forEach((matrix, matrixIndex) => {
+          payload[`matrixno${priceIndex}`].push((matrixIndex + 1).toString());
           payload[`pricematrixid${priceIndex}`].push(price.id || "0");
           payload[`matrixid${priceIndex}`].push(matrix.id || "0");
           payload[`unittype${priceIndex}`].push(matrix.unittype || "");
@@ -540,19 +538,139 @@ export default function EditInstrument() {
         });
       });
 
-      await axios.post(`/calibrationoperations/update-instrument/${id}`, payload, {
-        headers: { "Content-Type": "application/json" },
-      });
+      console.log("FINAL UPDATE Payload:", payload);
 
-      toast.success("Instrument updated successfully");
-      navigate("/dashboards/calibration-operations/instrument-list");
-    } catch(err)  {
-      console.error("API Error:", err.response?.data || err.message);
-      toast.error("Error updating instrument: " + (err.response?.data?.message || err.message));
+      const response = await axios.post(
+        `/calibrationoperations/update-instrument/${id}`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("=== UPDATE API RESPONSE ===");
+      console.log("Response Data:", response.data);
+        // ✅ STEP 1: Get Instrument ID from API response (instid: 259)
+      // ✅ Use the ID from URL params since we're editing
+    const instrumentId = id; // Use the ID from useParams, not from response
+    console.log("📌 Instrument ID from URL params:", instrumentId);
+
+
+      // Extract Format ID and Uncertainty ID from form data
+// Extract Format ID from form data
+    let formatId = null;
+    if (formData.suffix && Array.isArray(formData.suffix) && formData.suffix.length > 0) {
+      formatId = formData.suffix[0];
+    } else if (typeof formData.suffix === 'string' && formData.suffix) {
+      formatId = formData.suffix;
+    }
+    console.log("📌 Format ID from suffix field:", formatId);
+
+    // Extract Uncertainty ID from form data
+    let uncertaintyId = null;
+    if (formData.uncertaintytable && Array.isArray(formData.uncertaintytable) && formData.uncertaintytable.length > 0) {
+      uncertaintyId = formData.uncertaintytable[0];
+    } else if (typeof formData.uncertaintytable === 'string' && formData.uncertaintytable) {
+      uncertaintyId = formData.uncertaintytable;
+    }
+    console.log("📌 Uncertainty ID:", uncertaintyId);
+
+    if (instrumentId && formatId) {
+      const finalInstrumentId = typeof instrumentId === 'string' 
+        ? parseInt(instrumentId, 10) 
+        : instrumentId;
+      
+      const finalFormatId = typeof formatId === 'string' 
+        ? parseInt(formatId, 10) 
+        : formatId;
+      
+      if (!isNaN(finalInstrumentId) && finalInstrumentId > 0 && 
+          !isNaN(finalFormatId) && finalFormatId > 0) {
+        
+        console.log("✅ Valid Instrument ID:", finalInstrumentId);
+        console.log("✅ Valid Format ID:", finalFormatId);
+        
+        // ✅ Save both IDs
+        setSavedInstrumentId(finalInstrumentId);
+        setSavedFormatId(finalFormatId);
+        
+        // Save Uncertainty ID if provided
+        if (uncertaintyId) {
+          const finalUncertaintyId = typeof uncertaintyId === 'string' 
+            ? parseInt(uncertaintyId, 10) 
+            : uncertaintyId;
+          
+          if (!isNaN(finalUncertaintyId) && finalUncertaintyId > 0) {
+            setSavedUncertaintyId(finalUncertaintyId);
+            console.log("✅ Valid Uncertainty ID:", finalUncertaintyId);
+          }
+        }
+        
+        toast.success(
+          `Step 1 Complete! Instrument updated successfully.`
+        );
+        
+        // Move to Step 2
+        setTimeout(() => {
+          console.log("🚀 Moving to Step 2 with:", {
+            instrumentId: finalInstrumentId,
+            formatId: finalFormatId,
+            uncertaintyId
+          });
+          setCurrentStep(2);
+        }, 100);
+        
+      } else {
+        toast.error("Invalid ID format. Please try again.");
+        console.error("Invalid IDs:", { finalInstrumentId, finalFormatId });
+      }
+    } else {
+      if (!instrumentId) {
+        toast.error("Instrument ID not found");
+        console.error("Missing instrument ID");
+      }
+      if (!formatId) {
+        toast.error("Please select a Format before proceeding");
+        console.error("No Format ID found in suffix field");
+      }
+    }
+  } catch (err) {
+      console.error("API Error:", err);
+      toast.error(err.response?.data?.message || "Error updating instrument");
     } finally {
       setLoading(false);
     }
   };
+
+  // Step Progress Indicator
+  const renderStepIndicator = () => (
+    <div className="mb-6 flex items-center justify-center">
+      <div className="flex items-center space-x-4">
+        {[1, 2, 3].map((step) => (
+          <div key={step} className="flex items-center">
+            <div
+              className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                currentStep >= step
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-300 text-gray-600"
+              }`}
+            >
+              {step}
+            </div>
+            {step < 3 && (
+              <div
+                className={`h-1 w-16 ${
+                  currentStep > step ? "bg-blue-600" : "bg-gray-300"
+                }`}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   if (loading && !formData.name) {
     return (
@@ -576,7 +694,11 @@ export default function EditInstrument() {
     <Page title="Edit Instrument">
       <div className="p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Edit Instrument</h2>
+          <h2 className="text-lg font-semibold">
+            {currentStep === 1 && "Step 1: Edit Instrument"}
+            {currentStep === 2 && "Step 2: Calibration Results Settings"}
+            {currentStep === 3 && "Step 3: Uncertainty Settings"}
+          </h2>
           <Button
             variant="outline"
             className="bg-blue-600 text-white hover:bg-blue-700"
@@ -586,927 +708,158 @@ export default function EditInstrument() {
           </Button>
         </div>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div>
-            <Input
-              label="Instrument Name"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              className={errors.name ? "border-red-500 bg-red-50" : ""}
-            />
-            {errors.name && (
-              <p className="text-red-600 text-sm mt-1">This field is required</p>
-            )}
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">
-              Calibration Method / SOP <span className="text-red-500">*</span>
-            </label>
-            <ReactSelect
-              isMulti
-              name="sop"
-              options={sopOptions}
-              value={sopOptions.filter((opt) => formData.sop.includes(opt.value))}
-              onChange={(selected) => handleMultiSelectChange(selected, "sop")}
-              placeholder="Select Calibration Methods"
-              className={errors.sop ? "react-select-error" : ""}
-            />
-            {errors.sop && (
-              <p className="text-red-600 text-sm mt-1">This field is required</p>
-            )}
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Calibration Standard</label>
-            <ReactSelect
-              isMulti
-              name="standard"
-              options={standardOptions}
-              value={standardOptions.filter((opt) => formData.standard.includes(opt.value))}
-              onChange={(selected) => handleMultiSelectChange(selected, "standard")}
-              placeholder="Select Calibration Standards"
-            />
-          </div>
-          
-          <div>
-            <Input
-              label="Instrument Description"
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              className={errors.description ? "border-red-500 bg-red-50" : ""}
-            />
-            {errors.description && (
-              <p className="text-red-600 text-sm mt-1">This field is required</p>
-            )}
-          </div>
-          
-          <input type="hidden" name="vertical" value={formData.vertical} />
-          
-          <div>
-            <Input
-              label="Discipline"
-              name="discipline"
-              value={formData.discipline}
-              onChange={handleInputChange}
-              className={errors.discipline ? "border-red-500 bg-red-50" : ""}
-            />
-            {errors.discipline && (
-              <p className="text-red-600 text-sm mt-1">This field is required</p>
-            )}
-          </div>
-          
-          <div>
-            <Input
-              label="Group"
-              name="groups"
-              value={formData.groups}
-              onChange={handleInputChange}
-              className={errors.groups ? "border-red-500 bg-red-50" : ""}
-            />
-            {errors.groups && (
-              <p className="text-red-600 text-sm mt-1">This field is required</p>
-            )}
-          </div>
-          
-          <Input
-            label="Remark"
-            name="remark"
-            value={formData.remark}
-            onChange={handleInputChange}
-          />
-          
-          <div className="col-span-1 md:col-span-2">
-            <h1 className="text-lg font-semibold">Validation</h1>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Range Validation</label>
-            <Select
-              name="range"
-              value={formData.range}
-              onChange={handleInputChange}
-            >
-              <option value="">Select</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Leastcount Validation</label>
-            <Select
-              name="leastcount"
-              value={formData.leastcount}
-              onChange={handleInputChange}
-            >
-              <option value="">Select</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Unittype</label>
-            <Select
-              name="unittype"
-              value={formData.unittype}
-              onChange={handleInputChange}
-            >
-              <option value="">Select</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Mode</label>
-            <Select
-              name="mode"
-              value={formData.mode}
-              onChange={handleInputChange}
-            >
-              <option value="">Select</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Support Required</label>
-            <Select
-              name="supportmaster"
-              value={formData.supportmaster}
-              onChange={handleInputChange}
-            >
-              <option value="">Select</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Type Of Support</label>
-            <ReactSelect
-              isMulti
-              name="typeofsupport"
-              options={subcategoryOne}
-              value={subcategoryOne.filter((opt) => formData.typeofsupport.includes(opt.value))}
-              onChange={(selected) => handleMultiSelectChange(selected, "typeofsupport")}
-              placeholder="Select Type Of Support"
-            />
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Range Validation For Support</label>
-            <Select
-              name="supportrange"
-              value={formData.supportrange}
-              onChange={handleInputChange}
-            >
-              <option value="">Select</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Leastcount Validation For Support</label>
-            <Select
-              name="supportleastcount"
-              value={formData.supportleastcount}
-              onChange={handleInputChange}
-            >
-              <option value="">Select</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Unittype For Support</label>
-            <Select
-              name="supportunittype"
-              value={formData.supportunittype}
-              onChange={handleInputChange}
-            >
-              <option value="">Select</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Mode For Support</label>
-            <Select
-              name="supportmode"
-              value={formData.supportmode}
-              onChange={handleInputChange}
-            >
-              <option value="">Select</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Type Of Master Required</label>
-            <ReactSelect
-              isMulti
-              name="typeofmaster"
-              options={subcategoryTwo}
-              value={subcategoryTwo.filter((opt) => formData.typeofmaster.includes(opt.value))}
-              onChange={(selected) => handleMultiSelectChange(selected, "typeofmaster")}
-              placeholder="Select Type Of Master"
-            />
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Scope Matrix Validation</label>
-            <Select
-              name="scopematrixvalidation"
-              value={formData.scopematrixvalidation}
-              onChange={handleInputChange}
-            >
-              <option value="">Select</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <Input
-            label="No Of Digit in CMC"
-            name="digitincmc"
-            type="number"
-            value={formData.digitincmc}
-            onChange={handleInputChange}
-          />
-          
-          <div className="col-span-1 md:col-span-2">
-            <h1 className="text-lg font-semibold">Biomedical Details</h1>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Bio Medical Format</label>
-            <Select
-              name="biomedical"
-              value={formData.biomedical}
-              onChange={handleInputChange}
-            >
-              <option value="">Select</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Show Visual Test On Certificate</label>
-            <Select
-              name="showvisualtest"
-              value={formData.showvisualtest}
-              onChange={handleInputChange}
-            >
-              <option value="">Select</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Show Electrical Safety Test on Certificate</label>
-            <Select
-              name="showelectricalsafety"
-              value={formData.showelectricalsafety}
-              onChange={handleInputChange}
-            >
-              <option value="">Select</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Show Basic Safety Test on Certificate</label>
-            <Select
-              name="showbasicsafety"
-              value={formData.showbasicsafety}
-              onChange={handleInputChange}
-            >
-              <option value="">Select</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Show Performance Test on Certificate</label>
-            <Select
-              name="showperformancetest"
-              value={formData.showperformancetest}
-              onChange={handleInputChange}
-            >
-              <option value="">Select</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div className="col-span-1 md:col-span-2">
-            <h1 className="text-lg font-semibold">For Custom Formats Only</h1>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Setpoint</label>
-            <Select
-              name="setpoint"
-              value={formData.setpoint}
-              onChange={handleInputChange}
-            >
-              <option value="UUC">UUC</option>
-              <option value="Master">Master</option>
-              <option value="Separate">Separate</option>
-            </Select>
-          </div>
-          
-          <Input
-            label="UUC Repeatable"
-            name="uuc"
-            type="number"
-            value={formData.uuc}
-            onChange={handleInputChange}
-          />
-          
-          <Input
-            label="Master Repeatable"
-            name="master"
-            type="number"
-            value={formData.master}
-            onChange={handleInputChange}
-          />
-          
-          <Input
-            label="Set Point Heading"
-            name="setpointheading"
-            value={formData.setpointheading}
-            onChange={handleInputChange}
-          />
-          
-          <Input
-            label="Parameter Heading"
-            name="parameterheading"
-            value={formData.parameterheading}
-            onChange={handleInputChange}
-          />
-          
-          <Input
-            label="UUC Heading"
-            name="uucheading"
-            value={formData.uucheading}
-            onChange={handleInputChange}
-          />
-          
-          <Input
-            label="Master Heading"
-            name="masterheading"
-            value={formData.masterheading}
-            onChange={handleInputChange}
-          />
-          
-          <Input
-            label="Error Heading"
-            name="errorheading"
-            value={formData.errorheading}
-            onChange={handleInputChange}
-          />
-          
-          <Input
-            label="Remark Heading"
-            name="remarkheading"
-            value={formData.remarkheading}
-            onChange={handleInputChange}
-          />
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Setpoint To Show On Certificate</label>
-            <Select
-              name="setpointtoshow"
-              value={formData.setpointtoshow}
-              onChange={handleInputChange}
-            >
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Parameter To Show On Certificate</label>
-            <Select
-              name="parametertoshow"
-              value={formData.parametertoshow}
-              onChange={handleInputChange}
-            >
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">UUC To Show On Certificate</label>
-            <Select
-              name="uuctoshow"
-              value={formData.uuctoshow}
-              onChange={handleInputChange}
-            >
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Master To Show On Certificate</label>
-            <Select
-              name="mastertoshow"
-              value={formData.mastertoshow}
-              onChange={handleInputChange}
-            >
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Error To Show On Certificate</label>
-            <Select
-              name="errortoshow"
-              value={formData.errortoshow}
-              onChange={handleInputChange}
-            >
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Remark To Show On Certificate</label>
-            <Select
-              name="remarktoshow"
-              value={formData.remarktoshow}
-              onChange={handleInputChange}
-            >
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Specification To Show On Certificate</label>
-            <Select
-              name="specificationtoshow"
-              value={formData.specificationtoshow}
-              onChange={handleInputChange}
-            >
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-         
-          <div>
-            <Input
-              label="Temperature Range for Site"
-              name="tempsite"
-              type="number"
-              value={formData.tempsite}
-              onChange={handleInputChange}
-              className={errors.tempsite ? "border-red-500 bg-red-50" : ""}
-            />
-            {errors.tempsite && (
-              <p className="text-red-600 text-sm mt-1">This field is required</p>
-            )}
-          </div>
-          
-          <Input
-            label="Temperature Variable Site"
-            name="tempvariablesite"
-            type="number"
-            value={formData.tempvariablesite}
-            onChange={handleInputChange}
-          />
-          
-          <div>
-            <Input
-              label="Humidity Range for Site"
-              name="humisite"
-              type="number"
-              value={formData.humisite}
-              onChange={handleInputChange}
-              className={errors.humisite ? "border-red-500 bg-red-50" : ""}
-            />
-            {errors.humisite && (
-              <p className="text-red-600 text-sm mt-1">This field is required</p>
-            )}
-          </div>
-          
-          <Input
-            label="Humidity Variable Site"
-            name="humivariablesite"
-            type="number"
-            value={formData.humivariablesite}
-            onChange={handleInputChange}
-          />
-          
-          <div>
-            <Input
-              label="Temperature Range for Lab"
-              name="templab"
-              type="number"
-              value={formData.templab}
-              onChange={handleInputChange}
-              className={errors.templab ? "border-red-500 bg-red-50" : ""}
-            />
-            {errors.templab && (
-              <p className="text-red-600 text-sm mt-1">This field is required</p>
-            )}
-          </div>
-          
-          <Input
-            label="Temperature Variable Lab"
-            name="tempvariablelab"
-            type="number"
-            value={formData.tempvariablelab}
-            onChange={handleInputChange}
-          />
-          
-          <div>
-            <Input
-              label="Humidity Range for Lab"
-              name="humilab"
-              type="number"
-              value={formData.humilab}
-              onChange={handleInputChange}
-              className={errors.humilab ? "border-red-500 bg-red-50" : ""}
-            />
-            {errors.humilab && (
-              <p className="text-red-600 text-sm mt-1">This field is required</p>
-            )}
-          </div>
-          
-          <Input
-            label="Humidity Variable Lab"
-            name="humivariablelab"
-            type="number"
-            value={formData.humivariablelab}
-            onChange={handleInputChange}
-          />
-          
-          <Input
-            label="Specification Heading"
-            name="specificationheading"
-            value={formData.specificationheading}
-            onChange={handleInputChange}
-          />
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Show Masters In Certificate</label>
-            <Select
-              name="mastersincertificate"
-              value={formData.mastersincertificate}
-              onChange={handleInputChange}
-            >
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Show Uncertainty In Certificate</label>
-            <Select
-              name="uncertaintyincertificate"
-              value={formData.uncertaintyincertificate}
-              onChange={handleInputChange}
-            >
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Lab to Calibrate</label>
-            <ReactSelect
-              name="allottolab"
-              options={labOptions}
-              value={labOptions.find((opt) => opt.value === formData.allottolab) || null}
-              onChange={(selected) => handleSingleSelectChange(selected, "allottolab")}
-              placeholder="Select Lab"
-            />
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Format</label>
-            <ReactSelect
-              isMulti={false}
-              name="suffix"
-              options={formateOptions}
-              value={formateOptions.find((opt) => opt.value === formData.suffix[0]) || null}
-              onChange={(selected) => handleMultiSelectChange(selected ? [selected] : [], "suffix")}
-              placeholder="Select Format"
-            />
-          </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Uncertainty Sheet</label>
-            <ReactSelect
-              isMulti
-              name="uncertaintytable"
-              options={formateOptions}
-              value={formateOptions.filter((opt) => formData.uncertaintytable.includes(opt.value))}
-              onChange={(selected) => handleMultiSelectChange(selected, "uncertaintytable")}
-              placeholder="Select Uncertainty"
-            />
-          </div>
+        {renderStepIndicator()}
 
-          {priceLists.map((price, priceIndex) => (
-            <div key={priceIndex} className="col-span-1 md:col-span-2 border border-gray-300 p-4 rounded bg-gray-50">
-              <div className="flex items-center justify-between">
-                <h1 className="text-lg font-semibold">Price List {priceIndex + 1}</h1>
-                {priceLists.length > 1 && (
-                  <Button type="button" className="bg-red-600 text-white hover:bg-red-700" onClick={() => removePriceList(priceIndex)}>
-                    Remove Price List
-                  </Button>
-                )}
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                <input
-                  type="hidden"
-                  name="matrixidpricelist[]"
-                  value={price.id || "0"}
-                />
-                <input
-                  type="hidden"
-                  name="pricematrixno[]"
-                  value={priceIndex}
-                />
-                <div>
-                  <Input
-                    label="Package Name"
-                    name="packagename"
-                    data-price-index={priceIndex}
-                    value={price.packagename}
-                    onChange={(e) => handlePriceListChange(priceIndex, e)}
-                    className={errors[`pricelist_${priceIndex}_packagename`] ? "border-red-500 bg-red-50" : ""}
-                  />
-                  {errors[`pricelist_${priceIndex}_packagename`] && (
-                    <p className="text-red-600 text-sm mt-1">This field is required</p>
-                  )}
-                </div>
-                
-                <div>
-                  <Input
-                    label="Package Description"
-                    name="packagedesc"
-                    data-price-index={priceIndex}
-                    value={price.packagedesc}
-                    onChange={(e) => handlePriceListChange(priceIndex, e)}
-                    className={errors[`pricelist_${priceIndex}_packagedesc`] ? "border-red-500 bg-red-50" : ""}
-                  />
-                  {errors[`pricelist_${priceIndex}_packagedesc`] && (
-                    <p className="text-red-600 text-sm mt-1">This field is required</p>
-                  )}
-                </div>
-                
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Accreditation</label>
-                  <Select
-                    name="accreditation"
-                    value={price.accreditation}
-                    onChange={(e) => handlePriceListChange(priceIndex, e)}
-                  >
-                    <option value="">Select</option>
-                    <option value="Non Nabl">Non Nabl</option>
-                    <option value="Nabl">Nabl</option>
-                  </Select>
-                </div>
-                
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Location</label>
-                  <Select
-                    name="location"
-                    value={price.location}
-                    onChange={(e) => handlePriceListChange(priceIndex, e)}
-                  >
-                    <option value="">Select</option>
-                    <option value="Site">Site</option>
-                    <option value="Lab">Lab</option>
-                  </Select>
-                </div>
-                
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">Select Currency</label>
-                  <ReactSelect
-                    name="currency"
-                    value={price.currency}
-                    options={currencyOptions}
-                    onChange={(selected) => handlePriceCurrencyChange(selected, priceIndex)}
-                    placeholder="Select Currency"
-                  />
-                </div>
-                
-                <div>
-                  <Input
-                    label="Rate"
-                    name="rate"
-                    data-price-index={priceIndex}
-                    value={price.rate}
-                    type="number"
-                    onChange={(e) => handlePriceListChange(priceIndex, e)}
-                    className={errors[`pricelist_${priceIndex}_rate`] ? "border-red-500 bg-red-50" : ""}
-                  />
-                  {errors[`pricelist_${priceIndex}_rate`] && (
-                    <p className="text-red-600 text-sm mt-1">This field is required</p>
-                  )}
-                </div>
-                
-                <div>
-                  <Input
-                    label="Days Required"
-                    name="daysrequired"
-                    data-price-index={priceIndex}
-                    type="number"
-                    value={price.daysrequired}
-                    onChange={(e) => handlePriceListChange(priceIndex, e)}
-                    className={errors[`pricelist_${priceIndex}_daysrequired`] ? "border-red-500 bg-red-50" : ""}
-                  />
-                  {errors[`pricelist_${priceIndex}_daysrequired`] && (
-                    <p className="text-red-600 text-sm mt-1">This field is required</p>
-                  )}
-                </div>
-              </div>
+        {/* Step 1: Edit Instrument Form */}
+        {currentStep === 1 && (
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <Instrument 
+              formData={formData}
+              errors={errors}
+              handleInputChange={handleInputChange}
+              handleMultiSelectChange={handleMultiSelectChange}
+              sopOptions={sopOptions}
+              standardOptions={standardOptions}
+            />
 
-              <div className="mt-4">
-                <h2 className="text-md font-semibold mb-2">Matrices</h2>
-                {price.matrices.map((matrix, matrixIndex) => (
-                  <div key={`matrix-${priceIndex}-${matrixIndex}`} className="border border-gray-200 p-4 rounded mb-4 bg-white">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-medium">Matrix {matrix.matrixno}</h3>
-                      {price.matrices.length > 0 && (
-                        <Button type="button" className="bg-red-600 text-white hover:bg-red-700" onClick={() => removeMatrix(priceIndex, matrixIndex)}>
-                          Remove Matrix
-                        </Button>
-                      )}
-                    </div>
-                    <input
-                      type="hidden"
-                      name={`matrixno${priceIndex}[]`}
-                      value={matrix.matrixno}
-                    />
-                    <input
-                      type="hidden"
-                      name={`pricematrixid${priceIndex}[]`}
-                      value={price.id || "0"}
-                    />
-                    <input
-                      type="hidden"
-                      name={`matrixid${priceIndex}[]`}
-                      value={matrix.id || "0"}
-                    />
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                      <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">
-                          Unit Type/Parameter
-                        </label>
-                        <ReactSelect
-                          name="unittype"
-                          options={unitTypeOptions}
-                          value={unitTypeOptions.find((opt) => opt.value === matrix.unittype) || null}
-                          onChange={(selected) => handleMatrixChange(priceIndex, matrixIndex, { target: { name: 'unittype', value: selected?.value || '' } })}
-                          placeholder="Select Unit Type"
-                        />
-                      </div>
+            <ValidationFields
+              formData={formData}
+              handleInputChange={handleInputChange}
+              handleMultiSelectChange={handleMultiSelectChange}
+              subcategoryOne={subcategoryOne}
+              subcategoryTwo={subcategoryTwo}
+            />
 
-                      <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">
-                          Unit
-                        </label>
-                        <ReactSelect
-                          name="unit"
-                          options={unitOptions}
-                          value={unitOptions.find((opt) => opt.value === matrix.unit) || null}
-                          onChange={(selected) => handleMatrixChange(priceIndex, matrixIndex, { target: { name: 'unit', value: selected?.value || '' } })}
-                          placeholder="Select Unit"
-                        />
-                      </div>
+            <BiomedicalFields
+              formData={formData}
+              handleInputChange={handleInputChange}
+            />
 
-                      <Input
-                        label="Instrument Range Min"
-                        name="instrangemin"
-                        type="number"
-                        value={matrix.instrangemin}
-                        onChange={(e) => handleMatrixChange(priceIndex, matrixIndex, e)}
-                      />
+            <CustomFormatFields
+              formData={formData}
+              handleInputChange={handleInputChange}
+            />
 
-                      <Input
-                        label="Instrument Range Max"
-                        name="instrangemax"
-                        type="number"
-                        value={matrix.instrangemax}
-                        onChange={(e) => handleMatrixChange(priceIndex, matrixIndex, e)}
-                      />
+            <EnvironmentalFields
+              formData={formData}
+              errors={errors}
+              handleInputChange={handleInputChange}
+              handleSingleSelectChange={handleSingleSelectChange}
+              handleMultiSelectChange={handleMultiSelectChange}
+              labOptions={labOptions}
+              formateOptions={formateOptions}
+            />
 
+            <PriceListSection
+              priceLists={priceLists}
+              errors={errors}
+              currencyOptions={currencyOptions}
+              unitTypeOptions={unitTypeOptions}
+              unitOptions={unitOptions}
+              modeOptions={modeOptions}
+              handlePriceListChange={handlePriceListChange}
+              handlePriceCurrencyChange={handlePriceCurrencyChange}
+              handleMatrixChange={handleMatrixChange}
+              removeMatrix={removeMatrix}
+              addMatrix={addMatrix}
+              removePriceList={removePriceList}
+            />
 
-                      <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">
-                          Mode
-                        </label>
-                        <ReactSelect
-                          name="mode"
-                          options={[{ label: "Not Specified", value: "" }, ...modeOptions]}
-                          value={[{ label: "Not Specified", value: "" }, ...modeOptions].find((opt) => opt.value === matrix.mode) || null}
-                          onChange={(selected) => handleMatrixChange(priceIndex, matrixIndex, { target: { name: 'mode', value: selected?.value || '' } })}
-                          placeholder="Select Mode"
-                        />
-                      </div>
+            <div className="col-span-1 md:col-span-2">
+              <Button
+                type="button"
+                onClick={addPriceList}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                + Add Price List
+              </Button>
+            </div>
 
-                      <Input
-                        label="Tolerance (±)"
-                        name="tolerance"
-                        value={matrix.tolerance}
-                        type="number"
-                        onChange={(e) => handleMatrixChange(priceIndex, matrixIndex, e)}
-                      />
-
-                      <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">
-                          Tolerance Type
-                        </label>
-                        <ReactSelect
-                          name="tolerancetype"
-                          options={[
-                            { label: "Not Specified", value: "" },
-                            { label: "Fixed", value: "Fixed" },
-                            { label: "%", value: "%" }
-                          ]}
-                          value={[
-                            { label: "Not Specified", value: "" },
-                            { label: "Fixed", value: "Fixed" },
-                            { label: "%", value: "%" }
-                          ].find((opt) => opt.value === matrix.tolerancetype) || null}
-                          onChange={(selected) => handleMatrixChange(priceIndex, matrixIndex, { target: { name: 'tolerancetype', value: selected?.value || '' } })}
-                          placeholder="Select Tolerance Type"
-                        />
-                      </div>
-                    </div>
+            <div className="col-span-1 md:col-span-2">
+              <Button type="submit" color="primary" disabled={loading}>
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <svg
+                      className="animate-spin h-4 w-4 text-white"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 000 8v4a8 8 0 01-8-8z"
+                      ></path>
+                    </svg>
+                    Updating...
                   </div>
-                ))}
-                <Button type="button" className="bg-green-600 text-white hover:bg-green-700" onClick={() => addMatrix(priceIndex)}>
-                  + Add Matrix
+                ) : (
+                  "Update & Continue"
+                )}
+              </Button>
+            </div>
+          </form>
+        )}
+
+        {/* Step 2: Calibration Results Settings */}
+        {currentStep === 2 && (
+          <div>
+            {savedInstrumentId && savedFormatId ? (
+              <AddCalibration
+                instrumentId={savedInstrumentId}
+                instid={savedInstrumentId}
+                formatId={savedFormatId}
+                onNext={() => setCurrentStep(3)}
+                onBack={() => setCurrentStep(1)}
+              />
+            ) : (
+              <div className="text-center p-8">
+                <p className="text-red-600">Error: Format ID not found. Please go back and try again.</p>
+                <Button 
+                  onClick={() => setCurrentStep(1)}
+                  className="mt-4"
+                >
+                  Go Back to Step 1
                 </Button>
               </div>
-            </div>
-          ))}
-          
-          <div className="col-span-1 md:col-span-2">
-            <Button type="button" className=" bg-green-600 hover:bg-green-700 text-white  w-full" onClick={addPriceList}>
-              + Add Price List
-            </Button>
+            )}
           </div>
+        )}
 
-          <div className="col-span-1 md:col-span-2">
-            <Button
-              type="submit"
-              color="primary"
-              disabled={loading}
-              className={`flex items-center justify-center gap-2 ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-            >
-              {loading ? (
-                <>
-                  <svg
-                    className="animate-spin h-4 w-4 text-white"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8v4a4 4 0 000 8v4a8 8 0 01-8-8z"
-                    ></path>
-                  </svg>
-                  <span>Updating...</span>
-                </>
-              ) : (
-                "Update"
-              )}
-            </Button>
+        {/* Step 3: Uncertainty Settings */}
+        {currentStep === 3 && (
+          <div>
+            {savedInstrumentId && savedFormatId ? (
+              <AddUncertainty
+                instrumentId={savedInstrumentId}
+                instid={savedInstrumentId}
+                formatId={savedFormatId}
+                uncertaintyId={savedUncertaintyId}
+                onComplete={() => {
+                  toast.success("All steps completed successfully!");
+                  navigate("/dashboards/calibration-operations/instrument-list");
+                }}
+                onBack={() => setCurrentStep(2)}
+              />
+            ) : (
+              <div className="text-center p-8">
+                <p className="text-red-600">Error: Format ID not found. Please start from Step 1.</p>
+                <Button 
+                  onClick={() => setCurrentStep(1)}
+                  className="mt-4"
+                >
+                  Go Back to Step 1
+                </Button>
+              </div>
+            )}
           </div>
-        </form>
+        )}
       </div>
     </Page>
   );

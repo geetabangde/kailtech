@@ -6,7 +6,7 @@ import { EyeIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-hot-toast";
 import { Button } from "components/ui/button";
 
-export default function AddUncertainty({ formatId, onComplete, onBack }) {
+export default function AddUncertainty({ instid, instrumentId, formatId, onComplete, onBack }) {
   // const { id: formatId } = useParams();
   const navigate = useNavigate();
   
@@ -173,7 +173,7 @@ export default function AddUncertainty({ formatId, onComplete, onBack }) {
     setLoading(true);
     try {
       const response = await axios.get(
-        `/observationsetting/get-observation-setting/${fid}`,
+        `/observationsetting/get-observation-setting/${instrumentId}`,
       );
 
       if (response.data.success) {
@@ -367,6 +367,8 @@ export default function AddUncertainty({ formatId, onComplete, onBack }) {
       }));
 
       const payload = {
+        instrument_id: instrumentId,
+        instid: instid,
         observation_id: parseInt(formatId),
         resultsetting: {
           uncertaintysetting: uncertaintysetting,
