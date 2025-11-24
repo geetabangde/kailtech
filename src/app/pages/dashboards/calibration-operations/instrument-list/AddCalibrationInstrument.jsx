@@ -78,7 +78,7 @@ export default function AddInstrument() {
     uncertaintytable: [],
     vertical: "1",
   });
-
+  
   const [priceLists, setPriceLists] = useState([
     {
       packagename: "",
@@ -112,6 +112,23 @@ export default function AddInstrument() {
     description: "Description",
     discipline: "Discipline",
     groups: "Group",
+    remark: "remark",
+    mode: "mode",
+    range: "range",
+    suffix: "suffix",
+    unittype: "unittype",
+    uncertaintytable: "uncertaintytable",
+    tempvariablelab : "tempvariablelab",
+    supportunittype: "supportunittype",
+    supportrange: "supportrange",
+    supportmode : "supportmode",
+    supportmaster: "supportmaster",
+    supportleastcount : "supportleastcount",
+    specificationheading: "specificationheading",
+    scopematrixvalidation: "scopematrixvalidation",
+    humivariablesite: "humivariablesite",
+    leastcount: "leastcount",
+    humivariablelab:"The humivariablelab field is required",
     tempsite: "Temperature Range for Site",
     humisite: "Humidity Range for Site",
     templab: "Temperature Range for Lab",
@@ -600,6 +617,8 @@ export default function AddInstrument() {
             handleMultiSelectChange={handleMultiSelectChange}
             subcategoryOne={subcategoryOne}
             subcategoryTwo={subcategoryTwo}
+            errors={errors}
+
           />
 
           <BiomedicalFields

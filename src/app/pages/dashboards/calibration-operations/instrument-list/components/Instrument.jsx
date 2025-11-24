@@ -102,7 +102,11 @@ function Instrument({ formData, errors, handleInputChange, handleMultiSelectChan
           name="remark"
           value={formData.remark}
           onChange={handleInputChange}
+          className={errors.remark ? "border-red-500 bg-red-50" : ""}
         />
+        {errors.remark && (
+          <p className="text-red-600 text-sm mt-1">This field is required</p>
+        )}
       </div>
     </>
   );

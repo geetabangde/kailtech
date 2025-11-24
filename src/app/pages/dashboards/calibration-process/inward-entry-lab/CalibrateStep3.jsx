@@ -174,7 +174,7 @@ const evaluateFormula = (formula, variables) => {
       try {
         setLoading(true);
         const response = await axios.get(
-          'https://kailtech.in/newlims/api/calibrationprocess/get-calibration-step3-details',
+          '/calibrationprocess/get-calibration-step3-details',
           {
             params: {
               inward_id: inwardId,
@@ -700,7 +700,7 @@ const evaluateFormula = (formula, variables) => {
     try {
       for (const payload of payloads) {
         await axios.post(
-          'https://lims.kailtech.in/api/calibrationprocess/set-observations',
+          '/calibrationprocess/set-observations',
           payload,
           {
             headers: {
@@ -873,7 +873,7 @@ const evaluateFormula = (formula, variables) => {
 
     try {
       const response = await axios.post(
-        'https://lims.kailtech.in/api/calibrationprocess/insert-calibration-step3',
+        '/calibrationprocess/insert-calibration-step3',
         payloadStep3,
         {
           headers: {
