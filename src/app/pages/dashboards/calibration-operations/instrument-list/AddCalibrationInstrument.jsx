@@ -4,7 +4,7 @@ import axios from "utils/axios";
 import { toast } from "sonner";
 import { Button } from "components/ui";
 import { Page } from "components/shared/Page";
-import Instrument from "./components/Instrument"; 
+import Instrument from "./components/Instrument";
 import ValidationFields from "./components/ValidationFields";
 import BiomedicalFields from "./components/BiomedicalFields";
 import CustomFormatFields from "./components/CustomFormatFields";
@@ -74,11 +74,11 @@ export default function AddInstrument() {
     mastersincertificate: "Yes",
     uncertaintyincertificate: "Yes",
     allottolab: "",
-    suffix: [],
-    uncertaintytable: [],
+    suffix: "",           
+    uncertaintytable: [], 
     vertical: "1",
   });
-  
+
   const [priceLists, setPriceLists] = useState([
     {
       packagename: "",
@@ -118,21 +118,21 @@ export default function AddInstrument() {
     suffix: "suffix",
     unittype: "unittype",
     uncertaintytable: "uncertaintytable",
-    tempvariablelab : "tempvariablelab",
+    tempvariablelab: "tempvariablelab",
     supportunittype: "supportunittype",
     supportrange: "supportrange",
-    supportmode : "supportmode",
+    supportmode: "supportmode",
     supportmaster: "supportmaster",
-    supportleastcount : "supportleastcount",
+    supportleastcount: "supportleastcount",
     specificationheading: "specificationheading",
     scopematrixvalidation: "scopematrixvalidation",
     humivariablesite: "humivariablesite",
     leastcount: "leastcount",
-    humivariablelab:"The humivariablelab field is required",
+    humivariablelab: "The humivariablelab field is required",
     tempsite: "Temperature Range for Site",
     humisite: "Humidity Range for Site",
     templab: "Temperature Range for Lab",
-    humilab: "Humidity Range for Lab"
+    humilab: "Humidity Range for Lab",
   };
 
   // Required fields for price list
@@ -140,7 +140,7 @@ export default function AddInstrument() {
     packagename: "Package Name",
     packagedesc: "Package Description",
     daysrequired: "Days Required",
-    rate: "Rate"
+    rate: "Rate",
   };
 
   // Fetch dropdown options on mount
@@ -170,19 +170,79 @@ export default function AddInstrument() {
           axios.get("/master/units-list"),
           axios.get("/master/mode-list"),
         ]);
+
         const safeArray = (data) => (Array.isArray(data) ? data : []);
 
-        setSopOptions(safeArray(sopRes.data.data).map((item) => ({ label: item.name, value: item.id.toString() })));
-        setStandardOptions(safeArray(standardRes.data.data).map((item) => ({ label: item.name, value: item.id.toString() })));
-        setSubcategoryOne(safeArray(subcategoryoneRes.data.data).map((item) => ({ label: item.name, value: item.id.toString() })));
-        setSubcategoryTwo(safeArray(subcategorytwoRes.data.data).map((item) => ({ label: item.name, value: item.id.toString() })));
-        setFormateOptions(safeArray(formatelist.data.data).map((item) => ({ label: item.name, value: item.id.toString() })));
-        // setFormateOptions(safeArray(formatelist.data.data).map((item) => ({ label: item.name, value: item.description.toString() })));
-        setLabOptions(safeArray(lablist.data.data).map((item) => ({ label: item.name, value: item.id.toString() })));
-        setCurrencyOptions(safeArray(currencylist.data.data).map((item) => ({ label: `${item.name} (${item.description})`, value: item.id.toString() })));
-        setUnitTypeOptions(unitTypeRes.data.data?.map((item) => ({ label: item.name, value: item.name })) || []);
-        setUnitOptions(unitRes.data.data?.map((item) => ({ label: item.name, value: item.id.toString() })) || []);
-        setModeOptions(modeRes.data.data?.map((item) => ({ label: item.name, value: item.name })) || []);
+        setSopOptions(
+          safeArray(sopRes.data.data).map((item) => ({
+            label: item.name,
+            value: item.id.toString(),
+          })),
+        );
+
+        setStandardOptions(
+          safeArray(standardRes.data.data).map((item) => ({
+            label: item.name,
+            value: item.id.toString(),
+          })),
+        );
+
+        setSubcategoryOne(
+          safeArray(subcategoryoneRes.data.data).map((item) => ({
+            label: item.name,
+            value: item.id.toString(),
+          })),
+        );
+
+        setSubcategoryTwo(
+          safeArray(subcategorytwoRes.data.data).map((item) => ({
+            label: item.name,
+            value: item.id.toString(),
+          })),
+        );
+         // ✅ UPDATED: Store description as value, NOT name or id
+        setFormateOptions(
+          safeArray(formatelist.data.data).map((item) => ({
+            label: item.name, // Display name
+            value: item.description, // ✅ Store description as value
+            id: item.id.toString(), // Keep id for reference if needed
+          })),
+        );
+
+        setLabOptions(
+          safeArray(lablist.data.data).map((item) => ({
+            label: item.name,
+            value: item.id.toString(),
+          })),
+        );
+
+        setCurrencyOptions(
+          safeArray(currencylist.data.data).map((item) => ({
+            label: `${item.name} (${item.description})`,
+            value: item.id.toString(),
+          })),
+        );
+
+        setUnitTypeOptions(
+          unitTypeRes.data.data?.map((item) => ({
+            label: item.name,
+            value: item.name,
+          })) || [],
+        );
+
+        setUnitOptions(
+          unitRes.data.data?.map((item) => ({
+            label: item.name,
+            value: item.id.toString(),
+          })) || [],
+        );
+
+        setModeOptions(
+          modeRes.data.data?.map((item) => ({
+            label: item.name,
+            value: item.name,
+          })) || [],
+        );
       } catch (err) {
         toast.error("Error loading dropdown data");
         console.error("Dropdown Fetch Error:", err);
@@ -198,31 +258,45 @@ export default function AddInstrument() {
 
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: false
+        [name]: false,
       }));
     }
   };
 
-  const handleMultiSelectChange = (selectedOptions, name) => {
-    if (name === 'suffix') {
-      const value = selectedOptions && selectedOptions.length > 0 ? selectedOptions[0].value : "";
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value ? [value] : [],
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: selectedOptions ? selectedOptions.map((opt) => opt.value) : [],
-      }));
-    }
+  // ✅ UPDATE handleMultiSelectChange - Now it will store VALUE (which is the name)
+// ✅ UPDATE handleMultiSelectChange - Now it will store description as value
+const handleMultiSelectChange = (selectedOptions, name) => {
+  if (name === "suffix") {
+    // Store description directly
+    const selectedValue = selectedOptions ? selectedOptions.value : "";
+    setFormData((prev) => ({
+      ...prev,
+      [name]: selectedValue, // This will be description text
+    }));
+  } else if (name === "uncertaintytable") {
+    // For multi-select, map and get values (which are descriptions)
+    const selectedValues = selectedOptions
+      ? selectedOptions.map((opt) => opt.value)
+      : [];
+    setFormData((prev) => ({
+      ...prev,
+      [name]: selectedValues, // This will be array of descriptions
+    }));
+  } else {
+    // For other multi-select fields, keep using values
+    setFormData((prev) => ({
+      ...prev,
+      [name]: selectedOptions ? selectedOptions.map((opt) => opt.value) : [],
+    }));
+  }
 
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: false }));
-    }
-  };
+  // Clear error when field is touched
+  if (errors[name]) {
+    setErrors((prev) => ({ ...prev, [name]: false }));
+  }
+};
 
   const handleSingleSelectChange = (selectedOption, fieldName) => {
     setFormData((prev) => ({
@@ -232,9 +306,9 @@ export default function AddInstrument() {
 
     // Clear error when user makes selection
     if (errors[fieldName]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [fieldName]: false
+        [fieldName]: false,
       }));
     }
   };
@@ -249,9 +323,9 @@ export default function AddInstrument() {
 
     // Clear price list errors
     if (errors[`price_${index}_${name}`]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [`price_${index}_${name}`]: false
+        [`price_${index}_${name}`]: false,
       }));
     }
   };
@@ -291,7 +365,8 @@ export default function AddInstrument() {
 
       if (
         newMatrices.length > 0 &&
-        JSON.stringify(newMatrices[newMatrices.length - 1]) === JSON.stringify(newMatrix)
+        JSON.stringify(newMatrices[newMatrices.length - 1]) ===
+          JSON.stringify(newMatrix)
       ) {
         return prev;
       }
@@ -307,7 +382,9 @@ export default function AddInstrument() {
   const removeMatrix = (priceIndex, matrixIndex) => {
     setPriceLists((prev) => {
       const updated = [...prev];
-      updated[priceIndex].matrices = updated[priceIndex].matrices.filter((_, i) => i !== matrixIndex);
+      updated[priceIndex].matrices = updated[priceIndex].matrices.filter(
+        (_, i) => i !== matrixIndex,
+      );
       return updated;
     });
   };
@@ -335,21 +412,21 @@ export default function AddInstrument() {
   const validateForm = () => {
     const newErrors = {};
 
-    Object.keys(requiredFields).forEach(field => {
-      if (field === 'sop') {
+    Object.keys(requiredFields).forEach((field) => {
+      if (field === "sop") {
         if (!formData[field] || formData[field].length === 0) {
           newErrors[field] = true;
         }
       } else {
-        if (!formData[field] || formData[field].toString().trim() === '') {
+        if (!formData[field] || formData[field].toString().trim() === "") {
           newErrors[field] = true;
         }
       }
     });
 
     priceLists.forEach((price, index) => {
-      Object.keys(requiredPriceFields).forEach(field => {
-        if (!price[field] || price[field].toString().trim() === '') {
+      Object.keys(requiredPriceFields).forEach((field) => {
+        if (!price[field] || price[field].toString().trim() === "") {
           newErrors[`price_${index}_${field}`] = true;
         }
       });
@@ -361,8 +438,8 @@ export default function AddInstrument() {
       const firstErrorField = Object.keys(newErrors)[0];
       let element;
 
-      if (firstErrorField.startsWith('price_')) {
-        const fieldParts = firstErrorField.split('_');
+      if (firstErrorField.startsWith("price_")) {
+        const fieldParts = firstErrorField.split("_");
         const fieldName = fieldParts[2];
         element = document.querySelector(`input[name="${fieldName}"]`);
       } else {
@@ -371,15 +448,16 @@ export default function AddInstrument() {
 
       if (element) {
         element.focus();
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
       }
       return false;
     }
 
     return true;
   };
-  
+
   // Step 1: Save Instrument Details
+  // ✅ UPDATE handleSubmit - No conversion needed now!
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -393,12 +471,14 @@ export default function AddInstrument() {
     try {
       const payload = {
         ...formData,
-        suffix: Array.isArray(formData.suffix)
-          ? formData.suffix[0] || ""
-          : formData.suffix || "",
-        uncertaintytable: Array.isArray(formData.uncertaintytable)
-          ? formData.uncertaintytable[0] || ""
-          : formData.uncertaintytable || "",
+         // ✅ Now suffix contains the description text
+      suffix: Array.isArray(formData.suffix)
+        ? formData.suffix[0] || ""
+        : formData.suffix || "",
+      // ✅ Now uncertaintytable contains descriptions array
+      uncertaintytable: Array.isArray(formData.uncertaintytable)
+        ? formData.uncertaintytable[0] || ""
+        : formData.uncertaintytable || "",
         packagename: [],
         packagedesc: [],
         pricematrix: [],
@@ -426,10 +506,13 @@ export default function AddInstrument() {
           payload[`unittype${prefix}`] = payload[`unittype${prefix}`] || [];
           payload[`unit${prefix}`] = payload[`unit${prefix}`] || [];
           payload[`mode${prefix}`] = payload[`mode${prefix}`] || [];
-          payload[`instrangemin${prefix}`] = payload[`instrangemin${prefix}`] || [];
-          payload[`instrangemax${prefix}`] = payload[`instrangemax${prefix}`] || [];
+          payload[`instrangemin${prefix}`] =
+            payload[`instrangemin${prefix}`] || [];
+          payload[`instrangemax${prefix}`] =
+            payload[`instrangemax${prefix}`] || [];
           payload[`tolerance${prefix}`] = payload[`tolerance${prefix}`] || [];
-          payload[`tolerancetype${prefix}`] = payload[`tolerancetype${prefix}`] || [];
+          payload[`tolerancetype${prefix}`] =
+            payload[`tolerancetype${prefix}`] || [];
 
           payload[`matrixno${prefix}`].push(matrixIndex + 1);
           payload[`unittype${prefix}`].push(matrix.unittype);
@@ -443,8 +526,9 @@ export default function AddInstrument() {
       });
 
       console.log("FINAL JSON Payload:", payload);
+      console.log("✅ suffix value (description):", payload.suffix); 
+      console.log("✅ uncertaintytable value (description):", payload.uncertaintytable);
 
-      // Capture the response here
       const response = await axios.post(
         "/calibrationoperations/add-new-instrument",
         payload,
@@ -452,87 +536,88 @@ export default function AddInstrument() {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
-    // DEBUGGING: Log complete response
+
       console.log("=== COMPLETE API RESPONSE ===");
       console.log("Response Data:", response.data);
       console.log("=== END OF RESPONSE ===");
-      // ✅ STEP 1: Get Instrument ID from API response (instid: 259)
+
       const instrumentId = response.data?.instid;
       console.log("📌 Instrument ID from API (instid):", instrumentId);
 
-      
-      // ✅ STEP 2: Get Format ID from suffix field (user selection)
+      // ✅ Now formatId contains the name "apg", not id "1"
       let formatId = null;
-      if (formData.suffix && Array.isArray(formData.suffix) && formData.suffix.length > 0) {
+      if (
+        formData.suffix &&
+        Array.isArray(formData.suffix) &&
+        formData.suffix.length > 0
+      ) {
         formatId = formData.suffix[0];
-      } else if (typeof formData.suffix === 'string' && formData.suffix) {
+      } else if (typeof formData.suffix === "string" && formData.suffix) {
         formatId = formData.suffix;
       }
-      console.log("📌 Format ID from suffix field:", formatId);
+      console.log("📌 Format ID from suffix field:", formatId); // Should be "apg"
 
-     
-      // ✅ STEP 3: Get Uncertainty Sheet ID (optional)
+      // ✅ Now uncertaintyId contains the name "apg", not id "1"
       let uncertaintyId = null;
-      if (formData.uncertaintytable && Array.isArray(formData.uncertaintytable) && formData.uncertaintytable.length > 0) {
+      if (
+        formData.uncertaintytable &&
+        Array.isArray(formData.uncertaintytable) &&
+        formData.uncertaintytable.length > 0
+      ) {
         uncertaintyId = formData.uncertaintytable[0];
-      } else if (typeof formData.uncertaintytable === 'string' && formData.uncertaintytable) {
+      } else if (
+        typeof formData.uncertaintytable === "string" &&
+        formData.uncertaintytable
+      ) {
         uncertaintyId = formData.uncertaintytable;
       }
-      console.log("📌 Uncertainty Sheet ID:", uncertaintyId);
-      
-       // ✅ VALIDATION: Check both IDs are present
+      console.log("📌 Uncertainty Sheet ID:", uncertaintyId); // Should be "apg"
+
       if (instrumentId && formatId) {
-        // Convert to numbers
-        const finalInstrumentId = typeof instrumentId === 'string' 
-          ? parseInt(instrumentId, 10) 
-          : instrumentId;
-        
-        const finalFormatId = typeof formatId === 'string' 
-          ? parseInt(formatId, 10) 
-          : formatId;
-        
-        if (!isNaN(finalInstrumentId) && finalInstrumentId > 0 && 
-            !isNaN(finalFormatId) && finalFormatId > 0) {
-          
+        const finalInstrumentId =
+          typeof instrumentId === "string"
+            ? parseInt(instrumentId, 10)
+            : instrumentId;
+
+        // ✅ Don't parse formatId as number, keep it as string name
+        const finalFormatId = formatId; // Keep as "apg"
+
+        if (
+          !isNaN(finalInstrumentId) &&
+          finalInstrumentId > 0 &&
+          finalFormatId
+        ) {
           console.log("✅ Valid Instrument ID:", finalInstrumentId);
-          console.log("✅ Valid Format ID:", finalFormatId);
-          
-          // ✅ Save both IDs
+          console.log("✅ Valid Format Name:", finalFormatId);
+
           setSavedInstrumentId(finalInstrumentId);
           setSavedFormatId(finalFormatId);
-          
-          // Save Uncertainty ID if provided
+
           if (uncertaintyId) {
-            const finalUncertaintyId = typeof uncertaintyId === 'string' 
-              ? parseInt(uncertaintyId, 10) 
-              : uncertaintyId;
-            
-            if (!isNaN(finalUncertaintyId) && finalUncertaintyId > 0) {
-              setSavedUncertaintyId(finalUncertaintyId);
-              console.log("✅ Valid Uncertainty ID:", finalUncertaintyId);
-            }
+            // ✅ Keep uncertaintyId as string name, don't parse as number
+            const finalUncertaintyId = uncertaintyId; // Keep as "apg"
+            setSavedUncertaintyId(finalUncertaintyId);
+            console.log("✅ Valid Uncertainty Name:", finalUncertaintyId);
           }
-          
+
           toast.success(
-            `Step 1 Complete! Instrument ID: ${finalInstrumentId}, Format ID: ${finalFormatId}` +
-            (uncertaintyId ? `, Uncertainty ID: ${uncertaintyId}` : "")
+            `Step 1 Complete! Instrument ID: ${finalInstrumentId}, Format: ${finalFormatId}` +
+              (uncertaintyId ? `, Uncertainty: ${uncertaintyId}` : ""),
           );
-          
-          // Move to Step 2
+
           setTimeout(() => {
             console.log("🚀 Moving to Step 2 with:", {
               instrumentId: finalInstrumentId,
               formatId: finalFormatId,
-              uncertaintyId
+              uncertaintyId,
             });
             setCurrentStep(2);
           }, 100);
-          
         } else {
-          toast.error("Invalid ID received. Please try again.");
-          console.error("Invalid IDs:", { finalInstrumentId, finalFormatId });
+          toast.error("Invalid data received. Please try again.");
+          console.error("Invalid data:", { finalInstrumentId, finalFormatId });
         }
       } else {
         if (!instrumentId) {
@@ -541,10 +626,9 @@ export default function AddInstrument() {
         }
         if (!formatId) {
           toast.error("Please select a Format before proceeding");
-          console.error("No Format ID found in suffix field");
+          console.error("No Format found in suffix field");
         }
       }
-      
     } catch (err) {
       console.error("API Error:", err);
       toast.error(err.response?.data?.message || "Error adding instrument");
@@ -552,6 +636,7 @@ export default function AddInstrument() {
       setLoading(false);
     }
   };
+
   // Step Progress Indicator
   const renderStepIndicator = () => (
     <div className="mb-6 flex items-center justify-center">
@@ -592,113 +677,116 @@ export default function AddInstrument() {
           <Button
             variant="outline"
             className="bg-blue-600 text-white hover:bg-blue-700"
-            onClick={() => navigate("/dashboards/calibration-operations/instrument-list")}
+            onClick={() =>
+              navigate("/dashboards/calibration-operations/instrument-list")
+            }
           >
             Back to List
           </Button>
         </div>
-         {renderStepIndicator()}
+        {renderStepIndicator()}
 
-         {/* Step 1: Add Instrument Form */}
+        {/* Step 1: Add Instrument Form */}
         {currentStep === 1 && (
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <Instrument 
-            formData={formData}
-            errors={errors}
-            handleInputChange={handleInputChange}
-            handleMultiSelectChange={handleMultiSelectChange}
-            sopOptions={sopOptions}
-            standardOptions={standardOptions}
-          />
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 gap-4 md:grid-cols-2"
+          >
+            <Instrument
+              formData={formData}
+              errors={errors}
+              handleInputChange={handleInputChange}
+              handleMultiSelectChange={handleMultiSelectChange}
+              sopOptions={sopOptions}
+              standardOptions={standardOptions}
+            />
 
-          <ValidationFields
-            formData={formData}
-            handleInputChange={handleInputChange}
-            handleMultiSelectChange={handleMultiSelectChange}
-            subcategoryOne={subcategoryOne}
-            subcategoryTwo={subcategoryTwo}
-            errors={errors}
+            <ValidationFields
+              formData={formData}
+              handleInputChange={handleInputChange}
+              handleMultiSelectChange={handleMultiSelectChange}
+              subcategoryOne={subcategoryOne}
+              subcategoryTwo={subcategoryTwo}
+              errors={errors}
+            />
 
-          />
+            <BiomedicalFields
+              formData={formData}
+              handleInputChange={handleInputChange}
+            />
 
-          <BiomedicalFields
-            formData={formData}
-            handleInputChange={handleInputChange}
-          />
+            <CustomFormatFields
+              formData={formData}
+              handleInputChange={handleInputChange}
+            />
 
-          <CustomFormatFields
-            formData={formData}
-            handleInputChange={handleInputChange}
-          />
+            <EnvironmentalFields
+              formData={formData}
+              errors={errors}
+              handleInputChange={handleInputChange}
+              handleSingleSelectChange={handleSingleSelectChange}
+              handleMultiSelectChange={handleMultiSelectChange}
+              labOptions={labOptions}
+              formateOptions={formateOptions}
+            />
 
-          <EnvironmentalFields
-            formData={formData}
-            errors={errors}
-            handleInputChange={handleInputChange}
-            handleSingleSelectChange={handleSingleSelectChange}
-            handleMultiSelectChange={handleMultiSelectChange}
-            labOptions={labOptions}
-            formateOptions={formateOptions}
-          />
+            <PriceListSection
+              priceLists={priceLists}
+              errors={errors}
+              currencyOptions={currencyOptions}
+              unitTypeOptions={unitTypeOptions}
+              unitOptions={unitOptions}
+              modeOptions={modeOptions}
+              handlePriceListChange={handlePriceListChange}
+              handlePriceCurrencyChange={handlePriceCurrencyChange}
+              handleMatrixChange={handleMatrixChange}
+              removeMatrix={removeMatrix}
+              addMatrix={addMatrix}
+              removePriceList={removePriceList}
+            />
 
-          <PriceListSection
-            priceLists={priceLists}
-            errors={errors}
-            currencyOptions={currencyOptions}
-            unitTypeOptions={unitTypeOptions}
-            unitOptions={unitOptions}
-            modeOptions={modeOptions}
-            handlePriceListChange={handlePriceListChange}
-            handlePriceCurrencyChange={handlePriceCurrencyChange}
-            handleMatrixChange={handleMatrixChange}
-            removeMatrix={removeMatrix}
-            addMatrix={addMatrix}
-            removePriceList={removePriceList}
-          />
+            <div className="col-span-1 md:col-span-2">
+              <Button
+                type="button"
+                onClick={addPriceList}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                + Add Price List
+              </Button>
+            </div>
 
-          <div className="col-span-1 md:col-span-2">
-            <Button
-              type="button"
-              onClick={addPriceList}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              + Add Price List
-            </Button>
-          </div>
-
-          <div className="col-span-1 md:col-span-2">
-            <Button type="submit" color="primary" disabled={loading}>
-              {loading ? (
-                <div className="flex items-center gap-2">
-                  <svg
-                    className="animate-spin h-4 w-4 text-white"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8v4a4 4 0 000 8v4a8 8 0 01-8-8z"
-                    ></path>
-                  </svg>
-                  Saving...
-                </div>
-              ) : (
-                "Save"
-              )}
-            </Button>
-          </div>
-        </form>
+            <div className="col-span-1 md:col-span-2">
+              <Button type="submit" color="primary" disabled={loading}>
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <svg
+                      className="h-4 w-4 animate-spin text-white"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 000 8v4a8 8 0 01-8-8z"
+                      ></path>
+                    </svg>
+                    Saving...
+                  </div>
+                ) : (
+                  "Save"
+                )}
+              </Button>
+            </div>
+          </form>
         )}
-        
-        
+
         {/* ✅ Step 2: Pass BOTH instrumentId AND formatId */}
         {currentStep === 2 && (
           <div>
@@ -711,15 +799,12 @@ export default function AddInstrument() {
                 onBack={() => setCurrentStep(1)}
               />
             ) : (
-              <div className="text-center p-8">
+              <div className="p-8 text-center">
                 <p className="text-red-600">
-                  Error: {!savedInstrumentId ? "Instrument ID" : "Format ID"} not found. 
-                  Please go back and try again.
+                  Error: {!savedInstrumentId ? "Instrument ID" : "Format ID"}{" "}
+                  not found. Please go back and try again.
                 </p>
-                <Button 
-                  onClick={() => setCurrentStep(1)}
-                  className="mt-4"
-                >
+                <Button onClick={() => setCurrentStep(1)} className="mt-4">
                   Go Back to Step 1
                 </Button>
               </div>
@@ -727,7 +812,6 @@ export default function AddInstrument() {
           </div>
         )}
 
-        
         {/* ✅ Step 3: Pass BOTH instrumentId AND formatId */}
         {currentStep === 3 && (
           <div>
@@ -739,27 +823,25 @@ export default function AddInstrument() {
                 uncertaintyId={savedUncertaintyId}
                 onComplete={() => {
                   toast.success("All steps completed successfully!");
-                  navigate("/dashboards/calibration-operations/instrument-list");
+                  navigate(
+                    "/dashboards/calibration-operations/instrument-list",
+                  );
                 }}
                 onBack={() => setCurrentStep(2)}
               />
             ) : (
-              <div className="text-center p-8">
+              <div className="p-8 text-center">
                 <p className="text-red-600">
-                  Error: {!savedInstrumentId ? "Instrument ID" : "Format ID"} not found. 
-                  Please start from Step 1.
+                  Error: {!savedInstrumentId ? "Instrument ID" : "Format ID"}{" "}
+                  not found. Please start from Step 1.
                 </p>
-                <Button 
-                  onClick={() => setCurrentStep(1)}
-                  className="mt-4"
-                >
+                <Button onClick={() => setCurrentStep(1)} className="mt-4">
                   Go Back to Step 1
                 </Button>
               </div>
             )}
           </div>
         )}
-        
       </div>
     </Page>
   );

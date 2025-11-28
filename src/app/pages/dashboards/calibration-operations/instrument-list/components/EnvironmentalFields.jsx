@@ -1,15 +1,14 @@
-
 import { Input, Select } from "components/ui";
 import ReactSelect from "react-select";
 
-function EnvironmentalFields({ 
-  formData, 
+function EnvironmentalFields({
+  formData,
   errors,
-  handleInputChange, 
+  handleInputChange,
   handleSingleSelectChange,
   handleMultiSelectChange,
   labOptions,
-  formateOptions
+  formateOptions,
 }) {
   return (
     <>
@@ -25,7 +24,7 @@ function EnvironmentalFields({
           className={errors.tempsite ? "border-red-500 bg-red-50" : ""}
         />
         {errors.tempsite && (
-          <p className="text-red-600 text-sm mt-1">This field is required</p>
+          <p className="mt-1 text-sm text-red-600">This field is required</p>
         )}
       </div>
 
@@ -37,10 +36,10 @@ function EnvironmentalFields({
           type="number"
           value={formData.tempvariablesite}
           onChange={handleInputChange}
-          className={errors.tempsite ? "border-red-500 bg-red-50" : ""}
+          className={errors.tempvariablesite ? "border-red-500 bg-red-50" : ""}
         />
-        {errors.tempsite && (
-          <p className="text-red-600 text-sm mt-1">This field is required</p>
+        {errors.tempvariablesite && (
+          <p className="mt-1 text-sm text-red-600">This field is required</p>
         )}
       </div>
 
@@ -55,7 +54,7 @@ function EnvironmentalFields({
           className={errors.humisite ? "border-red-500 bg-red-50" : ""}
         />
         {errors.humisite && (
-          <p className="text-red-600 text-sm mt-1">This field is required</p>
+          <p className="mt-1 text-sm text-red-600">This field is required</p>
         )}
       </div>
 
@@ -70,7 +69,7 @@ function EnvironmentalFields({
           className={errors.humivariablesite ? "border-red-500 bg-red-50" : ""}
         />
         {errors.humivariablesite && (
-          <p className="text-red-600 text-sm mt-1">This field is required</p>
+          <p className="mt-1 text-sm text-red-600">This field is required</p>
         )}
       </div>
 
@@ -86,7 +85,7 @@ function EnvironmentalFields({
           className={errors.templab ? "border-red-500 bg-red-50" : ""}
         />
         {errors.templab && (
-          <p className="text-red-600 text-sm mt-1">This field is required</p>
+          <p className="mt-1 text-sm text-red-600">This field is required</p>
         )}
       </div>
 
@@ -101,7 +100,7 @@ function EnvironmentalFields({
           className={errors.tempvariablelab ? "border-red-500 bg-red-50" : ""}
         />
         {errors.tempvariablelab && (
-          <p className="text-red-600 text-sm mt-1">This field is required</p>
+          <p className="mt-1 text-sm text-red-600">This field is required</p>
         )}
       </div>
 
@@ -116,7 +115,7 @@ function EnvironmentalFields({
           className={errors.humilab ? "border-red-500 bg-red-50" : ""}
         />
         {errors.humilab && (
-          <p className="text-red-600 text-sm mt-1">This field is required</p>
+          <p className="mt-1 text-sm text-red-600">This field is required</p>
         )}
       </div>
 
@@ -128,25 +127,30 @@ function EnvironmentalFields({
           placeholder="Enter Humidity Variable Lab"
           value={formData.humivariablelab}
           onChange={handleInputChange}
-          className={errors.humilab ? "border-red-500 bg-red-50" : ""}
+          className={errors.humivariablelab ? "border-red-500 bg-red-50" : ""}
         />
         {errors.humivariablelab && (
-          <p className="text-red-600 text-sm mt-1">This field is required</p>
+          <p className="mt-1 text-sm text-red-600">This field is required</p>
         )}
       </div>
 
       {/* Additional Certificate Fields */}
-      <Input
-        label="Specification Heading"
-        name="specificationheading"
-        placeholder="Enter Specification Heading"
-        value={formData.specificationheading}
-        onChange={handleInputChange}
-        className={errors.specificationheading ? "border-red-500 bg-red-50" : ""}
-      />
+      <div>
+        <Input
+          label="Specification Heading"
+          name="specificationheading"
+          placeholder="Enter Specification Heading"
+          value={formData.specificationheading}
+          onChange={handleInputChange}
+          className={
+            errors.specificationheading ? "border-red-500 bg-red-50" : ""
+          }
+        />
         {errors.specificationheading && (
-          <p className="text-red-600 text-sm mt-1">This field is required</p>
+          <p className="mt-1 text-sm text-red-600">This field is required</p>
         )}
+      </div>
+
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">
           Show Masters In Certificate
@@ -160,6 +164,7 @@ function EnvironmentalFields({
           <option value="No">No</option>
         </Select>
       </div>
+
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">
           Show Uncertainty In Certificate
@@ -181,12 +186,17 @@ function EnvironmentalFields({
         <ReactSelect
           name="allottolab"
           options={labOptions}
-          value={labOptions.find((opt) => opt.value === formData.allottolab) || null}
-          onChange={(selected) => handleSingleSelectChange(selected, "allottolab")}
+          value={
+            labOptions.find((opt) => opt.value === formData.allottolab) || null
+          }
+          onChange={(selected) =>
+            handleSingleSelectChange(selected, "allottolab")
+          }
           placeholder="Select Lab"
         />
       </div>
 
+      {/* ✅ Format - Stores description instead of name or id */}
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">
           Format
@@ -195,16 +205,19 @@ function EnvironmentalFields({
           isMulti={false}
           name="suffix"
           options={formateOptions}
-          value={formateOptions.find((opt) => opt.value === formData.suffix[0]) || null}
-          onChange={(selected) => handleMultiSelectChange(selected ? [selected] : [], "suffix")}
+          value={
+            formateOptions.find((opt) => opt.value === formData.suffix) || null
+          }
+          onChange={(selected) => handleMultiSelectChange(selected, "suffix")}
           placeholder="Select Format"
           className={errors.suffix ? "border-red-500 bg-red-50" : ""}
         />
         {errors.suffix && (
-          <p className="text-red-600 text-sm mt-1">This field is required</p>
+          <p className="mt-1 text-sm text-red-600">This field is required</p>
         )}
       </div>
 
+      {/* ✅ Uncertainty Sheet - Stores descriptions instead of names or ids */}
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">
           Uncertainty Sheet
@@ -214,12 +227,16 @@ function EnvironmentalFields({
           className={errors.uncertaintytable ? "border-red-500 bg-red-50" : ""}
           name="uncertaintytable"
           options={formateOptions}
-          value={formateOptions.filter((opt) => formData.uncertaintytable.includes(opt.value))}
-          onChange={(selected) => handleMultiSelectChange(selected, "uncertaintytable")}
+          value={formateOptions.filter((opt) =>
+            formData.uncertaintytable.includes(opt.value),
+          )}
+          onChange={(selected) =>
+            handleMultiSelectChange(selected, "uncertaintytable")
+          }
           placeholder="Select Uncertainty"
         />
         {errors.uncertaintytable && (
-          <p className="text-red-600 text-sm mt-1">This field is required</p>
+          <p className="mt-1 text-sm text-red-600">This field is required</p>
         )}
       </div>
     </>
