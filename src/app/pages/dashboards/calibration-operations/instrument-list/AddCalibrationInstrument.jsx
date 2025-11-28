@@ -74,8 +74,10 @@ export default function AddInstrument() {
     mastersincertificate: "Yes",
     uncertaintyincertificate: "Yes",
     allottolab: "",
-    suffix: "",           
-    uncertaintytable: [], 
+    suffix: "",
+    suffixId: "", // ✅ New field for format ID
+    uncertaintytable: [],
+    uncertaintyIds: [],
     vertical: "1",
   });
 
@@ -200,14 +202,24 @@ export default function AddInstrument() {
             value: item.id.toString(),
           })),
         );
-         // ✅ UPDATED: Store description as value, NOT name or id
+        
+        // In the fetchDropdowns function
         setFormateOptions(
           safeArray(formatelist.data.data).map((item) => ({
-            label: item.name, // Display name
-            value: item.description, // ✅ Store description as value
-            id: item.id.toString(), // Keep id for reference if needed
+            label: item.name, // UI mein name dikhega
+            value: item.description, // Description store hogi
+            id: item.id.toString(), // ID alag se available rahegi
           })),
         );
+
+        // setFormateOptions(
+        //   safeArray(formatelist.data.data).map((item) => ({
+        //     label: item.name,    // UI mein description dikhega
+        //     value: item.description,    // Value bhi description hi
+        //     actualId: item.id.toString(), // ID alag field mein
+        //     name: item.name
+        //   })),
+        // );
 
         setLabOptions(
           safeArray(lablist.data.data).map((item) => ({
@@ -266,37 +278,44 @@ export default function AddInstrument() {
   };
 
   // ✅ UPDATE handleMultiSelectChange - Now it will store VALUE (which is the name)
-// ✅ UPDATE handleMultiSelectChange - Now it will store description as value
-const handleMultiSelectChange = (selectedOptions, name) => {
-  if (name === "suffix") {
-    // Store description directly
-    const selectedValue = selectedOptions ? selectedOptions.value : "";
-    setFormData((prev) => ({
-      ...prev,
-      [name]: selectedValue, // This will be description text
-    }));
-  } else if (name === "uncertaintytable") {
-    // For multi-select, map and get values (which are descriptions)
-    const selectedValues = selectedOptions
-      ? selectedOptions.map((opt) => opt.value)
-      : [];
-    setFormData((prev) => ({
-      ...prev,
-      [name]: selectedValues, // This will be array of descriptions
-    }));
-  } else {
-    // For other multi-select fields, keep using values
-    setFormData((prev) => ({
-      ...prev,
-      [name]: selectedOptions ? selectedOptions.map((opt) => opt.value) : [],
-    }));
-  }
+  // ✅ UPDATE handleMultiSelectChange - Now it will store description as value
+  const handleMultiSelectChange = (selectedOptions, name) => {
+    if (name === "suffix") {
+      // Single select - store both description and id
+      const selectedValue = selectedOptions ? selectedOptions.value : "";
+      const selectedId = selectedOptions ? selectedOptions.id : "";
 
-  // Clear error when field is touched
-  if (errors[name]) {
-    setErrors((prev) => ({ ...prev, [name]: false }));
-  }
-};
+      setFormData((prev) => ({
+        ...prev,
+        [name]: selectedValue, // Description for display/API
+        suffixId: selectedId, // ID stored separately
+      }));
+    } else if (name === "uncertaintytable") {
+      // Multi select - store arrays of both descriptions and ids
+      const selectedValues = selectedOptions
+        ? selectedOptions.map((opt) => opt.value)
+        : [];
+      const selectedIds = selectedOptions
+        ? selectedOptions.map((opt) => opt.id)
+        : [];
+
+      setFormData((prev) => ({
+        ...prev,
+        [name]: selectedValues, // Descriptions array
+        uncertaintyIds: selectedIds, // IDs array stored separately
+      }));
+    } else {
+      // Other fields remain unchanged
+      setFormData((prev) => ({
+        ...prev,
+        [name]: selectedOptions ? selectedOptions.map((opt) => opt.value) : [],
+      }));
+    }
+
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: false }));
+    }
+  };
 
   const handleSingleSelectChange = (selectedOption, fieldName) => {
     setFormData((prev) => ({
@@ -471,14 +490,13 @@ const handleMultiSelectChange = (selectedOptions, name) => {
     try {
       const payload = {
         ...formData,
-         // ✅ Now suffix contains the description text
-      suffix: Array.isArray(formData.suffix)
-        ? formData.suffix[0] || ""
-        : formData.suffix || "",
-      // ✅ Now uncertaintytable contains descriptions array
-      uncertaintytable: Array.isArray(formData.uncertaintytable)
-        ? formData.uncertaintytable[0] || ""
-        : formData.uncertaintytable || "",
+        // ✅ Send description to API (as your backend expects)
+        suffix: Array.isArray(formData.suffix)
+          ? formData.suffix[0] || ""
+          : formData.suffix || "",
+        uncertaintytable: Array.isArray(formData.uncertaintytable)
+          ? formData.uncertaintytable[0] || ""
+          : formData.uncertaintytable || "",
         packagename: [],
         packagedesc: [],
         pricematrix: [],
@@ -526,8 +544,11 @@ const handleMultiSelectChange = (selectedOptions, name) => {
       });
 
       console.log("FINAL JSON Payload:", payload);
-      console.log("✅ suffix value (description):", payload.suffix); 
-      console.log("✅ uncertaintytable value (description):", payload.uncertaintytable);
+      console.log("✅ suffix value (description):", payload.suffix);
+      console.log(
+        "✅ uncertaintytable value (description):",
+        payload.uncertaintytable,
+      );
 
       const response = await axios.post(
         "/calibrationoperations/add-new-instrument",
@@ -543,81 +564,71 @@ const handleMultiSelectChange = (selectedOptions, name) => {
       console.log("Response Data:", response.data);
       console.log("=== END OF RESPONSE ===");
 
+      // ✅ Extract values from response and formData
       const instrumentId = response.data?.instid;
-      console.log("📌 Instrument ID from API (instid):", instrumentId);
+      const formatId = formData.suffixId || null;
+      const uncertaintyId = formData.uncertaintyIds?.[0] || null;
 
-      // ✅ Now formatId contains the name "apg", not id "1"
-      let formatId = null;
-      if (
-        formData.suffix &&
-        Array.isArray(formData.suffix) &&
-        formData.suffix.length > 0
-      ) {
-        formatId = formData.suffix[0];
-      } else if (typeof formData.suffix === "string" && formData.suffix) {
-        formatId = formData.suffix;
-      }
-      console.log("📌 Format ID from suffix field:", formatId); // Should be "apg"
+      console.log("📌 Instrument ID:", instrumentId);
+      console.log("📌 Format ID (numeric):", formatId);
+      console.log("📌 Format Description:", formData.suffix);
+      console.log("📌 Uncertainty ID (numeric):", uncertaintyId);
+      console.log("📌 Uncertainty Description:", formData.uncertaintytable);
 
-      // ✅ Now uncertaintyId contains the name "apg", not id "1"
-      let uncertaintyId = null;
-      if (
-        formData.uncertaintytable &&
-        Array.isArray(formData.uncertaintytable) &&
-        formData.uncertaintytable.length > 0
-      ) {
-        uncertaintyId = formData.uncertaintytable[0];
-      } else if (
-        typeof formData.uncertaintytable === "string" &&
-        formData.uncertaintytable
-      ) {
-        uncertaintyId = formData.uncertaintytable;
-      }
-      console.log("📌 Uncertainty Sheet ID:", uncertaintyId); // Should be "apg"
-
+      // ✅ Validate required data
       if (instrumentId && formatId) {
         const finalInstrumentId =
           typeof instrumentId === "string"
             ? parseInt(instrumentId, 10)
             : instrumentId;
 
-        // ✅ Don't parse formatId as number, keep it as string name
-        const finalFormatId = formatId; // Keep as "apg"
+        // ✅ Parse formatId as number
+        const finalFormatId = parseInt(formatId, 10);
 
+        // ✅ Check validity
         if (
           !isNaN(finalInstrumentId) &&
           finalInstrumentId > 0 &&
-          finalFormatId
+          !isNaN(finalFormatId) &&
+          finalFormatId > 0
         ) {
           console.log("✅ Valid Instrument ID:", finalInstrumentId);
-          console.log("✅ Valid Format Name:", finalFormatId);
+          console.log("✅ Valid Format ID:", finalFormatId);
 
           setSavedInstrumentId(finalInstrumentId);
           setSavedFormatId(finalFormatId);
 
+          // ✅ Handle uncertainty ID if exists
           if (uncertaintyId) {
-            // ✅ Keep uncertaintyId as string name, don't parse as number
-            const finalUncertaintyId = uncertaintyId; // Keep as "apg"
-            setSavedUncertaintyId(finalUncertaintyId);
-            console.log("✅ Valid Uncertainty Name:", finalUncertaintyId);
+            const finalUncertaintyId = parseInt(uncertaintyId, 10);
+            if (!isNaN(finalUncertaintyId) && finalUncertaintyId > 0) {
+              setSavedUncertaintyId(finalUncertaintyId);
+              console.log("✅ Valid Uncertainty ID:", finalUncertaintyId);
+            }
           }
 
           toast.success(
-            `Step 1 Complete! Instrument ID: ${finalInstrumentId}, Format: ${finalFormatId}` +
-              (uncertaintyId ? `, Uncertainty: ${uncertaintyId}` : ""),
+            `Step 1 Complete! Instrument ID: ${finalInstrumentId}, Format ID: ${finalFormatId}` +
+              (uncertaintyId ? `, Uncertainty ID: ${uncertaintyId}` : ""),
           );
 
           setTimeout(() => {
             console.log("🚀 Moving to Step 2 with:", {
               instrumentId: finalInstrumentId,
               formatId: finalFormatId,
-              uncertaintyId,
+              uncertaintyId: uncertaintyId ? parseInt(uncertaintyId, 10) : null,
             });
             setCurrentStep(2);
           }, 100);
         } else {
           toast.error("Invalid data received. Please try again.");
-          console.error("Invalid data:", { finalInstrumentId, finalFormatId });
+          console.error("Invalid data:", {
+            finalInstrumentId,
+            finalFormatId,
+            instrumentIdValid:
+              !isNaN(finalInstrumentId) && finalInstrumentId > 0,
+            formatIdValid: !isNaN(finalFormatId) && finalFormatId > 0,
+          });
         }
       } else {
         if (!instrumentId) {
@@ -626,7 +637,7 @@ const handleMultiSelectChange = (selectedOptions, name) => {
         }
         if (!formatId) {
           toast.error("Please select a Format before proceeding");
-          console.error("No Format found in suffix field");
+          console.error("No Format ID found in suffixId field");
         }
       }
     } catch (err) {

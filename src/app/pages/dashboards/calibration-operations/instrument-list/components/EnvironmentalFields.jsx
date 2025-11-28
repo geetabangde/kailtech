@@ -196,49 +196,49 @@ function EnvironmentalFields({
         />
       </div>
 
-      {/* ✅ Format - Stores description instead of name or id */}
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">
-          Format
-        </label>
-        <ReactSelect
-          isMulti={false}
-          name="suffix"
-          options={formateOptions}
-          value={
-            formateOptions.find((opt) => opt.value === formData.suffix) || null
-          }
-          onChange={(selected) => handleMultiSelectChange(selected, "suffix")}
-          placeholder="Select Format"
-          className={errors.suffix ? "border-red-500 bg-red-50" : ""}
-        />
-        {errors.suffix && (
-          <p className="mt-1 text-sm text-red-600">This field is required</p>
-        )}
-      </div>
+      {/* Format Field */}
+<div>
+  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">
+    Format
+  </label>
+  <ReactSelect
+    isMulti={false}
+    name="suffix"
+    options={formateOptions}
+    value={
+      formateOptions.find((opt) => opt.value === formData.suffix) || null
+    }
+    onChange={(selected) => handleMultiSelectChange(selected, "suffix")}
+    placeholder="Select Format"
+    className={errors.suffix ? "border-red-500 bg-red-50" : ""}
+  />
+  {errors.suffix && (
+    <p className="mt-1 text-sm text-red-600">This field is required</p>
+  )}
+</div>
 
-      {/* ✅ Uncertainty Sheet - Stores descriptions instead of names or ids */}
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">
-          Uncertainty Sheet
-        </label>
-        <ReactSelect
-          isMulti
-          className={errors.uncertaintytable ? "border-red-500 bg-red-50" : ""}
-          name="uncertaintytable"
-          options={formateOptions}
-          value={formateOptions.filter((opt) =>
-            formData.uncertaintytable.includes(opt.value),
-          )}
-          onChange={(selected) =>
-            handleMultiSelectChange(selected, "uncertaintytable")
-          }
-          placeholder="Select Uncertainty"
-        />
-        {errors.uncertaintytable && (
-          <p className="mt-1 text-sm text-red-600">This field is required</p>
-        )}
-      </div>
+{/* Uncertainty Sheet Field */}
+<div>
+  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-white">
+    Uncertainty Sheet
+  </label>
+  <ReactSelect
+    isMulti
+    name="uncertaintytable"
+    options={formateOptions}
+    value={formateOptions.filter((opt) =>
+      formData.uncertaintytable.includes(opt.value)
+    )}
+    onChange={(selected) =>
+      handleMultiSelectChange(selected, "uncertaintytable")
+    }
+    placeholder="Select Uncertainty"
+    className={errors.uncertaintytable ? "border-red-500 bg-red-50" : ""}
+  />
+  {errors.uncertaintytable && (
+    <p className="mt-1 text-sm text-red-600">This field is required</p>
+  )}
+</div>
     </>
   );
 }
