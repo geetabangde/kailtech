@@ -47,92 +47,86 @@ const CalibrateStep3 = () => {
     }
   };
   
-// ✅ Complete Formula Evaluator with All Math Functions
-const evaluateFormula = (formula, variables) => {
-  if (!formula || !formula.trim()) return '';
+  // ✅ Complete Formula Evaluator with All Math Functions
+  const evaluateFormula = (formula, variables) => {
+    if (!formula || !formula.trim()) return '';
 
-  try {
-    let expr = formula.trim();
-    
-    console.log('🧮 Original formula:', formula);
-    console.log('📊 Input variables:', variables);
-
-    // Step 1: Remove ALL $ signs from formula
-    expr = expr.replace(/\$/g, '');
-    
-    // Step 2: Create clean variables without $ signs
-    const cleanVariables = {};
-    Object.keys(variables).forEach(key => {
-      const cleanKey = key.replace(/\$/g, '');
-      cleanVariables[cleanKey] = variables[key];
-    });
-
-    console.log('🔧 Clean formula:', expr);
-    console.log('🔧 Clean variables:', cleanVariables);
-
-    // Step 3: Handle special functions and operators
-    // Replace all function patterns with JavaScript equivalents
-    
-    // Math functions mapping
-    const functionMappings = [
-      { pattern: /\babs\(([^)]+)\)/g, replacement: 'Math.abs($1)' },
-      { pattern: /\bpow\(([^,]+),\s*([^)]+)\)/g, replacement: 'Math.pow($1, $2)' },
-      { pattern: /\bsqrt\(([^)]+)\)/g, replacement: 'Math.sqrt($1)' },
-      { pattern: /\bmin\(([^)]+)\)/g, replacement: 'Math.min($1)' },
-      { pattern: /\bmax\(([^)]+)\)/g, replacement: 'Math.max($1)' }
-    ];
-
-    functionMappings.forEach(mapping => {
-      expr = expr.replace(mapping.pattern, mapping.replacement);
-    });
-
-    // Step 4: Handle modulus operator (%)
-    expr = expr.replace(/%/g, '%');
-
-    // Step 5: Replace variables with their numeric values
-    const sortedKeys = Object.keys(cleanVariables).sort((a, b) => b.length - a.length);
-    
-    for (const key of sortedKeys) {
-      if (typeof cleanVariables[key] !== 'number') continue;
+    try {
+      let expr = formula.trim();
       
-      const regex = new RegExp(`\\b${key}\\b`, 'g');
-      expr = expr.replace(regex, `(${cleanVariables[key]})`);
-    }
+      console.log('🧮 Original formula:', formula);
+      console.log('📊 Input variables:', variables);
 
-    // Step 6: Replace any remaining unknown variables with 0
-    expr = expr.replace(/\b[mM]\d+\b/g, '0');
+      // Step 1: Remove ALL $ signs from formula
+      expr = expr.replace(/\$/g, '');
+      
+      // Step 2: Create clean variables without $ signs
+      const cleanVariables = {};
+      Object.keys(variables).forEach(key => {
+        const cleanKey = key.replace(/\$/g, '');
+        cleanVariables[cleanKey] = variables[key];
+      });
 
-    console.log('📝 Final expression:', expr);
+      console.log('🔧 Clean formula:', expr);
+      console.log('🔧 Clean variables:', cleanVariables);
 
-    // Step 7: Safe evaluation with all Math functions available
-    const result = new Function(`
-      'use strict';
-      const abs = Math.abs;
-      const pow = Math.pow;
-      const sqrt = Math.sqrt;
-      const min = Math.min;
-      const max = Math.max;
-      return ${expr};
-    `)();
+      // Step 3: Handle special functions and operators
+      const functionMappings = [
+        { pattern: /\babs\(([^)]+)\)/g, replacement: 'Math.abs($1)' },
+        { pattern: /\bpow\(([^,]+),\s*([^)]+)\)/g, replacement: 'Math.pow($1, $2)' },
+        { pattern: /\bsqrt\(([^)]+)\)/g, replacement: 'Math.sqrt($1)' },
+        { pattern: /\bmin\(([^)]+)\)/g, replacement: 'Math.min($1)' },
+        { pattern: /\bmax\(([^)]+)\)/g, replacement: 'Math.max($1)' }
+      ];
 
-    if (isNaN(result) || result === Infinity || result === -Infinity) {
-      console.warn('⚠️ Invalid result:', result);
+      functionMappings.forEach(mapping => {
+        expr = expr.replace(mapping.pattern, mapping.replacement);
+      });
+
+      // Step 4: Replace variables with their numeric values
+      const sortedKeys = Object.keys(cleanVariables).sort((a, b) => b.length - a.length);
+      
+      for (const key of sortedKeys) {
+        if (typeof cleanVariables[key] !== 'number') continue;
+        
+        const regex = new RegExp(`\\b${key}\\b`, 'g');
+        expr = expr.replace(regex, `(${cleanVariables[key]})`);
+      }
+
+      // Step 5: Replace any remaining unknown variables with 0
+      expr = expr.replace(/\b[a-zA-Z]\w*\b/g, '0');
+
+      console.log('📝 Final expression:', expr);
+
+      // Step 6: Safe evaluation
+      const result = new Function(`
+        'use strict';
+        const abs = Math.abs;
+        const pow = Math.pow;
+        const sqrt = Math.sqrt;
+        const min = Math.min;
+        const max = Math.max;
+        return ${expr};
+      `)();
+
+      if (isNaN(result) || result === Infinity || result === -Infinity) {
+        console.warn('⚠️ Invalid result:', result);
+        return '';
+      }
+
+      const finalValue = parseFloat(result.toFixed(4));
+      console.log('✅ Result:', finalValue);
+      
+      return finalValue;
+    } catch (err) {
+      console.error('❌ Formula evaluation failed:', {
+        formula,
+        error: err.message,
+        variables
+      });
       return '';
     }
-
-    const finalValue = parseFloat(result.toFixed(4));
-    console.log('✅ Result:', finalValue);
-    
-    return finalValue;
-  } catch (err) {
-    console.error('❌ Formula evaluation failed:', {
-      formula,
-      error: err.message,
-      variables
-    });
-    return '';
-  }
-};
+  };
 
   const fetchDynamicHeadings = useCallback(async (suffix) => {
     if (!suffix) {
@@ -236,323 +230,337 @@ const evaluateFormula = (formula, variables) => {
     }
   }, [inwardId, instId, caliblocation, calibacc, fetchDynamicHeadings]);
 
-  const generateDynamicTableStructure = useCallback((headings, template) => {
-    if (!headings || !Array.isArray(headings)) {
-      console.log('❌ No headings provided for dynamic table structure');
-      return null;
-    }
 
-    console.log('🔄 Generating dynamic table structure for template:', template, 'with headings:', headings);
+// ✅ Generate Dynamic Table Structure - Supports all 3 observation_from modes
+// ✅ Generate Dynamic Table Structure - Uses API order (NO SORTING)
+// ✅ Generate Dynamic Table Structure - Uses API order (NO SORTING)
+const generateDynamicTableStructure = useCallback((headings) => {
+  if (!headings || !Array.isArray(headings)) {
+    console.log('❌ No headings provided for dynamic table structure');
+    return null;
+  }
 
-    const sortedHeadings = [...headings].sort((a, b) => (a.field_position || 0) - (b.field_position || 0));
+  console.log('🔄 Generating dynamic table structure');
+
+  // ✅ Use API order directly - NO SORTING by field_position
+  const calibrationSettings = headings.filter(col => col.checkbox === 'yes');
+  const observationFrom = dynamicHeadings?.observation_from || 'master';  // ✅ FIXED
+  const observationSettings = dynamicHeadings?.observation_heading?.observation_settings || [];
+  const enabledObsSettings = observationSettings.filter(obs => obs.checkbox === 'yes');
+  
+  console.log('📋 Fields in API order:', calibrationSettings.map(s => s.fieldname));
+  console.log('📋 Observation from:', observationFrom);
+  console.log('📋 Enabled observations:', enabledObsSettings.length);
+  
+  const headers = [];
+  const subHeadersRow = [];
+
+  // SR NO column
+  headers.push({ name: 'SR NO', colspan: 1 });
+  subHeadersRow.push(null);
+
+  // ✅ Process fields in API order
+  calibrationSettings.forEach((heading) => {
+    const headerName = heading.field_heading || heading.fieldname;
+    const fieldname = heading.fieldname;
     
-    const headers = [];
-    const subHeadersRow = [];
-
-    headers.push({ name: 'SR NO', colspan: 1 });
-    subHeadersRow.push(null);
-
-    sortedHeadings.forEach((heading) => {
-      if (heading.checkbox === 'yes') {
-        const headerName = heading.field_heading || heading.fieldname;
-        
-        if (heading.fieldname === 'master' || heading.fieldname.includes('observation')) {
-          const observationSettings = dynamicHeadings?.observation_heading?.observation_settings || [];
-          const observationCount = observationSettings.filter(obs => obs.checkbox === 'yes').length;
-          
-          console.log(`📊 Found ${observationCount} observation columns for ${heading.fieldname}`);
-          
-          if (observationCount > 0) {
-            headers.push({ name: headerName, colspan: observationCount });
-            
-            observationSettings.forEach((obsSetting) => {
-              if (obsSetting.checkbox === 'yes') {
-                let subHeaderName = obsSetting.field_heading || obsSetting.fieldname;
-                subHeadersRow.push(subHeaderName);
-              }
-            });
-          } else {
-            let defaultCount = 3;
-            headers.push({ name: headerName, colspan: defaultCount });
-            for (let i = 1; i <= defaultCount; i++) {
-              subHeadersRow.push(`M${i}`);
-            }
-          }
+    // ✅ Handle different observation_from modes
+    if (observationFrom === 'master' && fieldname === 'master') {
+      // Master has multiple observations, UUC is single
+      if (enabledObsSettings.length > 0) {
+        headers.push({ name: headerName, colspan: enabledObsSettings.length });
+        enabledObsSettings.forEach((obsSetting) => {
+          subHeadersRow.push(obsSetting.field_heading || obsSetting.fieldname);
+        });
+      } else {
+        headers.push({ name: headerName, colspan: 1 });
+        subHeadersRow.push(null);
+      }
+    } 
+    else if (observationFrom === 'uuc' && fieldname === 'uuc') {
+      // UUC has multiple observations, Master is single
+      if (enabledObsSettings.length > 0) {
+        headers.push({ name: headerName, colspan: enabledObsSettings.length });
+        enabledObsSettings.forEach((obsSetting) => {
+          subHeadersRow.push(obsSetting.field_heading || obsSetting.fieldname);
+        });
+      } else {
+        headers.push({ name: headerName, colspan: 1 });
+        subHeadersRow.push(null);
+      }
+    }
+    else if (observationFrom === 'separate') {
+      // Both master and UUC have multiple observations
+      if (fieldname === 'master' || fieldname === 'uuc') {
+        if (enabledObsSettings.length > 0) {
+          headers.push({ name: headerName, colspan: enabledObsSettings.length });
+          enabledObsSettings.forEach((obsSetting) => {
+            subHeadersRow.push(obsSetting.field_heading || obsSetting.fieldname);
+          });
         } else {
           headers.push({ name: headerName, colspan: 1 });
           subHeadersRow.push(null);
         }
+      } else {
+        // Regular single column
+        headers.push({ name: headerName, colspan: 1 });
+        subHeadersRow.push(null);
       }
-    });
-
-    console.log('✅ Dynamic table structure generated:', { headers, subHeadersRow });
-    return { headers, subHeadersRow };
-  }, [dynamicHeadings]);
-
-  // ✅ Create observation rows with ALL master columns
-  const createObservationRows = (observationData) => {
-    if (!observationData || !Array.isArray(observationData)) {
-      return {
-        rows: [],
-        hiddenInputs: { calibrationPoints: [], types: [], repeatables: [], values: [] }
-      };
     }
+    else {
+      // Default case - regular single column
+      headers.push({ name: headerName, colspan: 1 });
+      subHeadersRow.push(null);
+    }
+  });
 
-    const rows = [];
-    const calibrationPoints = [];
-    const types = [];
-    const repeatables = [];
-    const values = [];
+  console.log('✅ Headers generated:', headers);
+  console.log('✅ Sub-headers generated:', subHeadersRow);
+  
+  return { headers, subHeadersRow };
+}, [dynamicHeadings]);
 
-    observationData.forEach((point, index) => {
-      const row = [(index + 1).toString()];
+  // ✅ Create observation rows - Supports all 3 observation_from modes
+  // ✅ Create observation rows - Supports all 3 observation_from modes
+// ✅ Create observation rows - Supports all 3 observation_from modes
+const createObservationRows = (observationData) => {
+  if (!observationData || !Array.isArray(observationData)) {
+    return {
+      rows: [],
+      hiddenInputs: { calibrationPoints: [], types: [], repeatables: [], values: [] }
+    };
+  }
 
-      if (dynamicHeadings?.mainhading?.calibration_settings) {
-        const sortedSettings = [...dynamicHeadings.mainhading.calibration_settings]
-          .filter(col => col.checkbox === 'yes')
-          .sort((a, b) => a.field_position - b.field_position);
+  const rows = [];
+  const calibrationPoints = [];
+  const types = [];
+  const repeatables = [];
+  const values = [];
+  
+  // ✅ Get observation_from from API response - FIXED
+  const observationFrom = dynamicHeadings?.observation_from || 'master';
+  const observationSettings = dynamicHeadings?.observation_heading?.observation_settings || [];
+  const enabledObsSettings = observationSettings.filter(obs => obs.checkbox === 'yes');
+  
+  // ✅ Get calibration settings WITHOUT sorting - use API order
+  const calibrationSettings = dynamicHeadings?.mainhading?.calibration_settings?.filter(col => col.checkbox === 'yes') || [];
 
-        sortedSettings.forEach((setting) => {
-          const fieldname = setting.fieldname;
+  console.log('🔄 Creating rows with observation_from:', observationFrom);
+  console.log('📋 Calibration settings (API order):', calibrationSettings.map(s => s.fieldname));
+  console.log('📋 Enabled observations:', enabledObsSettings.length);
 
-          if (fieldname === 'uuc') {
-            row.push(point.point || point.converted_point || '');
-          }
-          else if (fieldname === 'calculatedmaster') {
-            row.push(point.converted_point || point.calculated_master || '');
-          }
-          else if (fieldname === 'master') {
-            // ✅ Show ALL master observations dynamically
-            const masterData = point.summary_data?.master || [];
-            const obsSettings = dynamicHeadings?.observation_heading?.observation_settings || [];
-            
-            const sortedMasterData = [...masterData].sort((a, b) => 
-              parseInt(a.repeatable) - parseInt(b.repeatable)
-            );
-            
-            const enabledObsSettings = obsSettings.filter(obs => obs.checkbox === 'yes');
-            
-            enabledObsSettings.forEach((obsSetting, obsIndex) => {
-              const masterValue = sortedMasterData[obsIndex]?.value || '';
-              row.push(masterValue);
-            });
-          }
-          else {
-            // For other fields, just push empty initially (will be calculated)
-            row.push('');
-          }
-        });
+  observationData.forEach((point, index) => {
+    const row = [(index + 1).toString()];
+
+    // ✅ Process each field in API order (NO SORTING)
+    calibrationSettings.forEach((setting) => {
+      const fieldname = setting.fieldname;
+
+      if (fieldname === 'uuc') {
+        if (observationFrom === 'uuc' || observationFrom === 'separate') {
+          // ✅ UUC has multiple observations
+          const uucData = point.summary_data?.uuc || [];
+          const sortedUucData = [...uucData].sort((a, b) => 
+            parseInt(a.repeatable) - parseInt(b.repeatable)
+          );
+          
+          console.log(`📊 Point ${index} UUC - ${sortedUucData.length} observations`);
+          
+          // Push multiple UUC observation values
+          enabledObsSettings.forEach((obsSetting, obsIndex) => {
+            const uucValue = sortedUucData[obsIndex]?.value || '';
+            row.push(uucValue);
+          });
+        } else {
+          // ✅ Master mode: UUC is single value
+          row.push(point.point || point.converted_point || '');
+        }
       }
-
-      rows.push(row);
-      calibrationPoints.push(point.id?.toString() || '');
-      types.push('master');
-      repeatables.push('0');
-      values.push(point.point || point.converted_point || '0');
+      else if (fieldname === 'calculatedmaster') {
+        row.push(point.converted_point || point.calculated_master || '');
+      }
+      else if (fieldname === 'master') {
+        if (observationFrom === 'master' || observationFrom === 'separate') {
+          // ✅ Master has multiple observations
+          const masterData = point.summary_data?.master || [];
+          const sortedMasterData = [...masterData].sort((a, b) => 
+            parseInt(a.repeatable) - parseInt(b.repeatable)
+          );
+          
+          console.log(`📊 Point ${index} Master - ${sortedMasterData.length} observations`);
+          
+          // Push multiple Master observation values
+          enabledObsSettings.forEach((obsSetting, obsIndex) => {
+            const masterValue = sortedMasterData[obsIndex]?.value || '';
+            row.push(masterValue);
+          });
+        } else {
+          // ✅ UUC mode: Master is single value
+          const masterValue = point.point || point.converted_point || '';
+          console.log(`📊 Point ${index} Master single value: ${masterValue}`);
+          row.push(masterValue);
+        }
+      }
+      else {
+        // For other fields, push empty initially (will be calculated)
+        row.push('');
+      }
     });
 
-    console.log('✅ Created observation rows:', rows);
-    console.log('✅ Calibration point IDs:', calibrationPoints);
-    
-    return { rows, hiddenInputs: { calibrationPoints, types, repeatables, values } };
-  };
+    console.log(`✅ Row ${index} complete:`, row);
+    rows.push(row);
+    calibrationPoints.push(point.id?.toString() || '');
+    types.push('master');
+    repeatables.push('0');
+    values.push(point.point || point.converted_point || '0');
+  });
+
+  console.log('✅ All rows created:', rows);
+  
+  return { rows, hiddenInputs: { calibrationPoints, types, repeatables, values } };
+};
 
   const generateTableStructure = () => {
-    if (dynamicHeadings?.mainhading?.calibration_settings) {
-      const dynamicStructure = generateDynamicTableStructure(
-        dynamicHeadings.mainhading.calibration_settings,
-        apiData?.observationTemplate
-      );
-      if (dynamicStructure) {
-        console.log('✅ Using dynamic table structure');
-        return dynamicStructure;
-      }
+  if (dynamicHeadings?.mainhading?.calibration_settings) {
+    const dynamicStructure = generateDynamicTableStructure(
+      dynamicHeadings.mainhading.calibration_settings  // ✅ Only one parameter
+    );
+    if (dynamicStructure) {
+      console.log('✅ Using dynamic table structure');
+      return dynamicStructure;
     }
-    return null;
-  };
+  }
+  return null;
+};
 
   const tableStructure = generateTableStructure();
   const observationRows = createObservationRows(observations);
 
-  // ✅ Calculate initial values when observations load
-  useEffect(() => {
-    if (observations.length > 0 && dynamicHeadings) {
-      console.log('🔄 Calculating initial values...');
-      
-      const initialValues = {};
-      
-      observations.forEach((point, rowIndex) => {
-        // Build column map
-        const columnMap = {};
-        
-        if (dynamicHeadings?.mainhading?.calibration_settings) {
-          const sortedSettings = [...dynamicHeadings.mainhading.calibration_settings]
-            .filter(col => col.checkbox === 'yes')
-            .sort((a, b) => a.field_position - b.field_position);
-          
-          let currentCol = 1;
-          
-          sortedSettings.forEach((setting) => {
-            if (setting.fieldname === 'master') {
-              const obsCount = dynamicHeadings?.observation_heading?.observation_settings
-                ?.filter(obs => obs.checkbox === 'yes').length || 0;
-              
-              columnMap[setting.fieldname] = {
-                startCol: currentCol,
-                endCol: currentCol + obsCount - 1,
-                count: obsCount
-              };
-              currentCol += obsCount;
-            } else {
-              columnMap[setting.fieldname] = currentCol;
-              currentCol++;
-            }
-          });
-        }
-        
-        // Build variables from ALL master observations
-        const variables = {};
-        
-        if (point.summary_data?.master && dynamicHeadings?.observation_heading?.observation_settings) {
-          const obsSettings = dynamicHeadings.observation_heading.observation_settings.filter(
-            obs => obs.checkbox === 'yes'
-          );
-          
-          const masterData = point.summary_data.master.sort((a, b) => 
-            parseInt(a.repeatable) - parseInt(b.repeatable)
-          );
-          
-          // Map ALL master observations to their variables
-          obsSettings.forEach((obsSetting, idx) => {
-            const varName = obsSetting.setvariable; // e.g., "$m1", "$m2", etc.
-            const value = parseFloat(masterData[idx]?.value) || 0;
-            variables[varName] = value;
-          });
-        }
-        
-        console.log(`Row ${rowIndex} initial variables:`, variables);
-        
-        // Calculate all formula-based fields
-        if (dynamicHeadings?.mainhading?.calibration_settings) {
-          const sortedSettings = [...dynamicHeadings.mainhading.calibration_settings]
-            .filter(col => col.checkbox === 'yes')
-            .sort((a, b) => a.field_position - b.field_position);
-          
-          sortedSettings.forEach((setting) => {
-            const { fieldname, formula, SetVariable } = setting;
-            
-            if (fieldname === 'master') return;
-            
-            if (formula && formula.trim() !== '') {
-              const colIdx = columnMap[fieldname];
-              if (colIdx !== undefined) {
-                const calculatedValue = evaluateFormula(formula, variables);
-                
-                if (calculatedValue !== '') {
-                  initialValues[`${rowIndex}-${colIdx}`] = calculatedValue;
-                  console.log(`✅ Row ${rowIndex}, ${fieldname}: ${calculatedValue}`);
-                  
-                  // Store in variables for formula chaining
-                  if (SetVariable && SetVariable.trim() !== '') {
-                    variables[SetVariable] = parseFloat(calculatedValue) || 0;
-                  }
-                }
-              }
-            }
-          });
-        }
-      });
-      
-      setTableInputValues(prev => ({ ...prev, ...initialValues }));
-      console.log('✅ Initial calculations done:', initialValues);
-    }
-  }, [observations, dynamicHeadings]);
-
-  const renderThermalCoefficientSection = () => {
-    return null;
-  };
-
-  // ✅ Handle input changes with real-time calculation
-  const handleInputChange = (rowIndex, colIndex, value) => {
-    setTableInputValues((prev) => {
-      const newValues = { ...prev };
-      const key = `${rowIndex}-${colIndex}`;
-      newValues[key] = value;
-
-      // Get current row data
-      const rowData = observationRows.rows[rowIndex].map((cell, idx) => {
-        const inputKey = `${rowIndex}-${idx}`;
-        return newValues[inputKey] ?? (cell?.toString() || '');
-      });
-
+  // ✅ Calculate initial values - Supports all 3 observation_from modes
+useEffect(() => {
+  if (observations.length > 0 && dynamicHeadings) {
+    console.log('🔄 Calculating initial values...');
+    
+    const initialValues = {};
+    const observationFrom = dynamicHeadings?.observation_from || 'master';  // ✅ FIXED
+    
+    observations.forEach((point, rowIndex) => {
       // Build column map
       const columnMap = {};
       
       if (dynamicHeadings?.mainhading?.calibration_settings) {
-        const sortedSettings = [...dynamicHeadings.mainhading.calibration_settings]
-          .filter(col => col.checkbox === 'yes')
-          .sort((a, b) => a.field_position - b.field_position);
+        const calibrationSettings = dynamicHeadings.mainhading.calibration_settings
+          .filter(col => col.checkbox === 'yes');
         
         let currentCol = 1;
         
-        sortedSettings.forEach((setting) => {
-          if (setting.fieldname === 'master') {
+        calibrationSettings.forEach((setting) => {
+          const fieldname = setting.fieldname;
+          
+          if (observationFrom === 'master' && fieldname === 'master') {
             const obsCount = dynamicHeadings?.observation_heading?.observation_settings
               ?.filter(obs => obs.checkbox === 'yes').length || 0;
-            
-            columnMap[setting.fieldname] = {
-              startCol: currentCol,
-              endCol: currentCol + obsCount - 1,
-              count: obsCount
-            };
+            columnMap[fieldname] = { startCol: currentCol, endCol: currentCol + obsCount - 1, count: obsCount };
             currentCol += obsCount;
-          } else {
-            columnMap[setting.fieldname] = currentCol;
+          } 
+          else if (observationFrom === 'uuc' && fieldname === 'uuc') {
+            const obsCount = dynamicHeadings?.observation_heading?.observation_settings
+              ?.filter(obs => obs.checkbox === 'yes').length || 0;
+            columnMap[fieldname] = { startCol: currentCol, endCol: currentCol + obsCount - 1, count: obsCount };
+            currentCol += obsCount;
+          }
+          else if (observationFrom === 'separate' && (fieldname === 'master' || fieldname === 'uuc')) {
+            const obsCount = dynamicHeadings?.observation_heading?.observation_settings
+              ?.filter(obs => obs.checkbox === 'yes').length || 0;
+            columnMap[fieldname] = { startCol: currentCol, endCol: currentCol + obsCount - 1, count: obsCount };
+            currentCol += obsCount;
+          }
+          else {
+            columnMap[fieldname] = currentCol;
             currentCol++;
           }
         });
       }
-
-      // Build variables from ALL master observations
+      
+      // Build variables from observations based on observation_from
       const variables = {};
       
-      if (dynamicHeadings?.observation_heading?.observation_settings && columnMap['master']) {
+      if (dynamicHeadings?.observation_heading?.observation_settings) {
         const obsSettings = dynamicHeadings.observation_heading.observation_settings.filter(
           obs => obs.checkbox === 'yes'
         );
         
-        const masterInfo = columnMap['master'];
-        
-        obsSettings.forEach((obsSetting, idx) => {
-          const varName = obsSetting.setvariable;
-          const colIdx = masterInfo.startCol + idx;
-          const cellValue = parseFloat(rowData[colIdx]) || 0;
-          variables[varName] = cellValue;
-        });
+        if (observationFrom === 'master' && point.summary_data?.master) {
+          const masterData = point.summary_data.master.sort((a, b) => 
+            parseInt(a.repeatable) - parseInt(b.repeatable)
+          );
+          
+          obsSettings.forEach((obsSetting, idx) => {
+            const varName = obsSetting.setvariable;
+            const value = parseFloat(masterData[idx]?.value) || 0;
+            variables[varName] = value;
+          });
+        }
+        else if (observationFrom === 'uuc' && point.summary_data?.uuc) {
+          const uucData = point.summary_data.uuc.sort((a, b) => 
+            parseInt(a.repeatable) - parseInt(b.repeatable)
+          );
+          
+          obsSettings.forEach((obsSetting, idx) => {
+            const varName = obsSetting.setvariable;
+            const value = parseFloat(uucData[idx]?.value) || 0;
+            variables[varName] = value;
+          });
+        }
+        else if (observationFrom === 'separate') {
+          // Both master and UUC observations available
+          if (point.summary_data?.master) {
+            const masterData = point.summary_data.master.sort((a, b) => 
+              parseInt(a.repeatable) - parseInt(b.repeatable)
+            );
+            
+            obsSettings.forEach((obsSetting, idx) => {
+              const varName = obsSetting.setvariable;
+              const value = parseFloat(masterData[idx]?.value) || 0;
+              variables[varName] = value;
+            });
+          }
+          
+          if (point.summary_data?.uuc) {
+            const uucData = point.summary_data.uuc.sort((a, b) => 
+              parseInt(a.repeatable) - parseInt(b.repeatable)
+            );
+            
+            obsSettings.forEach((obsSetting, idx) => {
+              const varName = `$uuc${idx + 1}`;
+              const value = parseFloat(uucData[idx]?.value) || 0;
+              variables[varName] = value;
+            });
+          }
+        }
       }
-
-      console.log('📊 Variables from master observations:', variables);
-
+      
+      console.log(`Row ${rowIndex} initial variables:`, variables);
+      
       // Calculate all formula-based fields
       if (dynamicHeadings?.mainhading?.calibration_settings) {
-        const sortedSettings = [...dynamicHeadings.mainhading.calibration_settings]
-          .filter(col => col.checkbox === 'yes')
-          .sort((a, b) => a.field_position - b.field_position);
+        const calibrationSettings = dynamicHeadings.mainhading.calibration_settings
+          .filter(col => col.checkbox === 'yes');
         
-        sortedSettings.forEach((setting) => {
+        calibrationSettings.forEach((setting) => {
           const { fieldname, formula, SetVariable } = setting;
           
-          if (fieldname === 'master') return;
+          if (fieldname === 'master' || fieldname === 'uuc') return;
           
           if (formula && formula.trim() !== '') {
-            const calculatedValue = evaluateFormula(formula, variables);
-            
-            if (calculatedValue !== '') {
-              const colIdx = columnMap[fieldname];
-              if (colIdx !== undefined) {
-                newValues[`${rowIndex}-${colIdx}`] = calculatedValue;
+            const colIdx = columnMap[fieldname];
+            if (colIdx !== undefined) {
+              const calculatedValue = evaluateFormula(formula, variables);
+              
+              if (calculatedValue !== '') {
+                initialValues[`${rowIndex}-${colIdx}`] = calculatedValue;
+                console.log(`✅ Row ${rowIndex}, ${fieldname}: ${calculatedValue}`);
                 
-                // Store for formula chaining
                 if (SetVariable && SetVariable.trim() !== '') {
                   variables[SetVariable] = parseFloat(calculatedValue) || 0;
                 }
@@ -561,29 +569,86 @@ const evaluateFormula = (formula, variables) => {
           }
         });
       }
-      
-      return newValues;
     });
+    
+    setTableInputValues(prev => ({ ...prev, ...initialValues }));
+    console.log('✅ Initial calculations done:', initialValues);
+  }
+}, [observations, dynamicHeadings]);
+
+  const renderThermalCoefficientSection = () => {
+    return null;
   };
 
-  // ✅ Handle blur to save observations
-  const handleObservationBlur = async (rowIndex, colIndex, value) => {
-    const token = localStorage.getItem('authToken');
-    const calibrationPointId = observationRows.hiddenInputs?.calibrationPoints?.[rowIndex];
+  // ✅ Handle input changes - Supports all 3 observation_from modes
+  const handleInputChange = (rowIndex, colIndex, value) => {
+  setTableInputValues((prev) => {
+    const newValues = { ...prev };
+    const key = `${rowIndex}-${colIndex}`;
+    newValues[key] = value;
 
-    if (!calibrationPointId) {
-      toast.error('Calibration point ID not found');
-      return;
-    }
+    const observationFrom = dynamicHeadings?.observation_from || 'master';  // ✅ FIXED
 
+    // Get current row data
     const rowData = observationRows.rows[rowIndex].map((cell, idx) => {
       const inputKey = `${rowIndex}-${idx}`;
-      return tableInputValues[inputKey] ?? (cell?.toString() || '');
+      return newValues[inputKey] ?? (cell?.toString() || '');
     });
 
-    const payloads = [];
+    // Build column map
+    const columnMap = {};
+    let currentCol = 1;
     
-    // Build variables
+    if (dynamicHeadings?.mainhading?.calibration_settings) {
+      const calibrationSettings = dynamicHeadings.mainhading.calibration_settings
+        .filter(col => col.checkbox === 'yes');
+      
+      const observationSettings = dynamicHeadings?.observation_heading?.observation_settings || [];
+      const enabledObsSettings = observationSettings.filter(obs => obs.checkbox === 'yes');
+      
+      calibrationSettings.forEach((setting) => {
+        const fieldname = setting.fieldname;
+        
+        if (observationFrom === 'master' && fieldname === 'master') {
+          // Master has multiple observations
+          columnMap[fieldname] = { 
+            startCol: currentCol, 
+            endCol: currentCol + enabledObsSettings.length - 1, 
+            count: enabledObsSettings.length 
+          };
+          currentCol += enabledObsSettings.length;
+        }
+        else if (observationFrom === 'uuc' && fieldname === 'uuc') {
+          // UUC has multiple observations
+          columnMap[fieldname] = { 
+            startCol: currentCol, 
+            endCol: currentCol + enabledObsSettings.length - 1, 
+            count: enabledObsSettings.length 
+          };
+          currentCol += enabledObsSettings.length;
+        }
+        else if (observationFrom === 'separate') {
+          // Both master and UUC have multiple observations
+          if (fieldname === 'master' || fieldname === 'uuc') {
+            columnMap[fieldname] = { 
+              startCol: currentCol, 
+              endCol: currentCol + enabledObsSettings.length - 1, 
+              count: enabledObsSettings.length 
+            };
+            currentCol += enabledObsSettings.length;
+          } else {
+            columnMap[fieldname] = currentCol;
+            currentCol++;
+          }
+        }
+        else {
+          columnMap[fieldname] = currentCol;
+          currentCol++;
+        }
+      });
+    }
+
+    // Build variables based on observation_from
     const variables = {};
     
     if (dynamicHeadings?.observation_heading?.observation_settings) {
@@ -591,69 +656,189 @@ const evaluateFormula = (formula, variables) => {
         obs => obs.checkbox === 'yes'
       );
       
-      const sortedSettings = [...dynamicHeadings.mainhading.calibration_settings]
-        .filter(col => col.checkbox === 'yes')
-        .sort((a, b) => a.field_position - b.field_position);
-      
-      let masterStartCol = -1;
-      let tempCol = 1;
-      
-      for (const setting of sortedSettings) {
-        if (setting.fieldname === 'master') {
-          masterStartCol = tempCol;
-          break;
-        }
-        tempCol++;
-      }
-      
-      if (masterStartCol !== -1) {
+      if (observationFrom === 'master' && columnMap['master']) {
+        const masterInfo = columnMap['master'];
         obsSettings.forEach((obsSetting, idx) => {
           const varName = obsSetting.setvariable;
-          const colIdx = masterStartCol + idx;
+          const colIdx = masterInfo.startCol + idx;
+          const cellValue = parseFloat(rowData[colIdx]) || 0;
+          variables[varName] = cellValue;
+        });
+      }
+      else if (observationFrom === 'uuc' && columnMap['uuc']) {
+        const uucInfo = columnMap['uuc'];
+        obsSettings.forEach((obsSetting, idx) => {
+          const varName = obsSetting.setvariable;
+          const colIdx = uucInfo.startCol + idx;
+          const cellValue = parseFloat(rowData[colIdx]) || 0;
+          variables[varName] = cellValue;
+        });
+      }
+      else if (observationFrom === 'separate') {
+        if (columnMap['master']) {
+          const masterInfo = columnMap['master'];
+          obsSettings.forEach((obsSetting, idx) => {
+            const varName = obsSetting.setvariable;
+            const colIdx = masterInfo.startCol + idx;
+            const cellValue = parseFloat(rowData[colIdx]) || 0;
+            variables[varName] = cellValue;
+          });
+        }
+        
+        if (columnMap['uuc']) {
+          const uucInfo = columnMap['uuc'];
+          obsSettings.forEach((obsSetting, idx) => {
+            const varName = `$uuc${idx + 1}`;
+            const colIdx = uucInfo.startCol + idx;
+            const cellValue = parseFloat(rowData[colIdx]) || 0;
+            variables[varName] = cellValue;
+          });
+        }
+      }
+    }
+
+    console.log('📊 Variables from observations:', variables);
+
+    // Calculate all formula-based fields
+    if (dynamicHeadings?.mainhading?.calibration_settings) {
+      const calibrationSettings = dynamicHeadings.mainhading.calibration_settings
+        .filter(col => col.checkbox === 'yes');
+      
+      calibrationSettings.forEach((setting) => {
+        const { fieldname, formula, SetVariable } = setting;
+        
+        if (fieldname === 'master' || fieldname === 'uuc') return;
+        
+        if (formula && formula.trim() !== '') {
+          const calculatedValue = evaluateFormula(formula, variables);
+          
+          if (calculatedValue !== '') {
+            const colIdx = columnMap[fieldname];
+            if (colIdx !== undefined) {
+              newValues[`${rowIndex}-${colIdx}`] = calculatedValue;
+              
+              if (SetVariable && SetVariable.trim() !== '') {
+                variables[SetVariable] = parseFloat(calculatedValue) || 0;
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    return newValues;
+  });
+};
+
+  // ✅ Handle blur to save observations - Supports all 3 observation_from modes
+  const handleObservationBlur = async (rowIndex, colIndex, value) => {
+  const token = localStorage.getItem('authToken');
+  const calibrationPointId = observationRows.hiddenInputs?.calibrationPoints?.[rowIndex];
+  const observationFrom = dynamicHeadings?.observation_from || 'master';  // ✅ FIXED
+
+  if (!calibrationPointId) {
+    toast.error('Calibration point ID not found');
+    return;
+  }
+
+  const rowData = observationRows.rows[rowIndex].map((cell, idx) => {
+    const inputKey = `${rowIndex}-${idx}`;
+    return tableInputValues[inputKey] ?? (cell?.toString() || '');
+  });
+
+  const payloads = [];
+  
+  // Build variables
+  const variables = {};
+  
+  if (dynamicHeadings?.observation_heading?.observation_settings) {
+    const obsSettings = dynamicHeadings.observation_heading.observation_settings.filter(
+      obs => obs.checkbox === 'yes'
+    );
+    
+    const calibrationSettings = dynamicHeadings.mainhading.calibration_settings
+      .filter(col => col.checkbox === 'yes');
+    
+    let currentCol = 1;
+    const columnPositions = {};
+    
+    for (const setting of calibrationSettings) {
+      const fieldname = setting.fieldname;
+      
+      if (observationFrom === 'master' && fieldname === 'master') {
+        columnPositions.master = { start: currentCol, count: obsSettings.length };
+        currentCol += obsSettings.length;
+      }
+      else if (observationFrom === 'uuc' && fieldname === 'uuc') {
+        columnPositions.uuc = { start: currentCol, count: obsSettings.length };
+        currentCol += obsSettings.length;
+      }
+      else if (observationFrom === 'separate') {
+        if (fieldname === 'master') {
+          columnPositions.master = { start: currentCol, count: obsSettings.length };
+          currentCol += obsSettings.length;
+        } else if (fieldname === 'uuc') {
+          columnPositions.uuc = { start: currentCol, count: obsSettings.length };
+          currentCol += obsSettings.length;
+        } else {
+          currentCol++;
+        }
+      }
+      else {
+        currentCol++;
+      }
+    }
+    
+    // Build variables based on observation_from
+    if (observationFrom === 'master' && columnPositions.master) {
+      obsSettings.forEach((obsSetting, idx) => {
+        const varName = obsSetting.setvariable;
+        const colIdx = columnPositions.master.start + idx;
+        const cellValue = parseFloat(rowData[colIdx]) || 0;
+        variables[varName] = cellValue;
+      });
+    }
+    else if (observationFrom === 'uuc' && columnPositions.uuc) {
+      obsSettings.forEach((obsSetting, idx) => {
+        const varName = obsSetting.setvariable;
+        const colIdx = columnPositions.uuc.start + idx;
+        const cellValue = parseFloat(rowData[colIdx]) || 0;
+        variables[varName] = cellValue;
+      });
+    }
+    else if (observationFrom === 'separate') {
+      if (columnPositions.master) {
+        obsSettings.forEach((obsSetting, idx) => {
+          const varName = obsSetting.setvariable;
+          const colIdx = columnPositions.master.start + idx;
+          const cellValue = parseFloat(rowData[colIdx]) || 0;
+          variables[varName] = cellValue;
+        });
+      }
+      
+      if (columnPositions.uuc) {
+        obsSettings.forEach((obsSetting, idx) => {
+          const varName = `$uuc${idx + 1}`;
+          const colIdx = columnPositions.uuc.start + idx;
           const cellValue = parseFloat(rowData[colIdx]) || 0;
           variables[varName] = cellValue;
         });
       }
     }
+  }
 
-    // Build payloads
-    if (dynamicHeadings?.mainhading?.calibration_settings) {
-      const sortedSettings = [...dynamicHeadings.mainhading.calibration_settings]
-        .filter(col => col.checkbox === 'yes')
-        .sort((a, b) => a.field_position - b.field_position);
+  // Build payloads
+  if (dynamicHeadings?.mainhading?.calibration_settings) {
+    const calibrationSettings = dynamicHeadings.mainhading.calibration_settings
+      .filter(col => col.checkbox === 'yes');
+    
+    let currentColIndex = 1;
+    
+    for (const setting of calibrationSettings) {
+      const fieldname = setting.fieldname;
       
-      let currentColIndex = 1;
-      
-      for (const setting of sortedSettings) {
-        const fieldname = setting.fieldname;
-        
-        if (fieldname === 'uuc') {
-          if (colIndex === currentColIndex) {
-            payloads.push({
-              inwardid: inwardId,
-              instid: instId,
-              calibrationpoint: calibrationPointId,
-              type: 'uuc',
-              repeatable: '0',
-              value: value || '0',
-            });
-          }
-          currentColIndex++;
-        } 
-        else if (fieldname === 'calculatedmaster') {
-          if (colIndex === currentColIndex) {
-            payloads.push({
-              inwardid: inwardId,
-              instid: instId,
-              calibrationpoint: calibrationPointId,
-              type: 'calculatedmaster',
-              repeatable: '0',
-              value: value || '0',
-            });
-          }
-          currentColIndex++;
-        } 
-        else if (fieldname === 'master') {
+      if (fieldname === 'uuc') {
+        if (observationFrom === 'uuc' || observationFrom === 'separate') {
           const obsSettings = dynamicHeadings?.observation_heading?.observation_settings || [];
           const obsCount = obsSettings.filter(obs => obs.checkbox === 'yes').length;
           
@@ -663,16 +848,15 @@ const evaluateFormula = (formula, variables) => {
                 inwardid: inwardId,
                 instid: instId,
                 calibrationpoint: calibrationPointId,
-                type: 'master',
+                type: 'uuc',
                 repeatable: i.toString(),
                 value: value || '0',
               });
               
-              // Also save all calculated fields
-              sortedSettings.forEach((calcSetting) => {
+              // Save calculated fields
+              calibrationSettings.forEach((calcSetting) => {
                 if (calcSetting.formula && calcSetting.formula.trim() !== '') {
                   const calculatedValue = evaluateFormula(calcSetting.formula, variables);
-                  
                   if (calculatedValue !== '') {
                     payloads.push({
                       inwardid: inwardId,
@@ -688,42 +872,107 @@ const evaluateFormula = (formula, variables) => {
             }
             currentColIndex++;
           }
-        } 
-        else {
+        } else {
+          if (colIndex === currentColIndex) {
+            payloads.push({
+              inwardid: inwardId,
+              instid: instId,
+              calibrationpoint: calibrationPointId,
+              type: 'uuc',
+              repeatable: '0',
+              value: value || '0',
+            });
+          }
           currentColIndex++;
         }
-      }
-    }
-
-    console.log('📡 Saving payloads:', payloads);
-
-    try {
-      for (const payload of payloads) {
-        await axios.post(
-          '/calibrationprocess/set-observations',
-          payload,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
+      } 
+      else if (fieldname === 'calculatedmaster') {
+        if (colIndex === currentColIndex) {
+          payloads.push({
+            inwardid: inwardId,
+            instid: instId,
+            calibrationpoint: calibrationPointId,
+            type: 'calculatedmaster',
+            repeatable: '0',
+            value: value || '0',
+          });
+        }
+        currentColIndex++;
+      } 
+      else if (fieldname === 'master') {
+        if (observationFrom === 'master' || observationFrom === 'separate') {
+          const obsSettings = dynamicHeadings?.observation_heading?.observation_settings || [];
+          const obsCount = obsSettings.filter(obs => obs.checkbox === 'yes').length;
+          
+          for (let i = 0; i < obsCount; i++) {
+            if (colIndex === currentColIndex) {
+              payloads.push({
+                inwardid: inwardId,
+                instid: instId,
+                calibrationpoint: calibrationPointId,
+                type: 'master',
+                repeatable: i.toString(),
+                value: value || '0',
+              });
+              
+              // Save calculated fields
+              calibrationSettings.forEach((calcSetting) => {
+                if (calcSetting.formula && calcSetting.formula.trim() !== '') {
+                  const calculatedValue = evaluateFormula(calcSetting.formula, variables);
+                  if (calculatedValue !== '') {
+                    payloads.push({
+                      inwardid: inwardId,
+                      instid: instId,
+                      calibrationpoint: calibrationPointId,
+                      type: calcSetting.fieldname,
+                      repeatable: '0',
+                      value: calculatedValue.toString(),
+                    });
+                  }
+                }
+              });
+            }
+            currentColIndex++;
           }
-        );
+        } else {
+          currentColIndex++;
+        }
+      } 
+      else {
+        currentColIndex++;
       }
-
-      console.log(`✅ Saved successfully!`);
-      toast.success('Observation saved successfully!');
-
-      // Refetch observations
-      const headingsResponse = await fetchDynamicHeadings(suffix);
-      if (headingsResponse?.data?.calibration_points) {
-        setObservations(headingsResponse.data.calibration_points);
-      }
-    } catch (err) {
-      console.error(`❌ Error saving:`, err);
-      toast.error(err.response?.data?.message || 'Failed to save observation');
     }
-  };
+  }
+
+  console.log('📡 Saving payloads:', payloads);
+
+  try {
+    for (const payload of payloads) {
+      await axios.post(
+        '/calibrationprocess/set-observations',
+        payload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    }
+
+    console.log(`✅ Saved successfully!`);
+    toast.success('Observation saved successfully!');
+
+    // Refetch observations
+    const headingsResponse = await fetchDynamicHeadings(suffix);
+    if (headingsResponse?.data?.calibration_points) {
+      setObservations(headingsResponse.data.calibration_points);
+    }
+  } catch (err) {
+    console.error(`❌ Error saving:`, err);
+    toast.error(err.response?.data?.message || 'Failed to save observation');
+  }
+};
 
   const handleBackToInwardList = () => {
     navigate(
@@ -753,6 +1002,7 @@ const evaluateFormula = (formula, variables) => {
     const types = [];
     const repeatables = [];
     const values = [];
+    const observationFrom = dynamicHeadings?.observation_heading?.observation_from || 'master';
 
     observationRows.rows.forEach((row, rowIndex) => {
       const calibPointId = observationRows.hiddenInputs?.calibrationPoints?.[rowIndex] || '';
@@ -774,24 +1024,71 @@ const evaluateFormula = (formula, variables) => {
           .filter(col => col.checkbox === 'yes')
           .sort((a, b) => a.field_position - b.field_position);
         
-        let masterStartCol = -1;
-        let tempCol = 1;
+        let currentCol = 1;
+        const columnPositions = {};
         
         for (const setting of sortedSettings) {
-          if (setting.fieldname === 'master') {
-            masterStartCol = tempCol;
-            break;
+          const fieldname = setting.fieldname;
+          
+          if (observationFrom === 'master' && fieldname === 'master') {
+            columnPositions.master = { start: currentCol, count: obsSettings.length };
+            currentCol += obsSettings.length;
           }
-          tempCol++;
+          else if (observationFrom === 'uuc' && fieldname === 'uuc') {
+            columnPositions.uuc = { start: currentCol, count: obsSettings.length };
+            currentCol += obsSettings.length;
+          }
+          else if (observationFrom === 'separate') {
+            if (fieldname === 'master') {
+              columnPositions.master = { start: currentCol, count: obsSettings.length };
+              currentCol += obsSettings.length;
+            } else if (fieldname === 'uuc') {
+              columnPositions.uuc = { start: currentCol, count: obsSettings.length };
+              currentCol += obsSettings.length;
+            } else {
+              currentCol++;
+            }
+          }
+          else {
+            currentCol++;
+          }
         }
         
-        if (masterStartCol !== -1) {
+        // Build variables based on observation_from
+        if (observationFrom === 'master' && columnPositions.master) {
           obsSettings.forEach((obsSetting, idx) => {
             const varName = obsSetting.setvariable;
-            const colIdx = masterStartCol + idx;
+            const colIdx = columnPositions.master.start + idx;
             const cellValue = parseFloat(rowData[colIdx]) || 0;
             variables[varName] = cellValue;
           });
+        }
+        else if (observationFrom === 'uuc' && columnPositions.uuc) {
+          obsSettings.forEach((obsSetting, idx) => {
+            const varName = obsSetting.setvariable;
+            const colIdx = columnPositions.uuc.start + idx;
+            const cellValue = parseFloat(rowData[colIdx]) || 0;
+            variables[varName] = cellValue;
+          });
+        }
+        else if (observationFrom === 'separate') {
+          if (columnPositions.master) {
+            obsSettings.forEach((obsSetting, idx) => {
+              const varName = obsSetting.setvariable;
+              const colIdx = columnPositions.master.start + idx;
+              const cellValue = parseFloat(rowData[colIdx]) || 0;
+              variables[varName] = cellValue;
+            });
+          }
+          
+          if (columnPositions.uuc) {
+            obsSettings.forEach((obsSetting, idx) => {
+              const varName = `$uuc${idx + 1}`;
+              const colIdx = columnPositions.uuc.start + idx;
+              const cellValue = parseFloat(rowData[colIdx]) || 0;
+              variables[varName] = cellValue;
+            });
+          }
         }
       }
 
@@ -808,11 +1105,24 @@ const evaluateFormula = (formula, variables) => {
           const formula = setting.formula;
 
           if (fieldname === 'uuc') {
-            calibrationPoints.push(calibPointId);
-            types.push('uuc');
-            repeatables.push('0');
-            values.push(rowData[colIndex] || '0');
-            colIndex++;
+            if (observationFrom === 'uuc' || observationFrom === 'separate') {
+              const obsSettings = dynamicHeadings?.observation_heading?.observation_settings || [];
+              const obsCount = obsSettings.filter(obs => obs.checkbox === 'yes').length;
+
+              for (let i = 0; i < obsCount; i++) {
+                calibrationPoints.push(calibPointId);
+                types.push('uuc');
+                repeatables.push(i.toString());
+                values.push(rowData[colIndex] || '0');
+                colIndex++;
+              }
+            } else {
+              calibrationPoints.push(calibPointId);
+              types.push('uuc');
+              repeatables.push('0');
+              values.push(rowData[colIndex] || '0');
+              colIndex++;
+            }
           } 
           else if (fieldname === 'calculatedmaster') {
             calibrationPoints.push(calibPointId);
@@ -822,13 +1132,21 @@ const evaluateFormula = (formula, variables) => {
             colIndex++;
           } 
           else if (fieldname === 'master') {
-            const obsSettings = dynamicHeadings?.observation_heading?.observation_settings || [];
-            const obsCount = obsSettings.filter(obs => obs.checkbox === 'yes').length;
+            if (observationFrom === 'master' || observationFrom === 'separate') {
+              const obsSettings = dynamicHeadings?.observation_heading?.observation_settings || [];
+              const obsCount = obsSettings.filter(obs => obs.checkbox === 'yes').length;
 
-            for (let i = 0; i < obsCount; i++) {
+              for (let i = 0; i < obsCount; i++) {
+                calibrationPoints.push(calibPointId);
+                types.push('master');
+                repeatables.push(i.toString());
+                values.push(rowData[colIndex] || '0');
+                colIndex++;
+              }
+            } else {
               calibrationPoints.push(calibPointId);
               types.push('master');
-              repeatables.push(i.toString());
+              repeatables.push('0');
               values.push(rowData[colIndex] || '0');
               colIndex++;
             }
@@ -896,6 +1214,17 @@ const evaluateFormula = (formula, variables) => {
       toast.error(error.response?.data?.message || 'Something went wrong while submitting');
     }
   };
+
+  useEffect(() => {
+  console.log('🔍 DEBUG - Current State:', {
+    observationFrom: dynamicHeadings?.observation_heading?.observation_from,
+    dynamicHeadings: dynamicHeadings,
+    tableStructure: tableStructure,
+    observationRows: observationRows,
+    observationsCount: observations.length,
+    observationSettings: dynamicHeadings?.observation_heading?.observation_settings
+  });
+}, [dynamicHeadings, tableStructure, observationRows, observations]);
 
   if (loading) {
     return (

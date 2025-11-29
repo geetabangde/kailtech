@@ -232,6 +232,14 @@ export default function EditCalibrationInstrumnet() {
 
         // Set instrument data
         const instrumentData = instrumentRes.data.data;
+        // ✅ ADD THESE CONSOLE LOGS HERE 👇
+    console.log("=== DEBUGGING SUFFIX DATA ===");
+    console.log("📌 Suffix from API:", instrumentData.instrument.suffix);
+    console.log("📌 Type:", typeof instrumentData.instrument.suffix);
+    console.log("📌 Is Array?:", Array.isArray(instrumentData.instrument.suffix));
+    console.log("📌 Uncertainty Table:", instrumentData.instrument.uncertaintytable);
+    console.log("📌 Format Options Available:", formateOptions);
+    console.log("=== END DEBUG ===");
         const safeArrayData = (value) =>
           Array.isArray(value)
             ? value
