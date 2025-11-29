@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "utils/axios";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import UncertaintyTable from "../../../Operations/observation-settings/components/UncertaintyTable";
 import { EyeIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-hot-toast";
@@ -8,7 +8,7 @@ import { Button } from "components/ui/button";
 
 export default function AddUncertainty({ instid, instrumentId, formatId, onComplete, onBack }) {
   // const { id: formatId } = useParams();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   
 
   console.log("Instrument ID from URL:", formatId);
@@ -332,9 +332,9 @@ export default function AddUncertainty({ instid, instrumentId, formatId, onCompl
     setRows((prevRows) => prevRows.filter((row) => row.id !== id));
   };
 
-  const handleBack = () => {
-    navigate("/dashboards/operations/observation-settings");
-  };
+  // const handleBack = () => {
+  //   navigate("/dashboards/operations/observation-settings");
+  // };
 
   // ✅ Save handler - EXACTLY like cURL API
   const handleSave = async () => {
@@ -417,7 +417,7 @@ export default function AddUncertainty({ instid, instrumentId, formatId, onCompl
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="mx-auto max-w-[98%] space-y-6">
         {/* Back Button */}
-        <div className="flex items-center justify-start gap-4">
+        {/* <div className="flex items-center justify-start gap-4">
           <button
             style={{ cursor: "pointer" }}
             onClick={handleBack}
@@ -437,7 +437,7 @@ export default function AddUncertainty({ instid, instrumentId, formatId, onCompl
             </svg>
             Back
           </button>
-        </div>
+        </div> */}
         {/* Title + View Icon */}
         <h1 className="flex items-center gap-3 text-2xl font-bold text-gray-800">
           Edit Uncertainty Setting

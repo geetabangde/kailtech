@@ -444,7 +444,7 @@ export default function AddCalibration({ instid, instrumentId, formatId, onNext,
       <div className="mx-auto max-w-7xl space-y-6">
         <div className="overflow-hidden rounded-lg bg-white shadow-md">
           <div className="flex items-center justify-start gap-4 p-4">
-            <button
+            {/* <button
               style={{ cursor: "pointer" }}
               onClick={() => window.history.back()}
               className="flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700"
@@ -462,7 +462,7 @@ export default function AddCalibration({ instid, instrumentId, formatId, onNext,
                 />
               </svg>
               Back
-            </button>
+            </button> */}
             {/* Title + View Icon */}
             <h1 className="flex items-center gap-3 text-2xl font-bold text-gray-800">
               Calibration Results Settings

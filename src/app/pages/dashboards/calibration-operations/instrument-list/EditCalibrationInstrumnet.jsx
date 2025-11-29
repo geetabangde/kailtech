@@ -119,322 +119,280 @@ export default function EditCalibrationInstrumnet() {
 
   // Fetch all data on mount
   useEffect(() => {
-    const fetchAllData = async () => {
-      try {
-        setLoading(true);
+  const fetchAllData = async () => {
+    try {
+      setLoading(true);
 
-        // ✅ Set the instrument ID from URL params immediately
-        if (id) {
-          const instrumentIdFromUrl =
-            typeof id === "string" ? parseInt(id, 10) : id;
-          if (!isNaN(instrumentIdFromUrl) && instrumentIdFromUrl > 0) {
-            setSavedInstrumentId(instrumentIdFromUrl);
-            console.log("✅ Set Instrument ID from URL:", instrumentIdFromUrl);
-          }
+      if (id) {
+        const instrumentIdFromUrl =
+          typeof id === "string" ? parseInt(id, 10) : id;
+        if (!isNaN(instrumentIdFromUrl) && instrumentIdFromUrl > 0) {
+          setSavedInstrumentId(instrumentIdFromUrl);
+          console.log("✅ Set Instrument ID from URL:", instrumentIdFromUrl);
         }
-
-        const [
-          sopRes,
-          standardRes,
-          subcategoryoneRes,
-          subcategorytwoRes,
-          formatelist,
-          lablist,
-          currencylist,
-          unitTypeRes,
-          unitRes,
-          modeRes,
-          instrumentRes,
-        ] = await Promise.all([
-          axios.get("/calibrationoperations/calibration-method-list"),
-          axios.get("/calibrationoperations/calibration-standard-list"),
-          axios.get("/inventory/subcategory-list"),
-          axios.get("/inventory/subcategory-list"),
-          axios.get("/get-formate"),
-          axios.get("/master/list-lab"),
-          axios.get("/master/currency-list"),
-          axios.get("/master/unit-type-list"),
-          axios.get("/master/units-list"),
-          axios.get("/master/mode-list"),
-          axios.get(`/calibrationoperations/get-instrument-byid/${id}`),
-        ]);
-
-        const safeArray = (data) => (Array.isArray(data) ? data : []);
-
-        // Set dropdown options
-        setSopOptions(
-          safeArray(sopRes.data.data).map((item) => ({
-            label: item.name,
-            value: item.id.toString(),
-          })),
-        );
-        setStandardOptions(
-          safeArray(standardRes.data.data).map((item) => ({
-            label: item.name,
-            value: item.id.toString(),
-          })),
-        );
-        setSubcategoryOne(
-          safeArray(subcategoryoneRes.data.data).map((item) => ({
-            label: item.name,
-            value: item.id.toString(),
-          })),
-        );
-        setSubcategoryTwo(
-          safeArray(subcategorytwoRes.data.data).map((item) => ({
-            label: item.name,
-            value: item.id.toString(),
-          })),
-        );
-        setFormateOptions(
-          safeArray(formatelist.data.data).map((item) => ({
-            label: item.name, // UI mein name dikhega
-            value: item.description, // Description store hogi
-            id: item.id.toString(), // ID alag se available rahegi
-          })),
-        );
-        // setFormateOptions(
-        //   safeArray(formatelist.data.data).map((item) => ({
-        //     label: item.name,
-        //     value: item.id.toString(),
-        //   })),
-        // );
-        setLabOptions(
-          safeArray(lablist.data.data).map((item) => ({
-            label: item.name,
-            value: item.id.toString(),
-          })),
-        );
-        setCurrencyOptions(
-          safeArray(currencylist.data.data).map((item) => ({
-            label: `${item.name} (${item.description})`,
-            value: item.id.toString(),
-          })),
-        );
-        setUnitTypeOptions(
-          safeArray(unitTypeRes.data.data).map((item) => ({
-            label: item.name,
-            value: item.name,
-          })),
-        );
-        setUnitOptions(
-          safeArray(unitRes.data.data).map((item) => ({
-            label: item.name,
-            value: item.id.toString(),
-          })),
-        );
-        setModeOptions(
-          safeArray(modeRes.data.data).map((item) => ({
-            label: item.name,
-            value: item.name,
-          })),
-        );
-
-        // Set instrument data
-        const instrumentData = instrumentRes.data.data;
-        // ✅ ADD THESE CONSOLE LOGS HERE 👇
-    console.log("=== DEBUGGING SUFFIX DATA ===");
-    console.log("📌 Suffix from API:", instrumentData.instrument.suffix);
-    console.log("📌 Type:", typeof instrumentData.instrument.suffix);
-    console.log("📌 Is Array?:", Array.isArray(instrumentData.instrument.suffix));
-    console.log("📌 Uncertainty Table:", instrumentData.instrument.uncertaintytable);
-    console.log("📌 Format Options Available:", formateOptions);
-    console.log("=== END DEBUG ===");
-        const safeArrayData = (value) =>
-          Array.isArray(value)
-            ? value
-            : typeof value === "string" && value
-              ? value.split(",")
-              : [];
-        const safeString = (value) => (value != null ? String(value) : "");
-
-        setFormData((prev) => ({
-          ...prev,
-          name: safeString(instrumentData.instrument.name),
-          sop: safeArrayData(instrumentData.instrument.sop),
-          standard: safeArrayData(instrumentData.instrument.standard),
-          typeofsupport: safeArrayData(instrumentData.instrument.typeofsupport),
-          typeofmaster: safeArrayData(instrumentData.instrument.typeofmaster),
-          description: safeString(instrumentData.instrument.description),
-          discipline: safeString(instrumentData.instrument.discipline),
-          groups: safeString(instrumentData.instrument.groups),
-          remark: safeString(instrumentData.instrument.remark),
-          range: safeString(instrumentData.instrument.range),
-          leastcount: safeString(instrumentData.instrument.leastcount),
-          unittype: safeString(instrumentData.instrument.unittype),
-          mode: safeString(instrumentData.instrument.mode),
-          supportmaster: safeString(instrumentData.instrument.supportmaster),
-          supportrange: safeString(instrumentData.instrument.supportrange),
-          supportleastcount: safeString(
-            instrumentData.instrument.supportleastcount,
-          ),
-          supportunittype: safeString(
-            instrumentData.instrument.supportunittype,
-          ),
-          supportmode: safeString(instrumentData.instrument.supportmode),
-          scopematrixvalidation: safeString(
-            instrumentData.instrument.scopematrixvalidation,
-          ),
-          digitincmc: safeString(instrumentData.instrument.digitincmc || "2"),
-          biomedical: safeString(instrumentData.instrument.biomedical || "No"),
-          showvisualtest: safeString(
-            instrumentData.instrument.showvisualtest || "No",
-          ),
-          showelectricalsafety: safeString(
-            instrumentData.instrument.showelectricalsafety || "No",
-          ),
-          showbasicsafety: safeString(
-            instrumentData.instrument.showbasicsafety || "No",
-          ),
-          showperformancetest: safeString(
-            instrumentData.instrument.showperformancetest || "No",
-          ),
-          setpoint: safeString(instrumentData.instrument.setpoint || "UUC"),
-          uuc: safeString(instrumentData.instrument.uuc || "1"),
-          master: safeString(instrumentData.instrument.master || "1"),
-          setpointheading: safeString(
-            instrumentData.instrument.setpointheading || "Set Point",
-          ),
-          parameterheading: safeString(
-            instrumentData.instrument.parameterheading || "",
-          ),
-          uucheading: safeString(
-            instrumentData.instrument.uucheading || "Observation On UUC",
-          ),
-          masterheading: safeString(
-            instrumentData.instrument.masterheading || "Standard Reading",
-          ),
-          errorheading: safeString(
-            instrumentData.instrument.errorheading || "Error",
-          ),
-          remarkheading: safeString(
-            instrumentData.instrument.remarkheading || "Remark",
-          ),
-          setpointtoshow: safeString(
-            instrumentData.instrument.setpointtoshow || "Yes",
-          ),
-          parametertoshow: safeString(
-            instrumentData.instrument.parametertoshow || "Yes",
-          ),
-          uuctoshow: safeString(instrumentData.instrument.uuctoshow || "Yes"),
-          mastertoshow: safeString(
-            instrumentData.instrument.mastertoshow || "Yes",
-          ),
-          errortoshow: safeString(
-            instrumentData.instrument.errortoshow || "Yes",
-          ),
-          remarktoshow: safeString(
-            instrumentData.instrument.remarktoshow || "Yes",
-          ),
-          specificationtoshow: safeString(
-            instrumentData.instrument.specificationtoshow || "Yes",
-          ),
-          specificationheading: safeString(
-            instrumentData.instrument.specificationheading || "",
-          ),
-          tempsite: safeString(instrumentData.instrument.tempsite),
-          tempvariablesite: safeString(
-            instrumentData.instrument.tempvariablesite,
-          ),
-          humisite: safeString(instrumentData.instrument.humisite),
-          humivariablesite: safeString(
-            instrumentData.instrument.humivariablesite,
-          ),
-          templab: safeString(instrumentData.instrument.templab),
-          tempvariablelab: safeString(
-            instrumentData.instrument.tempvariablelab,
-          ),
-          humilab: safeString(instrumentData.instrument.humilab),
-          humivariablelab: safeString(
-            instrumentData.instrument.humivariablelab,
-          ),
-          mastersincertificate: safeString(
-            instrumentData.instrument.mastersincertificate || "Yes",
-          ),
-          uncertaintyincertificate: safeString(
-            instrumentData.instrument.uncertaintyincertificate || "Yes",
-          ),
-          allottolab: safeString(instrumentData.instrument.allottolab),
-          suffix: safeArrayData(instrumentData.instrument.suffix),
-          uncertaintytable: safeArrayData(
-            instrumentData.instrument.uncertaintytable,
-          ),
-          vertical: safeString(instrumentData.instrument.vertical || "1"),
-        }));
-
-        // Extract and save Format ID and Uncertainty ID from loaded data
-        const suffixData = safeArrayData(instrumentData.instrument.suffix);
-        if (suffixData && suffixData.length > 0) {
-          const formatId =
-            typeof suffixData[0] === "string"
-              ? parseInt(suffixData[0], 10)
-              : suffixData[0];
-          if (!isNaN(formatId) && formatId > 0) {
-            setSavedFormatId(formatId);
-            console.log("✅ Loaded Format ID:", formatId);
-          }
-        }
-
-        const uncertaintyData = safeArrayData(
-          instrumentData.instrument.uncertaintytable,
-        );
-        if (uncertaintyData && uncertaintyData.length > 0) {
-          const uncertaintyId =
-            typeof uncertaintyData[0] === "string"
-              ? parseInt(uncertaintyData[0], 10)
-              : uncertaintyData[0];
-          if (!isNaN(uncertaintyId) && uncertaintyId > 0) {
-            setSavedUncertaintyId(uncertaintyId);
-            console.log("✅ Loaded Uncertainty ID:", uncertaintyId);
-          }
-        }
-
-        // Set price lists
-        const priceMatrix = Array.isArray(instrumentData.pricematrix)
-          ? instrumentData.pricematrix
-          : [];
-        const fetchedPriceLists =
-          priceMatrix.length > 0
-            ? priceMatrix.map((price) => ({
-                id: price.id || "",
-                packagename: safeString(price.packagename),
-                packagedesc: safeString(price.packagedesc),
-                accreditation: safeString(price.accreditation),
-                location: safeString(price.location),
-                currency:
-                  currencyOptions.find(
-                    (opt) => opt.value === safeString(price.currency),
-                  ) || null,
-                rate: safeString(price.rate),
-                daysrequired: safeString(price.daysrequired),
-                matrices:
-                  Array.isArray(price.matrix) && price.matrix.length > 0
-                    ? price.matrix.map((matrix, matrixIndex) => ({
-                        id: matrix.id || "",
-                        matrixno: matrixIndex + 1,
-                        unittype: safeString(matrix.unittype),
-                        unit: safeString(matrix.unit),
-                        mode: safeString(matrix.mode),
-                        instrangemin: safeString(matrix.instrangemin),
-                        instrangemax: safeString(matrix.instrangemax),
-                        tolerance: safeString(matrix.tolerance),
-                        tolerancetype: safeString(matrix.tolerancetype),
-                      }))
-                    : [],
-              }))
-            : [];
-
-        setPriceLists(fetchedPriceLists);
-      } catch (err) {
-        toast.error("Error loading data");
-        console.error("Data Fetch Error:", err);
-      } finally {
-        setLoading(false);
       }
-    };
 
-    fetchAllData();
-  }, [id]);
+      // ✅ STEP 1: First fetch all dropdown options
+      const [
+        sopRes,
+        standardRes,
+        subcategoryoneRes,
+        subcategorytwoRes,
+        formatelist,
+        lablist,
+        currencylist,
+        unitTypeRes,
+        unitRes,
+        modeRes,
+      ] = await Promise.all([
+        axios.get("/calibrationoperations/calibration-method-list"),
+        axios.get("/calibrationoperations/calibration-standard-list"),
+        axios.get("/inventory/subcategory-list"),
+        axios.get("/inventory/subcategory-list"),
+        axios.get("/get-formate"),
+        axios.get("/master/list-lab"),
+        axios.get("/master/currency-list"),
+        axios.get("/master/unit-type-list"),
+        axios.get("/master/units-list"),
+        axios.get("/master/mode-list"),
+      ]);
+
+      const safeArray = (data) => (Array.isArray(data) ? data : []);
+
+      // ✅ STEP 2: Set all dropdown options FIRST
+      setSopOptions(
+        safeArray(sopRes.data.data).map((item) => ({
+          label: item.name,
+          value: item.id.toString(),
+        }))
+      );
+      setStandardOptions(
+        safeArray(standardRes.data.data).map((item) => ({
+          label: item.name,
+          value: item.id.toString(),
+        }))
+      );
+      setSubcategoryOne(
+        safeArray(subcategoryoneRes.data.data).map((item) => ({
+          label: item.name,
+          value: item.id.toString(),
+        }))
+      );
+      setSubcategoryTwo(
+        safeArray(subcategorytwoRes.data.data).map((item) => ({
+          label: item.name,
+          value: item.id.toString(),
+        }))
+      );
+      
+      // ✅ Store formatted options in a variable
+      const formattedOptions = safeArray(formatelist.data.data).map((item) => ({
+        label: item.name,
+        value: item.description,
+        id: item.id.toString(),
+      }));
+      
+      setFormateOptions(formattedOptions);
+      console.log("✅ Format Options Set:", formattedOptions);
+      
+      setLabOptions(
+        safeArray(lablist.data.data).map((item) => ({
+          label: item.name,
+          value: item.id.toString(),
+        }))
+      );
+      setCurrencyOptions(
+        safeArray(currencylist.data.data).map((item) => ({
+          label: `${item.name} (${item.description})`,
+          value: item.id.toString(),
+        }))
+      );
+      setUnitTypeOptions(
+        safeArray(unitTypeRes.data.data).map((item) => ({
+          label: item.name,
+          value: item.name,
+        }))
+      );
+      setUnitOptions(
+        safeArray(unitRes.data.data).map((item) => ({
+          label: item.name,
+          value: item.id.toString(),
+        }))
+      );
+      setModeOptions(
+        safeArray(modeRes.data.data).map((item) => ({
+          label: item.name,
+          value: item.name,
+        }))
+      );
+
+      // ✅ STEP 3: NOW fetch instrument data AFTER options are ready
+      const instrumentRes = await axios.get(
+        `/calibrationoperations/get-instrument-byid/${id}`
+      );
+
+      const instrumentData = instrumentRes.data.data;
+      
+      console.log("=== DEBUGGING SUFFIX DATA ===");
+      console.log("📌 Suffix from API:", instrumentData.instrument.suffix);
+      console.log("📌 Format Options Now Available:", formattedOptions);
+      console.log("=== END DEBUG ===");
+
+      const safeArrayData = (value) =>
+        Array.isArray(value)
+          ? value
+          : typeof value === "string" && value
+            ? value.split(",")
+            : [];
+      const safeString = (value) => (value != null ? String(value) : "");
+
+      // ✅ Find matching format by description
+      const savedSuffix = safeString(instrumentData.instrument.suffix);
+      const matchingFormat = formattedOptions.find(
+        (opt) => opt.value === savedSuffix
+      );
+
+      console.log("🔍 Looking for suffix:", savedSuffix);
+      console.log("🔍 Found matching format:", matchingFormat);
+
+      setFormData((prev) => ({
+        ...prev,
+        name: safeString(instrumentData.instrument.name),
+        sop: safeArrayData(instrumentData.instrument.sop),
+        standard: safeArrayData(instrumentData.instrument.standard),
+        typeofsupport: safeArrayData(instrumentData.instrument.typeofsupport),
+        typeofmaster: safeArrayData(instrumentData.instrument.typeofmaster),
+        description: safeString(instrumentData.instrument.description),
+        discipline: safeString(instrumentData.instrument.discipline),
+        groups: safeString(instrumentData.instrument.groups),
+        remark: safeString(instrumentData.instrument.remark),
+        range: safeString(instrumentData.instrument.range),
+        leastcount: safeString(instrumentData.instrument.leastcount),
+        unittype: safeString(instrumentData.instrument.unittype),
+        mode: safeString(instrumentData.instrument.mode),
+        supportmaster: safeString(instrumentData.instrument.supportmaster),
+        supportrange: safeString(instrumentData.instrument.supportrange),
+        supportleastcount: safeString(instrumentData.instrument.supportleastcount),
+        supportunittype: safeString(instrumentData.instrument.supportunittype),
+        supportmode: safeString(instrumentData.instrument.supportmode),
+        scopematrixvalidation: safeString(instrumentData.instrument.scopematrixvalidation),
+        digitincmc: safeString(instrumentData.instrument.digitincmc || "2"),
+        biomedical: safeString(instrumentData.instrument.biomedical || "No"),
+        showvisualtest: safeString(instrumentData.instrument.showvisualtest || "No"),
+        showelectricalsafety: safeString(instrumentData.instrument.showelectricalsafety || "No"),
+        showbasicsafety: safeString(instrumentData.instrument.showbasicsafety || "No"),
+        showperformancetest: safeString(instrumentData.instrument.showperformancetest || "No"),
+        setpoint: safeString(instrumentData.instrument.setpoint || "UUC"),
+        uuc: safeString(instrumentData.instrument.uuc || "1"),
+        master: safeString(instrumentData.instrument.master || "1"),
+        setpointheading: safeString(instrumentData.instrument.setpointheading || "Set Point"),
+        parameterheading: safeString(instrumentData.instrument.parameterheading || ""),
+        uucheading: safeString(instrumentData.instrument.uucheading || "Observation On UUC"),
+        masterheading: safeString(instrumentData.instrument.masterheading || "Standard Reading"),
+        errorheading: safeString(instrumentData.instrument.errorheading || "Error"),
+        remarkheading: safeString(instrumentData.instrument.remarkheading || "Remark"),
+        setpointtoshow: safeString(instrumentData.instrument.setpointtoshow || "Yes"),
+        parametertoshow: safeString(instrumentData.instrument.parametertoshow || "Yes"),
+        uuctoshow: safeString(instrumentData.instrument.uuctoshow || "Yes"),
+        mastertoshow: safeString(instrumentData.instrument.mastertoshow || "Yes"),
+        errortoshow: safeString(instrumentData.instrument.errortoshow || "Yes"),
+        remarktoshow: safeString(instrumentData.instrument.remarktoshow || "Yes"),
+        specificationtoshow: safeString(instrumentData.instrument.specificationtoshow || "Yes"),
+        specificationheading: safeString(instrumentData.instrument.specificationheading || ""),
+        tempsite: safeString(instrumentData.instrument.tempsite),
+        tempvariablesite: safeString(instrumentData.instrument.tempvariablesite),
+        humisite: safeString(instrumentData.instrument.humisite),
+        humivariablesite: safeString(instrumentData.instrument.humivariablesite),
+        templab: safeString(instrumentData.instrument.templab),
+        tempvariablelab: safeString(instrumentData.instrument.tempvariablelab),
+        humilab: safeString(instrumentData.instrument.humilab),
+        humivariablelab: safeString(instrumentData.instrument.humivariablelab),
+        mastersincertificate: safeString(instrumentData.instrument.mastersincertificate || "Yes"),
+        uncertaintyincertificate: safeString(instrumentData.instrument.uncertaintyincertificate || "Yes"),
+        allottolab: safeString(instrumentData.instrument.allottolab),
+        // ✅ Store description for display AND id separately
+        suffix: savedSuffix,
+        suffixId: matchingFormat ? matchingFormat.id : "",
+        uncertaintytable: safeArrayData(instrumentData.instrument.uncertaintytable),
+        vertical: safeString(instrumentData.instrument.vertical || "1"),
+      }));
+
+      // ✅ Set saved IDs
+      if (matchingFormat && matchingFormat.id) {
+        const formatId = parseInt(matchingFormat.id, 10);
+        if (!isNaN(formatId) && formatId > 0) {
+          setSavedFormatId(formatId);
+          console.log("✅ Loaded Format ID:", formatId);
+        }
+      }
+
+      const uncertaintyData = safeArrayData(instrumentData.instrument.uncertaintytable);
+      if (uncertaintyData && uncertaintyData.length > 0) {
+        // Find matching uncertainty by description
+        const matchingUncertainties = formattedOptions.filter((opt) =>
+          uncertaintyData.includes(opt.value)
+        );
+        
+        if (matchingUncertainties.length > 0) {
+          const uncertaintyIds = matchingUncertainties.map((u) => parseInt(u.id, 10));
+          setFormData((prev) => ({
+            ...prev,
+            uncertaintyIds: uncertaintyIds,
+          }));
+          
+          if (uncertaintyIds[0]) {
+            setSavedUncertaintyId(uncertaintyIds[0]);
+            console.log("✅ Loaded Uncertainty IDs:", uncertaintyIds);
+          }
+        }
+      }
+
+      // Set price lists
+      const priceMatrix = Array.isArray(instrumentData.pricematrix)
+        ? instrumentData.pricematrix
+        : [];
+      const fetchedPriceLists =
+        priceMatrix.length > 0
+          ? priceMatrix.map((price) => ({
+              id: price.id || "",
+              packagename: safeString(price.packagename),
+              packagedesc: safeString(price.packagedesc),
+              accreditation: safeString(price.accreditation),
+              location: safeString(price.location),
+              currency:
+                currencyOptions.find(
+                  (opt) => opt.value === safeString(price.currency)
+                ) || null,
+              rate: safeString(price.rate),
+              daysrequired: safeString(price.daysrequired),
+              matrices:
+                Array.isArray(price.matrix) && price.matrix.length > 0
+                  ? price.matrix.map((matrix, matrixIndex) => ({
+                      id: matrix.id || "",
+                      matrixno: matrixIndex + 1,
+                      unittype: safeString(matrix.unittype),
+                      unit: safeString(matrix.unit),
+                      mode: safeString(matrix.mode),
+                      instrangemin: safeString(matrix.instrangemin),
+                      instrangemax: safeString(matrix.instrangemax),
+                      tolerance: safeString(matrix.tolerance),
+                      tolerancetype: safeString(matrix.tolerancetype),
+                    }))
+                  : [],
+            }))
+          : [];
+
+      setPriceLists(fetchedPriceLists);
+    } catch (err) {
+      toast.error("Error loading data");
+      console.error("Data Fetch Error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchAllData();
+}, [id]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

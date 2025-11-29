@@ -8,9 +8,9 @@ import {
 } from "@headlessui/react";
 import {
   EllipsisHorizontalIcon,
-  PencilIcon,
+  // PencilIcon,
   TrashIcon,
-  PlusCircleIcon, // ✅ new icon for Add Uncertainty
+  // PlusCircleIcon, // ✅ new icon for Add Uncertainty
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { Fragment, useCallback, useState } from "react";
@@ -21,7 +21,7 @@ import { ConfirmModal } from "components/shared/ConfirmModal";
 import { Button } from "components/ui";
 import axios from "utils/axios";
 import { toast } from "sonner";
-import { useNavigate } from "react-router";
+// import { useNavigate } from "react-router";
 
 // ----------------------------------------------------------------------
 
@@ -36,18 +36,18 @@ const confirmMessages = {
 };
 
 export function RowActions({ row, table }) {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
-  const handleEdit = () => {
-    const id = row.original.id;
-    navigate(`/dashboards/operations/observation-settings/edit/${id}`);
-  };
+  // const handleEdit = () => {
+  //   const id = row.original.id;
+  //   navigate(`/dashboards/operations/observation-settings/edit/${id}`);
+  // };
 
-  // ✅ New handler for Add Uncertainty
-  const handleEditUncertainty = () => {
-    const id = row.original.id;
-    navigate(`/dashboards/operations/observation-settings/edit-uncertainty/${id}`);
-  };
+  // // ✅ New handler for Add Uncertainty
+  // const handleEditUncertainty = () => {
+  //   const id = row.original.id;
+  //   navigate(`/dashboards/operations/observation-settings/edit-uncertainty/${id}`);
+  // };
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [confirmDeleteLoading, setConfirmDeleteLoading] = useState(false);
@@ -110,7 +110,7 @@ export function RowActions({ row, table }) {
               className="absolute z-100 w-[11rem] rounded-lg border border-gray-300 bg-white py-1 shadow-lg shadow-gray-200/50 outline-hidden focus-visible:outline-hidden dark:border-dark-500 dark:bg-dark-750 dark:shadow-none ltr:right-0 rtl:left-0"
             >
               {/* ✏️ Edit */}
-              <MenuItem>
+              {/* <MenuItem>
                 {({ focus }) => (
                   <button
                     onClick={handleEdit}
@@ -124,10 +124,10 @@ export function RowActions({ row, table }) {
                     <span>Edit Calibration </span>
                   </button>
                 )}
-              </MenuItem>
+              </MenuItem> */}
 
               {/* ➕ Add Uncertainty */}
-              <MenuItem>
+              {/* <MenuItem>
                 {({ focus }) => (
                   <button
                     onClick={handleEditUncertainty}
@@ -141,7 +141,7 @@ export function RowActions({ row, table }) {
                     <span>Edit Uncertainty</span>
                   </button>
                 )}
-              </MenuItem>
+              </MenuItem> */}
 
               {/* 🗑️ Delete */}
               <MenuItem>
