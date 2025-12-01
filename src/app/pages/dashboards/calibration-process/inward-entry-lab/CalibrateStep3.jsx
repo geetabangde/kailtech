@@ -185,6 +185,7 @@ const CalibrateStep3 = () => {
         console.log('All API Data:', response.data);
         setApiData(response.data);
         setSupportMasters(response.data.supportMasters || []);
+        console.log("widksjdh", response.data)
 
         if (response.data.listOfInstrument?.suffix) {
           setSuffix(response.data.listOfInstrument.suffix);
@@ -320,9 +321,8 @@ const generateDynamicTableStructure = useCallback((headings) => {
   return { headers, subHeadersRow };
 }, [dynamicHeadings]);
 
-  // ✅ Create observation rows - Supports all 3 observation_from modes
-  // ✅ Create observation rows - Supports all 3 observation_from modes
-// ✅ Create observation rows - Supports all 3 observation_from modes
+
+// ✅ Create observation rows - Supports all 3 observation_from modes + mode field
 const createObservationRows = (observationData) => {
   if (!observationData || !Array.isArray(observationData)) {
     return {
@@ -337,7 +337,7 @@ const createObservationRows = (observationData) => {
   const repeatables = [];
   const values = [];
   
-  // ✅ Get observation_from from API response - FIXED
+  // ✅ Get observation_from from API response
   const observationFrom = dynamicHeadings?.observation_from || 'master';
   const observationSettings = dynamicHeadings?.observation_heading?.observation_settings || [];
   const enabledObsSettings = observationSettings.filter(obs => obs.checkbox === 'yes');
@@ -356,7 +356,15 @@ const createObservationRows = (observationData) => {
     calibrationSettings.forEach((setting) => {
       const fieldname = setting.fieldname;
 
-      if (fieldname === 'uuc') {
+      // ✅ FIXED: Handle mode field from calibration point data
+      if (fieldname === 'mode') {
+        row.push(point.mode || '');
+      }
+      // ✅ FIXED: Handle range field from calibration point data
+      else if (fieldname === 'range') {
+        row.push(point.range || '');
+      }
+      else if (fieldname === 'uuc') {
         if (observationFrom === 'uuc' || observationFrom === 'separate') {
           // ✅ UUC has multiple observations
           const uucData = point.summary_data?.uuc || [];
@@ -402,7 +410,7 @@ const createObservationRows = (observationData) => {
         }
       }
       else {
-        // For other fields, push empty initially (will be calculated)
+        // For other fields (like average, error), push empty initially (will be calculated)
         row.push('');
       }
     });
