@@ -973,8 +973,6 @@ const PerformCalibration = () => {
             return;
         }
 
-
-
         try {
             const token = localStorage.getItem('authToken');
 

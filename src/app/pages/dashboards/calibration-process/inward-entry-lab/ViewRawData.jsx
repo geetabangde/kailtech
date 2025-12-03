@@ -348,16 +348,7 @@ export default function CalibrationReport() {
     fetchAllData();
   }, [instid, inwardid, caliblocation, calibacc, fetchDynamicHeadings]);
 
-  // const formatDate = (dateString) => {
-  //   if (!dateString || dateString === '0000-00-00') return '';
-  //   try {
-  //     const date = new Date(dateString);
-  //     if (isNaN(date.getTime())) return '';
-  //     return date.toLocaleDateString('en-GB');
-  //   } catch {
-  //     return '';
-  //   }
-  // };
+  
 
   const handleBackToPerformCalibration = () => {
     navigate(`/dashboards/calibration-process/inward-entry-lab/perform-calibration/${inwardid}?caliblocation=${caliblocation}&calibacc=${calibacc}`);
