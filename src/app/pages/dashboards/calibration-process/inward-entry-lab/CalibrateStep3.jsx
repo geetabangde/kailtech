@@ -943,97 +943,102 @@ const handleObservationBlur = async (rowIndex, colIndex, value) => {
   }
 
   // ✅ Determine which field was edited
-  if (dynamicHeadings?.mainhading?.calibration_settings) {
-    const calibrationSettings =
-      dynamicHeadings.mainhading.calibration_settings.filter(
-        (col) => col.checkbox === "yes",
-      );
+  // ✅ Determine which field was edited
+if (dynamicHeadings?.mainhading?.calibration_settings) {
+  const calibrationSettings = dynamicHeadings.mainhading.calibration_settings.filter(
+    (col) => col.checkbox === "yes"
+  );
 
-    const obsSettings =
-      dynamicHeadings?.observation_heading?.observation_settings?.filter(
-        (obs) => obs.checkbox === "yes",
-      ) || [];
+  const obsSettings = dynamicHeadings?.observation_heading?.observation_settings?.filter(
+    (obs) => obs.checkbox === "yes"
+  ) || [];
 
-    let currentColIndex = 1;
+  let currentColIndex = 1;
 
-    for (const setting of calibrationSettings) {
-      const fieldname = setting.fieldname;
+  for (const setting of calibrationSettings) {
+    const fieldname = setting.fieldname;
 
-      if (fieldname === "uuc") {
-        if (observationFrom === "uuc" || observationFrom === "separate") {
-          // UUC has multiple observations
-          for (let i = 0; i < obsSettings.length; i++) {
-            if (colIndex === currentColIndex) {
-              // ✅ Save the UUC observation
-              payloads.push({
-                inwardid: inwardId,
-                instid: instId,
-                calibrationpoint: calibrationPointId,
-                type: "uuc",
-                repeatable: i.toString(),
-                value: value || "0",
-              });
-              
-              // ✅ Calculate and save derived fields (average, error, etc.)
-              calibrationSettings.forEach((calcSetting) => {
-                if (
-                  calcSetting.formula &&
-                  calcSetting.formula.trim() !== ""
-                ) {
-                  const calculatedValue = evaluateFormula(
-                    calcSetting.formula,
-                    variables,
-                  );
-                  if (calculatedValue !== "") {
-                    payloads.push({
-                      inwardid: inwardId,
-                      instid: instId,
-                      calibrationpoint: calibrationPointId,
-                      type: calcSetting.fieldname,
-                      repeatable: "0",
-                      value: calculatedValue.toString(),
-                    });
-                  }
-                }
-              });
-            }
-            currentColIndex++;
-          }
-        } else {
-          // Master mode: UUC is single value
+    if (fieldname === "uuc") {
+      if (observationFrom === "uuc" || observationFrom === "separate") {
+        // UUC has multiple observations
+        for (let i = 0; i < obsSettings.length; i++) {
           if (colIndex === currentColIndex) {
+            // ✅ Save the UUC observation
             payloads.push({
               inwardid: inwardId,
               instid: instId,
               calibrationpoint: calibrationPointId,
               type: "uuc",
-              repeatable: "0",
+              repeatable: i.toString(),
               value: value || "0",
             });
-          }
-          currentColIndex++;
-        }
-      } else if (fieldname === "master") {
-        if (observationFrom === "master" || observationFrom === "separate") {
-          currentColIndex += obsSettings.length;
-        } else {
-          if (colIndex === currentColIndex) {
-            payloads.push({
-              inwardid: inwardId,
-              instid: instId,
-              calibrationpoint: calibrationPointId,
-              type: "master",
-              repeatable: "0",
-              value: value || "0",
+            
+            // ✅ Calculate and save derived fields ONLY if they have formulas
+            calibrationSettings.forEach((calcSetting) => {
+              if (calcSetting.formula && calcSetting.formula.trim() !== "") {
+                const calculatedValue = evaluateFormula(calcSetting.formula, variables);
+                if (calculatedValue !== "") {
+                  payloads.push({
+                    inwardid: inwardId,
+                    instid: instId,
+                    calibrationpoint: calibrationPointId,
+                    type: calcSetting.fieldname,
+                    repeatable: "0",
+                    value: calculatedValue.toString(),
+                  });
+                }
+              }
             });
           }
           currentColIndex++;
         }
       } else {
+        // Master mode: UUC is single value
+        if (colIndex === currentColIndex) {
+          payloads.push({
+            inwardid: inwardId,
+            instid: instId,
+            calibrationpoint: calibrationPointId,
+            type: "uuc",
+            repeatable: "0",
+            value: value || "0",
+          });
+        }
         currentColIndex++;
       }
+    } else if (fieldname === "master") {
+      if (observationFrom === "master" || observationFrom === "separate") {
+        currentColIndex += obsSettings.length;
+      } else {
+        if (colIndex === currentColIndex) {
+          payloads.push({
+            inwardid: inwardId,
+            instid: instId,
+            calibrationpoint: calibrationPointId,
+            type: "master",
+            repeatable: "0",
+            value: value || "0",
+          });
+        }
+        currentColIndex++;
+      }
+    } else {
+      // For other fields (average, error, etc.), save the current value from tableInputValues
+      if (colIndex === currentColIndex) {
+        const currentValue = tableInputValues[`${rowIndex}-${colIndex}`] || value || "0";
+        payloads.push({
+          inwardid: inwardId,
+          instid: instId,
+          calibrationpoint: calibrationPointId,
+          type: fieldname,
+          repeatable: "0",
+          value: currentValue.toString(),
+        });
+      }
+      currentColIndex++;
     }
   }
+}
 
   console.log("📡 Saving payloads:", payloads);
   console.log("📊 Variables for calculation:", variables);
@@ -1084,247 +1089,167 @@ const handleObservationBlur = async (rowIndex, colIndex, value) => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const token = localStorage.getItem("authToken");
-    const calibrationPoints = [];
-    const types = [];
-    const repeatables = [];
-    const values = [];
-    const observationFrom =
-      dynamicHeadings?.observation_heading?.observation_from || "master";
+  const token = localStorage.getItem("authToken");
+  const calibrationPoints = [];
+  const types = [];
+  const repeatables = [];
+  const values = [];
+  const observationFrom = dynamicHeadings?.observation_from || "master";
 
-    observationRows.rows.forEach((row, rowIndex) => {
-      const calibPointId =
-        observationRows.hiddenInputs?.calibrationPoints?.[rowIndex] || "";
+  // First, let's create a mapping of what each column represents
+  const columnMap = {};
+  let currentColIndex = 1; // Start from 1 (0 is SR NO)
 
-      const rowData = row.map((cell, idx) => {
-        const inputKey = `${rowIndex}-${idx}`;
-        return tableInputValues[inputKey] ?? (cell?.toString() || "");
-      });
+  if (dynamicHeadings?.mainhading?.calibration_settings) {
+    const calibrationSettings = dynamicHeadings.mainhading.calibration_settings.filter(
+      (col) => col.checkbox === "yes"
+    );
 
-      // Build variables
-      const variables = {};
+    const obsSettings = 
+      dynamicHeadings?.observation_heading?.observation_settings?.filter(
+        (obs) => obs.checkbox === "yes"
+      ) || [];
 
-      if (dynamicHeadings?.observation_heading?.observation_settings) {
-        const obsSettings =
-          dynamicHeadings.observation_heading.observation_settings.filter(
-            (obs) => obs.checkbox === "yes",
-          );
+    calibrationSettings.forEach((setting) => {
+      const fieldname = setting.fieldname;
 
-        const sortedSettings = [
-          ...dynamicHeadings.mainhading.calibration_settings,
-        ]
-          .filter((col) => col.checkbox === "yes")
-          .sort((a, b) => a.field_position - b.field_position);
-
-        let currentCol = 1;
-        const columnPositions = {};
-
-        for (const setting of sortedSettings) {
-          const fieldname = setting.fieldname;
-
-          if (observationFrom === "master" && fieldname === "master") {
-            columnPositions.master = {
-              start: currentCol,
-              count: obsSettings.length,
-            };
-            currentCol += obsSettings.length;
-          } else if (observationFrom === "uuc" && fieldname === "uuc") {
-            columnPositions.uuc = {
-              start: currentCol,
-              count: obsSettings.length,
-            };
-            currentCol += obsSettings.length;
-          } else if (observationFrom === "separate") {
-            if (fieldname === "master") {
-              columnPositions.master = {
-                start: currentCol,
-                count: obsSettings.length,
-              };
-              currentCol += obsSettings.length;
-            } else if (fieldname === "uuc") {
-              columnPositions.uuc = {
-                start: currentCol,
-                count: obsSettings.length,
-              };
-              currentCol += obsSettings.length;
-            } else {
-              currentCol++;
-            }
-          } else {
-            currentCol++;
-          }
+      if (observationFrom === "master" && fieldname === "master") {
+        // Master has multiple observations
+        columnMap[fieldname] = {
+          type: "multi",
+          start: currentColIndex,
+          count: obsSettings.length,
+          repeatables: obsSettings.map((_, idx) => idx.toString())
+        };
+        currentColIndex += obsSettings.length;
+      } else if (observationFrom === "uuc" && fieldname === "uuc") {
+        // UUC has multiple observations
+        columnMap[fieldname] = {
+          type: "multi",
+          start: currentColIndex,
+          count: obsSettings.length,
+          repeatables: obsSettings.map((_, idx) => idx.toString())
+        };
+        currentColIndex += obsSettings.length;
+      } else if (observationFrom === "separate") {
+        if (fieldname === "master" || fieldname === "uuc") {
+          // Both have multiple observations
+          columnMap[fieldname] = {
+            type: "multi",
+            start: currentColIndex,
+            count: obsSettings.length,
+            repeatables: obsSettings.map((_, idx) => idx.toString())
+          };
+          currentColIndex += obsSettings.length;
+        } else {
+          // Single column field
+          columnMap[fieldname] = {
+            type: "single",
+            column: currentColIndex,
+            repeatable: "0"
+          };
+          currentColIndex++;
         }
-
-        // Build variables based on observation_from
-        if (observationFrom === "master" && columnPositions.master) {
-          obsSettings.forEach((obsSetting, idx) => {
-            const varName = obsSetting.setvariable;
-            const colIdx = columnPositions.master.start + idx;
-            const cellValue = parseFloat(rowData[colIdx]) || 0;
-            variables[varName] = cellValue;
-          });
-        } else if (observationFrom === "uuc" && columnPositions.uuc) {
-          obsSettings.forEach((obsSetting, idx) => {
-            const varName = obsSetting.setvariable;
-            const colIdx = columnPositions.uuc.start + idx;
-            const cellValue = parseFloat(rowData[colIdx]) || 0;
-            variables[varName] = cellValue;
-          });
-        } else if (observationFrom === "separate") {
-          if (columnPositions.master) {
-            obsSettings.forEach((obsSetting, idx) => {
-              const varName = obsSetting.setvariable;
-              const colIdx = columnPositions.master.start + idx;
-              const cellValue = parseFloat(rowData[colIdx]) || 0;
-              variables[varName] = cellValue;
-            });
-          }
-
-          if (columnPositions.uuc) {
-            obsSettings.forEach((obsSetting, idx) => {
-              const varName = `$uuc${idx + 1}`;
-              const colIdx = columnPositions.uuc.start + idx;
-              const cellValue = parseFloat(rowData[colIdx]) || 0;
-              variables[varName] = cellValue;
-            });
-          }
-        }
-      }
-
-      // Build payloads
-      if (dynamicHeadings?.mainhading?.calibration_settings) {
-        const sortedSettings = [
-          ...dynamicHeadings.mainhading.calibration_settings,
-        ]
-          .filter((col) => col.checkbox === "yes")
-          .sort((a, b) => a.field_position - b.field_position);
-
-        let colIndex = 1;
-
-        sortedSettings.forEach((setting) => {
-          const fieldname = setting.fieldname;
-          const formula = setting.formula;
-
-          if (fieldname === "uuc") {
-            if (observationFrom === "uuc" || observationFrom === "separate") {
-              const obsSettings =
-                dynamicHeadings?.observation_heading?.observation_settings ||
-                [];
-              const obsCount = obsSettings.filter(
-                (obs) => obs.checkbox === "yes",
-              ).length;
-
-              for (let i = 0; i < obsCount; i++) {
-                calibrationPoints.push(calibPointId);
-                types.push("uuc");
-                repeatables.push(i.toString());
-                values.push(rowData[colIndex] || "0");
-                colIndex++;
-              }
-            } else {
-              calibrationPoints.push(calibPointId);
-              types.push("uuc");
-              repeatables.push("0");
-              values.push(rowData[colIndex] || "0");
-              colIndex++;
-            }
-          } else if (fieldname === "calculatedmaster") {
-            calibrationPoints.push(calibPointId);
-            types.push("calculatedmaster");
-            repeatables.push("0");
-            values.push(rowData[colIndex] || "0");
-            colIndex++;
-          } else if (fieldname === "master") {
-            if (
-              observationFrom === "master" ||
-              observationFrom === "separate"
-            ) {
-              const obsSettings =
-                dynamicHeadings?.observation_heading?.observation_settings ||
-                [];
-              const obsCount = obsSettings.filter(
-                (obs) => obs.checkbox === "yes",
-              ).length;
-
-              for (let i = 0; i < obsCount; i++) {
-                calibrationPoints.push(calibPointId);
-                types.push("master");
-                repeatables.push(i.toString());
-                values.push(rowData[colIndex] || "0");
-                colIndex++;
-              }
-            } else {
-              calibrationPoints.push(calibPointId);
-              types.push("master");
-              repeatables.push("0");
-              values.push(rowData[colIndex] || "0");
-              colIndex++;
-            }
-          } else if (formula && formula.trim() !== "") {
-            const calculatedValue = evaluateFormula(formula, variables);
-
-            calibrationPoints.push(calibPointId);
-            types.push(fieldname);
-            repeatables.push("0");
-            values.push(calculatedValue?.toString() || "0");
-            colIndex++;
-          } else {
-            calibrationPoints.push(calibPointId);
-            types.push(fieldname);
-            repeatables.push("0");
-            values.push(rowData[colIndex] || "0");
-            colIndex++;
-          }
-        });
+      } else {
+        // Single column field
+        columnMap[fieldname] = {
+          type: "single",
+          column: currentColIndex,
+          repeatable: "0"
+        };
+        currentColIndex++;
       }
     });
+  }
 
-    const payloadStep3 = {
-      inwardid: inwardId,
-      instid: instId,
-      caliblocation: caliblocation,
-      calibacc: calibacc,
-      tempend: formData.tempend,
-      humiend: formData.humiend,
-      notes: formData.notes,
-      enddate: formData.enddate,
-      duedate: formData.duedate,
-      calibrationpoint: calibrationPoints,
-      type: types,
-      repeatable: repeatables,
-      value: values,
-    };
+  console.log("📊 Column Map for submission:", columnMap);
 
-    console.log("📤 Step 3 Payload:", payloadStep3);
-
-    try {
-      const response = await axios.post(
-        '/calibrationprocess/insert-calibration-step3',
-        payloadStep3,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      console.log('✅ Step 3 saved successfully:', response.data);
-      toast.success('All data submitted successfully!');
-      
-      setTimeout(() => {
-        navigate(
-          `/dashboards/calibration-process/inward-entry-lab/perform-calibration/${id}?caliblocation=${caliblocation}&calibacc=${calibacc}`
-        );
-      }, 1000);
-    } catch (error) {
-      console.error('❌ Network Error:', error);
-      toast.error(error.response?.data?.message || 'Something went wrong while submitting');
+  // Now collect data from tableInputValues
+  observationRows.rows.forEach((row, rowIndex) => {
+    const calibPointId = observationRows.hiddenInputs?.calibrationPoints?.[rowIndex] || "";
+    
+    if (!calibPointId) {
+      console.warn(`⚠️ No calibration point ID for row ${rowIndex}`);
+      return;
     }
+
+    // Process each field in column map
+    Object.keys(columnMap).forEach((fieldname) => {
+      const fieldInfo = columnMap[fieldname];
+      
+      if (fieldInfo.type === "multi") {
+        // Multiple observations (e.g., multiple UUC or Master readings)
+        for (let i = 0; i < fieldInfo.count; i++) {
+          const colIndex = fieldInfo.start + i;
+          const key = `${rowIndex}-${colIndex}`;
+          const value = tableInputValues[key] ?? row[colIndex] ?? "0";
+          
+          calibrationPoints.push(calibPointId);
+          types.push(fieldname);
+          repeatables.push(fieldInfo.repeatables[i] || i.toString());
+          values.push(value.toString());
+        }
+      } else {
+        // Single column field
+        const colIndex = fieldInfo.column;
+        const key = `${rowIndex}-${colIndex}`;
+        const value = tableInputValues[key] ?? row[colIndex] ?? "0";
+        
+        calibrationPoints.push(calibPointId);
+        types.push(fieldname);
+        repeatables.push(fieldInfo.repeatable);
+        values.push(value.toString());
+      }
+    });
+  });
+
+  const payloadStep3 = {
+    inwardid: inwardId,
+    instid: instId,
+    caliblocation: caliblocation,
+    calibacc: calibacc,
+    tempend: formData.tempend,
+    humiend: formData.humiend,
+    notes: formData.notes,
+    enddate: formData.enddate,
+    duedate: formData.duedate,
+    calibrationpoint: calibrationPoints,
+    type: types,
+    repeatable: repeatables,
+    value: values,
   };
+
+  console.log("📤 Step 3 Payload for submission:", payloadStep3);
+  console.log("📊 Table Input Values used:", tableInputValues);
+
+  try {
+    const response = await axios.post(
+      '/calibrationprocess/insert-calibration-step3',
+      payloadStep3,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log('✅ Step 3 saved successfully:', response.data);
+    toast.success('All data submitted successfully!');
+    
+    setTimeout(() => {
+      navigate(
+        `/dashboards/calibration-process/inward-entry-lab/perform-calibration/${id}?caliblocation=${caliblocation}&calibacc=${calibacc}`
+      );
+    }, 1000);
+  } catch (error) {
+    console.error('❌ Network Error:', error);
+    toast.error(error.response?.data?.message || 'Something went wrong while submitting');
+  }
+};
   
 
   useEffect(() => {
