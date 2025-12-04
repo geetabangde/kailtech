@@ -43,8 +43,6 @@ export default function CalibrationReport() {
   const [suffix, setSuffix] = useState('');
   const [thermalCoeff, setThermalCoeff] = useState({});
 
-  
-
   // ✅ FETCH DYNAMIC HEADINGS - USING AXIOS
   const fetchDynamicHeadings = useCallback(async (suffix) => {
     if (!suffix) return null;
@@ -140,12 +138,18 @@ export default function CalibrationReport() {
       }
     });
 
+    console.log('✅ Generated Headers:', headers);
+    console.log('✅ Generated Sub-headers:', subHeadersRow);
+
     return { headers, subHeadersRow };
   }, [dynamicHeadings]);
 
   // ✅ CREATE OBSERVATION ROWS - SAME AS CALIBRATE STEP3
   const createObservationRows = useCallback((observationData) => {
-    if (!observationData || !Array.isArray(observationData)) return [];
+    if (!observationData || !Array.isArray(observationData)) {
+      console.log('❌ No observation data provided');
+      return [];
+    }
 
     const rows = [];
     const observationFrom = dynamicHeadings?.observation_from || 'master';
@@ -153,36 +157,80 @@ export default function CalibrationReport() {
     const observationSettings = dynamicHeadings?.observation_heading?.observation_settings || [];
     const enabledObsSettings = observationSettings.filter(obs => obs.checkbox === 'yes');
 
+    console.log('🔄 Creating observation rows...');
+    console.log('📊 Observation From:', observationFrom);
+    console.log('📊 Calibration Settings:', calibrationSettings.length);
+    console.log('📊 Enabled Obs Settings:', enabledObsSettings.length);
+
     observationData.forEach((point, index) => {
       const row = [(index + 1).toString()];
 
       calibrationSettings.forEach((setting) => {
         const fieldname = setting.fieldname;
 
+        // ✅ Handle mode field
         if (fieldname === 'mode') {
-          row.push(point.mode || '');
+          const modeData = point.summary_data?.mode;
+          if (modeData && Array.isArray(modeData) && modeData.length > 0) {
+            row.push(modeData[0]?.value || '');
+          } else {
+            row.push(point.mode || '');
+          }
         }
+        // ✅ Handle range field
         else if (fieldname === 'range') {
-          row.push(point.range || '');
+          const rangeData = point.summary_data?.range;
+          if (rangeData && Array.isArray(rangeData) && rangeData.length > 0) {
+            row.push(rangeData[0]?.value || '');
+          } else {
+            row.push(point.range || '');
+          }
         }
+        // ✅ Handle UUC field
         else if (fieldname === 'uuc') {
           if (observationFrom === 'uuc' || observationFrom === 'separate') {
             const uucData = point.summary_data?.uuc || [];
-            const sortedUucData = [...uucData].sort((a, b) => 
-              parseInt(a.repeatable) - parseInt(b.repeatable)
-            );
             
-            enabledObsSettings.forEach((obsSetting, obsIndex) => {
-              const uucValue = sortedUucData[obsIndex]?.value || '';
-              row.push(uucValue);
-            });
+            if (uucData.length === 0) {
+              enabledObsSettings.forEach(() => row.push(''));
+            } else if (uucData.length === 1 && uucData[0].repeatable === "0") {
+              const uucValue = uucData[0]?.value || '';
+              for (let i = 0; i < 6; i++) {
+                row.push(uucValue);
+              }
+            } else {
+              const sortedUucData = [...uucData].sort((a, b) => 
+                parseInt(a.repeatable) - parseInt(b.repeatable)
+              );
+              
+              for (let i = 0; i < 6; i++) {
+                if (i < sortedUucData.length) {
+                  row.push(sortedUucData[i]?.value || '');
+                } else {
+                  row.push('');
+                }
+              }
+            }
           } else {
-            row.push(point.point || point.converted_point || '');
+            const uucData = point.summary_data?.uuc;
+            if (uucData && Array.isArray(uucData) && uucData.length > 0) {
+              const calculatedUuc = uucData.find(item => item.repeatable === "0");
+              row.push(calculatedUuc?.value || '');
+            } else {
+              row.push('');
+            }
           }
         }
+        // ✅ Handle calculatedmaster field
         else if (fieldname === 'calculatedmaster') {
-          row.push(point.converted_point || point.calculated_master || '');
+          const calcMasterData = point.summary_data?.calculatedmaster;
+          if (calcMasterData && Array.isArray(calcMasterData) && calcMasterData.length > 0) {
+            row.push(calcMasterData[0]?.value || '');
+          } else {
+            row.push(point.converted_point || point.calculated_master || '');
+          }
         }
+        // ✅ Handle MASTER field
         else if (fieldname === 'master') {
           if (observationFrom === 'master' || observationFrom === 'separate') {
             const masterData = point.summary_data?.master || [];
@@ -194,21 +242,40 @@ export default function CalibrationReport() {
               const masterValue = sortedMasterData[obsIndex]?.value || '';
               row.push(masterValue);
             });
+          } else if (observationFrom === 'uuc') {
+            const masterData = point.summary_data?.master;
+            if (masterData && Array.isArray(masterData) && masterData.length > 0) {
+              const masterSingleValue = masterData.find(item => item.repeatable === "0");
+              row.push(masterSingleValue?.value || point.point || point.converted_point || '');
+            } else {
+              const masterValue = point.point || point.converted_point || '';
+              row.push(masterValue);
+            }
           } else {
-            const masterValue = point.point || point.converted_point || '';
-            row.push(masterValue);
+            const masterData = point.summary_data?.master;
+            if (masterData && Array.isArray(masterData) && masterData.length > 0) {
+              row.push(masterData[0]?.value || '');
+            } else {
+              row.push(point.point || point.converted_point || '');
+            }
           }
         }
+        // ✅ For all other fields (average, error, etc.)
         else {
-          // For calculated fields (average, error, etc.)
-          const fieldValue = point[fieldname] || '';
-          row.push(fieldValue);
+          const summaryFieldData = point.summary_data?.[fieldname];
+          if (summaryFieldData && Array.isArray(summaryFieldData) && summaryFieldData.length > 0) {
+            row.push(summaryFieldData[0]?.value || '');
+          } else {
+            row.push('');
+          }
         }
       });
 
+      console.log(`✅ Row ${index} complete:`, row);
       rows.push(row);
     });
 
+    console.log('✅ Total rows created:', rows.length);
     return rows;
   }, [dynamicHeadings]);
 
@@ -224,6 +291,9 @@ export default function CalibrationReport() {
       try {
         setLoading(true);
         setError(null);
+
+        console.log('🔄 Starting data fetch...');
+        console.log('📊 Parameters:', { instid, inwardid, caliblocation, calibacc });
 
         // ✅ STEP 1: Fetch step3 details to get suffix
         const step3Response = await axios.get(
@@ -244,20 +314,24 @@ export default function CalibrationReport() {
         if (step3Data?.listOfInstrument?.suffix) {
           const foundSuffix = step3Data.listOfInstrument.suffix;
           setSuffix(foundSuffix);
+          console.log('✅ Found suffix:', foundSuffix);
           
-          // ✅ STEP 2: Fetch dynamic headings
+          // ✅ STEP 2: Fetch dynamic headings with observations
           const headingsResponse = await fetchDynamicHeadings(foundSuffix);
           
           if (headingsResponse) {
+            console.log('✅ Dynamic headings loaded:', headingsResponse.heading);
             setDynamicHeadings(headingsResponse.heading);
             
             // ✅ STEP 3: Set observations from dynamic API
             if (headingsResponse.data?.calibration_points) {
+              console.log('✅ Observations loaded:', headingsResponse.data.calibration_points.length);
               setObservations(headingsResponse.data.calibration_points);
             }
 
             // ✅ STEP 4: Set thermal coefficients
             if (headingsResponse.data?.thermal_coeff) {
+              console.log('✅ Thermal coefficients loaded');
               setThermalCoeff(headingsResponse.data.thermal_coeff);
             }
           }
@@ -275,6 +349,7 @@ export default function CalibrationReport() {
         );
 
         const reportData = reportResponse.data;
+        console.log('📊 Report Data:', reportData);
 
         if (reportData?.success === true && reportData?.data) {
           const { uuc_details, master_details } = reportData.data;
@@ -320,24 +395,22 @@ export default function CalibrationReport() {
 
           // Map master details
           if (master_details && Array.isArray(master_details)) {
-            console.log("🔍 Raw Master Details from API: ", master_details); // Debug raw data
-            
-             const mappedMasterData = master_details.map((master) => {
-                return {
-                  reference: master.name || master.reference_standard || "N/A",
-                  serialno: master.serialno || master.serial_no || "N/A",  // ✅ serialno field
-                  idNo: master.idno || master.newidno || master.id_no || "N/A",
-                  certificate: master.certificateno || master.certificate_no || "N/A",
-                  enddate: master.enddate || master.cert_end_date || master.valid_upto || "N/A"  // ✅ Direct date, no formatting
-                };
-            });
+            const mappedMasterData = master_details.map((master) => ({
+              reference: master.name || master.reference_standard || "N/A",
+              serialno: master.serialno || master.serial_no || "N/A",
+              idNo: master.idno || master.newidno || master.id_no || "N/A",
+              certificate: master.certificateno || master.certificate_no || "N/A",
+              enddate: master.enddate || master.cert_end_date || master.valid_upto || "N/A"
+            }));
             
             console.log("🔍 Mapped Master Data: ", mappedMasterData);
             setMasterData(mappedMasterData);
           }
         }
+
+        console.log('✅ All data fetched successfully');
       } catch (err) {
-        console.error('Error fetching data:', err);
+        console.error('❌ Error fetching data:', err);
         setError('Failed to load calibration report');
         toast.error('Failed to load calibration report');
       } finally {
@@ -347,8 +420,6 @@ export default function CalibrationReport() {
 
     fetchAllData();
   }, [instid, inwardid, caliblocation, calibacc, fetchDynamicHeadings]);
-
-  
 
   const handleBackToPerformCalibration = () => {
     navigate(`/dashboards/calibration-process/inward-entry-lab/perform-calibration/${inwardid}?caliblocation=${caliblocation}&calibacc=${calibacc}`);
@@ -387,7 +458,7 @@ export default function CalibrationReport() {
     );
   }
 
-  const tableStructure = dynamicHeadings ? generateDynamicTableStructure(dynamicHeadings.mainhading.calibration_settings) : null;
+  const tableStructure = dynamicHeadings ? generateDynamicTableStructure(dynamicHeadings.mainhading?.calibration_settings || []) : null;
   const observationRows = createObservationRows(observations);
 
   return (
@@ -491,10 +562,10 @@ export default function CalibrationReport() {
           </div>
 
           {/* ✅ DYNAMIC OBSERVATION TABLE - USING CUSTOM HEADINGS */}
-          {tableStructure && observationRows.length > 0 && (
+          {tableStructure && observationRows.length > 0 ? (
             <>
               <h3 className="font-semibold mb-2 text-base">
-                Calibration Results - Dynamic Mode Active: Using custom column names for suffix {suffix}
+                Calibration Results {suffix && `(Suffix: ${suffix})`}
               </h3>
               <div className="overflow-x-auto mb-6">
                 <table className="w-full border border-gray-300 text-sm">
@@ -530,7 +601,7 @@ export default function CalibrationReport() {
                       <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                         {row.map((cell, colIndex) => (
                           <td key={colIndex} className="border border-gray-300 px-3 py-2">
-                            {cell || ''}
+                            {cell || '-'}
                           </td>
                         ))}
                       </tr>
@@ -539,6 +610,10 @@ export default function CalibrationReport() {
                 </table>
               </div>
             </>
+          ) : (
+            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded">
+              <p className="text-yellow-800">⚠️ No calibration observation data available</p>
+            </div>
           )}
 
           {/* Environmental Conditions */}
