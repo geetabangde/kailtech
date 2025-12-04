@@ -354,7 +354,7 @@ import axios from "utils/axios";
 import { toast } from "sonner";
 import { useNavigate, useLocation } from "react-router";
 
-// ----------------------------------------------------------------------
+
 
 const confirmMessages = {
   pending: {
@@ -676,17 +676,12 @@ export function RowActions({ row, table }) {
       <div className="flex flex-wrap justify-left gap-2">
         {filteredActions.map((action, index) => (
           <Button
-          
-           
             key={index}
             onClick={action.onClick}
             className={clsx(
             "h-6 space-x-1.5 rounded-md px-1 text-xs font-medium outline-none transition-colors",
             action.color
-            
             )}
-            
-             
          
           >
             {/* <PencilIcon className="size-4 stroke-1" /> */}
