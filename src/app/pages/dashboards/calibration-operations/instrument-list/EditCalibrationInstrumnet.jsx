@@ -758,32 +758,85 @@ export default function EditCalibrationInstrumnet() {
   };
 
   // Step Progress Indicator
-  const renderStepIndicator = () => (
+  // Step Progress Indicator - CLICKABLE VERSION (replace the existing one)
+const renderStepIndicator = () => {
+  // Function to handle step click
+  const handleStepClick = (step) => {
+    // Allow going to step 1 always
+    if (step === 1) {
+      setCurrentStep(step);
+      return;
+    }
+    
+    // For step 2 - check if step 1 is completed
+    if (step === 2) {
+      if (savedInstrumentId && savedFormatId) {
+        setCurrentStep(step);
+      } else {
+        toast.error("Please complete Step 1 first");
+      }
+      return;
+    }
+    
+    // For step 3 - check if step 2 is completed
+    if (step === 3) {
+      if (savedInstrumentId && savedFormatId) {
+        setCurrentStep(step);
+      } else {
+        toast.error("Please complete Step 2 first");
+      }
+      return;
+    }
+  };
+
+  return (
     <div className="mb-6 flex items-center justify-center">
       <div className="flex items-center space-x-4">
-        {[1, 2, 3].map((step) => (
-          <div key={step} className="flex items-center">
-            <div
-              className={`flex h-10 w-10 items-center justify-center rounded-full ${
-                currentStep >= step
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-300 text-gray-600"
-              }`}
-            >
-              {step}
+        {[1, 2, 3].map((step) => {
+          // Check if step is clickable
+          const isClickable = step === 1 || 
+            (step === 2 && savedInstrumentId && savedFormatId) ||
+            (step === 3 && savedInstrumentId && savedFormatId);
+          
+          return (
+            <div key={step} className="flex items-center">
+              <button
+                type="button"
+                onClick={() => isClickable && handleStepClick(step)}
+                className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200 ${
+                  currentStep >= step
+                    ? isClickable 
+                      ? "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+                      : "bg-blue-600 text-white cursor-default"
+                    : isClickable
+                    ? "bg-gray-300 text-gray-600 hover:bg-gray-400 cursor-pointer"
+                    : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                } ${currentStep === step ? "ring-2 ring-blue-400 ring-offset-2" : ""}`}
+                disabled={!isClickable}
+                title={
+                  step === 1 
+                    ? "Go to Step 1: Instrument Details" 
+                    : step === 2 
+                    ? (isClickable ? "Go to Step 2: Calibration Settings" : "Complete Step 1 first")
+                    : (isClickable ? "Go to Step 3: Uncertainty Settings" : "Complete previous steps first")
+                }
+              >
+                {step}
+              </button>
+              {step < 3 && (
+                <div
+                  className={`h-1 w-16 ${
+                    currentStep > step ? "bg-blue-600" : "bg-gray-300"
+                  }`}
+                />
+              )}
             </div>
-            {step < 3 && (
-              <div
-                className={`h-1 w-16 ${
-                  currentStep > step ? "bg-blue-600" : "bg-gray-300"
-                }`}
-              />
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
+};
 
   if (loading && !formData.name) {
     return (

@@ -328,6 +328,7 @@ const generateDynamicTableStructure = useCallback((headings, template) => {
 }, [dynamicHeadings]);
 
 
+
   const validateObservationFields = () => {
     let newErrors = {};
 

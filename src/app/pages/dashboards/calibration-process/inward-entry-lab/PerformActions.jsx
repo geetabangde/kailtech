@@ -456,7 +456,7 @@ export function PerformActions({ item, onAction }) {
                     color: 'text-cyan-600',
                     hoverColor: 'hover:bg-cyan-50 hover:text-cyan-700',
                 },
-                ...(item.accreditation === 'NABL'
+                ...(item.accreditation === 'Nabl'
                     ? [
                         {
                             label: 'View CMC Calculation',
@@ -529,7 +529,7 @@ export function PerformActions({ item, onAction }) {
             : []),
 
         // CMC Calculation for approved NABL items
-        ...(item.allotedto && item.status === 5 && item.accreditation === 'NABL'
+        ...(item.allotedto && item.status === 5 && item.accreditation === 'Nabl'
             ? [
                 {
                     label: 'View CMC Calculation',
@@ -599,7 +599,7 @@ export function PerformActions({ item, onAction }) {
                     color: 'text-cyan-600',
                     hoverColor: 'hover:bg-cyan-50 hover:text-cyan-700',
                 },
-                ...(item.accreditation === 'NABL'
+                ...(item.accreditation === 'Nabl'
                     ? [
                         {
                             label: 'View CMC Calculation',
@@ -1054,7 +1054,7 @@ PerformActions.propTypes = {
 //     //                 color: 'text-cyan-600',
 //     //                 hoverColor: 'hover:bg-cyan-50 hover:text-cyan-700',
 //     //             },
-//     //             ...(item.accreditation === 'NABL'
+//     //             ...(item.accreditation === 'Nabl'
 //     //                 ? [
 //     //                     {
 //     //                         label: 'View CMC Calculation',

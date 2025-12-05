@@ -6,10 +6,15 @@ import { EyeIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-hot-toast";
 import { Button } from "components/ui/button";
 
-export default function AddUncertainty({ instid, instrumentId, formatId, onComplete, onBack }) {
+export default function AddUncertainty({
+  instid,
+  instrumentId,
+  formatId,
+  onComplete,
+  onBack,
+}) {
   // const { id: formatId } = useParams();
   // const navigate = useNavigate();
-  
 
   console.log("Instrument ID from URL:", formatId);
 
@@ -508,19 +513,23 @@ export default function AddUncertainty({ instid, instrumentId, formatId, onCompl
         />
 
         {/* Save Button */}
-        <div className="flex flex-col items-end gap-2">
-          <div>
-            <Button onClick={onBack} variant="outline" className="mt-2 mb-2 rounded-md bg-blue-600 px-8 py-3 text-lg font-medium text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">← Back</Button>
-            <br />
-            <button
-              onClick={handleSave}
-              disabled={loading}
-              style={{ cursor: loading ? "not-allowed" : "pointer" }}
-              className="rounded-md bg-blue-600 px-8 py-3 text-lg font-medium text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Complete & Finish
-            </button>
-          </div>
+        <div className="mt-4 flex flex-row items-center justify-between gap-2">
+          <Button
+            onClick={onBack}
+            variant="outline"
+            className="rounded-md bg-blue-600 px-8 py-3 text-lg font-medium text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            ← Back
+          </Button>
+
+          <button
+            onClick={handleSave}
+            disabled={loading}
+            style={{ cursor: loading ? "not-allowed" : "pointer" }}
+            className="rounded-md bg-blue-600 px-8 py-3 text-lg font-medium text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Complete & Finish
+          </button>
         </div>
       </div>
 

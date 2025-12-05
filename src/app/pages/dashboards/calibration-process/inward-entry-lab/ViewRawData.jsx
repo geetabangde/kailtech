@@ -192,24 +192,26 @@ export default function CalibrationReport() {
             const uucData = point.summary_data?.uuc || [];
             
             if (uucData.length === 0) {
-              enabledObsSettings.forEach(() => row.push(''));
-            } else if (uucData.length === 1 && uucData[0].repeatable === "0") {
-              const uucValue = uucData[0]?.value || '';
-              for (let i = 0; i < 6; i++) {
-                row.push(uucValue);
-              }
+      enabledObsSettings.forEach(() => row.push(''));
+    } else if (uucData.length === 1 && uucData[0].repeatable === "0") {
+      const uucValue = uucData[0]?.value || '';
+      // ✅ FIXED - Dynamic length
+      enabledObsSettings.forEach(() => {
+        row.push(uucValue);
+      });
             } else {
               const sortedUucData = [...uucData].sort((a, b) => 
                 parseInt(a.repeatable) - parseInt(b.repeatable)
               );
               
-              for (let i = 0; i < 6; i++) {
-                if (i < sortedUucData.length) {
-                  row.push(sortedUucData[i]?.value || '');
-                } else {
-                  row.push('');
-                }
-              }
+              // ✅ FIXED - Dynamic length
+      enabledObsSettings.forEach((_, idx) => {
+        if (idx < sortedUucData.length) {
+          row.push(sortedUucData[idx]?.value || '');
+        } else {
+          row.push('');
+        }
+      });
             }
           } else {
             const uucData = point.summary_data?.uuc;
