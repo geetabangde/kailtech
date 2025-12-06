@@ -30,6 +30,8 @@ const CalibrateStep3 = () => {
   const [humidityRange, setHumidityRange] = useState(null);
   const [temperatureRange, setTemperatureRange] = useState(null);
   const [errors] = useState({});
+  const [leastCountData, setLeastCountData] = useState({});
+
   const [formData, setFormData] = useState({
     enddate: "",
     duedate: "",
@@ -49,7 +51,6 @@ const CalibrateStep3 = () => {
       return "";
     }
   };
-
 
   // ✅ Wrap evaluateFormula in useCallback to prevent re-creation
   const evaluateFormula = useCallback((formula, variables) => {
@@ -219,6 +220,16 @@ const CalibrateStep3 = () => {
                 headingsResponse.data.calibration_points,
               );
               setObservations(headingsResponse.data.calibration_points);
+
+              // ✅ FIXED: Extract least count from matrix.leastcount
+              const leastCountMap = {};
+              headingsResponse.data.calibration_points.forEach((point) => {
+                if (point.id && point.matrix?.leastcount) {
+                  leastCountMap[point.id] = parseFloat(point.matrix.leastcount);
+                }
+              });
+              setLeastCountData(leastCountMap);
+              console.log("📊 Least Count Map:", leastCountMap);
             }
           }
         }
@@ -254,7 +265,6 @@ const CalibrateStep3 = () => {
     }
   }, [inwardId, instId, caliblocation, calibacc, fetchDynamicHeadings]);
 
-  
   // ✅ Generate Dynamic Table Structure - Uses API order (NO SORTING)
   const generateDynamicTableStructure = useCallback(
     (headings) => {
@@ -365,7 +375,6 @@ const CalibrateStep3 = () => {
     [dynamicHeadings],
   );
 
-
   // ✅ Create observation rows - Supports all 3 observation_from modes + mode field + calculated fields
   const createObservationRows = (observationData) => {
     if (!observationData || !Array.isArray(observationData)) {
@@ -428,7 +437,7 @@ const CalibrateStep3 = () => {
             row.push(point.range || "");
           }
         }
-    
+
         // ✅ Handle UUC field based on observation_from - FIXED VERSION
         else if (fieldname === "uuc") {
           if (observationFrom === "uuc" || observationFrom === "separate") {
@@ -468,7 +477,6 @@ const CalibrateStep3 = () => {
               });
             }
           } else {
-          
             // ✅ Master mode: UUC is single calculated value
             const uucData = point.summary_data?.uuc;
             if (uucData && Array.isArray(uucData) && uucData.length > 0) {
@@ -738,7 +746,6 @@ const CalibrateStep3 = () => {
     return null;
   };
 
-  
   // ✅ Handle input changes - Supports all 3 observation_from modes
   const handleInputChange = (rowIndex, colIndex, value) => {
     setTableInputValues((prev) => {
@@ -747,6 +754,107 @@ const CalibrateStep3 = () => {
       newValues[key] = value;
 
       const observationFrom = dynamicHeadings?.observation_from || "master";
+      // ✅ ADD THIS VALIDATION BLOCK HERE - BEFORE building variables
+      // Real-time validation for observation fields
+      if (dynamicHeadings?.mainhading?.calibration_settings) {
+        const calibrationSettings =
+          dynamicHeadings.mainhading.calibration_settings.filter(
+            (col) => col.checkbox === "yes",
+          );
+
+        const observationSettings =
+          dynamicHeadings?.observation_heading?.observation_settings || [];
+        const enabledObsSettings = observationSettings.filter(
+          (obs) => obs.checkbox === "yes",
+        );
+
+        let currentCol = 1; // Start from 1 (0 is SR NO)
+
+        // Find which field this column belongs to
+        for (const setting of calibrationSettings) {
+          const fieldname = setting.fieldname;
+
+          // Check if this is a UUC observation column
+          if (observationFrom === "uuc" && fieldname === "uuc") {
+            const uucStartCol = currentCol;
+            const uucEndCol = currentCol + enabledObsSettings.length - 1;
+
+            // If current column is within UUC observation range
+            if (colIndex >= uucStartCol && colIndex <= uucEndCol) {
+              const calibPointId =
+                observationRows.hiddenInputs?.calibrationPoints?.[rowIndex];
+              const leastCount = leastCountData[calibPointId];
+
+              if (leastCount && value.trim()) {
+                const numValue = parseFloat(value);
+
+                // Clear previous error
+                setObservationErrors((prevErrors) => {
+                  const newErrors = { ...prevErrors };
+                  delete newErrors[key];
+                  return newErrors;
+                });
+
+                // Validate and set error if needed
+                if (numValue < leastCount) {
+                  setObservationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    [key]: `Please enter a value with in leastcount ${leastCount}`,
+                  }));
+                } else if (numValue % leastCount !== 0) {
+                  setObservationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    [key]: `Please Enter Value divisible by ${leastCount}`,
+                  }));
+                }
+              }
+            }
+            currentCol += enabledObsSettings.length;
+          } else if (observationFrom === "master" && fieldname === "master") {
+            currentCol += enabledObsSettings.length;
+          } else if (observationFrom === "separate") {
+            if (fieldname === "master" || fieldname === "uuc") {
+              const obsStartCol = currentCol;
+              const obsEndCol = currentCol + enabledObsSettings.length - 1;
+
+              // Check if editing this specific field's observations
+              if (colIndex >= obsStartCol && colIndex <= obsEndCol) {
+                const calibPointId =
+                  observationRows.hiddenInputs?.calibrationPoints?.[rowIndex];
+                const leastCount = leastCountData[calibPointId];
+
+                if (leastCount && value.trim()) {
+                  const numValue = parseFloat(value);
+
+                  setObservationErrors((prevErrors) => {
+                    const newErrors = { ...prevErrors };
+                    delete newErrors[key];
+                    return newErrors;
+                  });
+
+                  if (numValue < leastCount) {
+                    setObservationErrors((prevErrors) => ({
+                      ...prevErrors,
+                      [key]: `Please enter a value with in leastcount ${leastCount}`,
+                    }));
+                  } else if (numValue % leastCount !== 0) {
+                    setObservationErrors((prevErrors) => ({
+                      ...prevErrors,
+                      [key]: `Please Enter Value divisible by ${leastCount}`,
+                    }));
+                  }
+                }
+              }
+              currentCol += enabledObsSettings.length;
+            } else {
+              currentCol++;
+            }
+          } else {
+            currentCol++;
+          }
+        }
+      }
+      // ✅ VALIDATION BLOCK ENDS HERE
 
       // Get current row data
       const rowData = observationRows.rows[rowIndex].map((cell, idx) => {
@@ -876,7 +984,6 @@ const CalibrateStep3 = () => {
     });
   };
 
-  
   // ✅ Handle blur to save observations - Supports all 3 observation_from modes
   const handleObservationBlur = async (rowIndex, colIndex, value) => {
     const token = localStorage.getItem("authToken");
@@ -1123,9 +1230,139 @@ const CalibrateStep3 = () => {
       [name]: value,
     }));
   };
+  // Add this function BEFORE handleSubmit (around line 1150)
+  // Around line 1150 - REPLACE the validateObservationFields function
+  const validateObservationFields = () => {
+    let newErrors = {};
+
+    if (!observationRows.rows || observationRows.rows.length === 0) {
+      return true;
+    }
+
+    const observationFrom = dynamicHeadings?.observation_from || "master";
+    const calibrationSettings =
+      dynamicHeadings?.mainhading?.calibration_settings?.filter(
+        (col) => col.checkbox === "yes",
+      ) || [];
+
+    const obsSettings =
+      dynamicHeadings?.observation_heading?.observation_settings?.filter(
+        (obs) => obs.checkbox === "yes",
+      ) || [];
+
+    observationRows.rows.forEach((row, rowIndex) => {
+      let currentCol = 1;
+
+      calibrationSettings.forEach((setting) => {
+        const fieldname = setting.fieldname;
+
+        // ✅ Check UUC observations with LEAST COUNT validation
+        if (observationFrom === "uuc" && fieldname === "uuc") {
+          const calibPointId =
+            observationRows.hiddenInputs?.calibrationPoints?.[rowIndex];
+          const leastCount = leastCountData[calibPointId];
+
+          for (let i = 0; i < obsSettings.length; i++) {
+            const colIndex = currentCol + i;
+            const key = `${rowIndex}-${colIndex}`;
+            const value =
+              tableInputValues[key] ?? (row[colIndex]?.toString() || "");
+
+            // ✅ FIRST: Check if field is required (not empty)
+            if (!value.trim()) {
+              newErrors[key] = "This field is required";
+            }
+            // ✅ SECOND: If value exists, check least count validation
+            else if (leastCount) {
+              const numValue = parseFloat(value);
+              if (isNaN(numValue)) {
+                newErrors[key] = "Please enter a valid number";
+              } else if (numValue < leastCount) {
+                newErrors[key] =
+                  `Please enter a value with in leastcount ${leastCount}`;
+              } else if (numValue % leastCount !== 0) {
+                newErrors[key] =
+                  `Please Enter Value divisible by ${leastCount}`;
+              }
+            }
+          }
+          currentCol += obsSettings.length;
+        }
+        // ✅ Check Master observations (required validation only)
+        else if (observationFrom === "master" && fieldname === "master") {
+          for (let i = 0; i < obsSettings.length; i++) {
+            const colIndex = currentCol + i;
+            const key = `${rowIndex}-${colIndex}`;
+            const value =
+              tableInputValues[key] ?? (row[colIndex]?.toString() || "");
+
+            if (!value.trim()) {
+              newErrors[key] = "This field is required";
+            }
+          }
+          currentCol += obsSettings.length;
+        }
+        // ✅ Check Separate mode (both UUC and Master)
+        else if (
+          observationFrom === "separate" &&
+          (fieldname === "uuc" || fieldname === "master")
+        ) {
+          for (let i = 0; i < obsSettings.length; i++) {
+            const colIndex = currentCol + i;
+            const key = `${rowIndex}-${colIndex}`;
+            const value =
+              tableInputValues[key] ?? (row[colIndex]?.toString() || "");
+
+            // Check if empty first
+            if (!value.trim()) {
+              newErrors[key] = "This field is required";
+            }
+            // If UUC and has value, check least count
+            else if (fieldname === "uuc") {
+              const calibPointId =
+                observationRows.hiddenInputs?.calibrationPoints?.[rowIndex];
+              const leastCount = leastCountData[calibPointId];
+
+              if (leastCount) {
+                const numValue = parseFloat(value);
+                if (isNaN(numValue)) {
+                  newErrors[key] = "Please enter a valid number";
+                } else if (numValue < leastCount) {
+                  newErrors[key] =
+                    `Please enter a value with in leastcount ${leastCount}`;
+                } else if (numValue % leastCount !== 0) {
+                  newErrors[key] =
+                    `Please Enter Value divisible by ${leastCount}`;
+                }
+              }
+            }
+          }
+          currentCol += obsSettings.length;
+        } else {
+          currentCol++;
+        }
+      });
+    });
+
+    setObservationErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // ✅ ADD VALIDATION CHECK HERE
+    if (!validateObservationFields()) {
+      toast.error(
+        "Please fill all required observation fields before submitting.",
+      );
+      // Scroll to first error
+      const firstErrorKey = Object.keys(observationErrors)[0];
+      if (firstErrorKey) {
+        const [rowIndex, colIndex] = firstErrorKey.split("-");
+        console.error("❌ First validation error at:", { rowIndex, colIndex });
+      }
+      return; // Stop submission
+    }
 
     const token = localStorage.getItem("authToken");
     const calibrationPoints = [];

@@ -36,6 +36,17 @@ export default function ViewInwardEntrySrf() {
       hysterisis: 2,
       coveragefactor: 2,
       dof: 2,
+      // ✅ Add observation fields with 3 decimal places
+      uuc1: 3,
+      uuc2: 3,
+      uuc3: 3,
+      uuc4: 3,
+      uuc5: 3,
+      uuc6: 3,
+      uuc7: 3,
+      uuc8: 3,
+      uuc9: 3,
+      uuc10: 3,
     };
 
     const decimals = decimalMap[key] || 2;
@@ -59,10 +70,10 @@ export default function ViewInwardEntrySrf() {
           const calibrationPoints = response.data.data?.calibration_points || [];
 
           if (calibrationPoints.length > 0) {
-            const keys = Object.keys(
-              calibrationPoints[0].uncertainty_calculations
-            );
-
+            const firstPoint = calibrationPoints[0];
+            
+            // ✅ Get uncertainty calculation keys
+            const keys = Object.keys(firstPoint.uncertainty_calculations || {});
             setFieldKeys(keys);
 
             // ✅ FIX: DOF auto-insert if missing
@@ -78,6 +89,8 @@ export default function ViewInwardEntrySrf() {
             id: point.id,
             uncertaintyCalculations: point.uncertainty_calculations || {},
           }));
+
+          console.log('📊 Mapped Data:', mappedData);
 
           setData(mappedData);
         } else {
@@ -110,51 +123,138 @@ export default function ViewInwardEntrySrf() {
     setTimeout(() => window.print(), 1000);
   };
 
-  // ✅ Render Table (INDEX MAPPING)
-  const renderMgTable = () => (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-max border-collapse text-[12px] text-gray-700">
-        <thead>
-          <tr className="bg-gray-200 text-center text-xs font-medium">
-            <th rowSpan="2" className="border border-gray-300 px-2 py-2">
-              Sr no
-            </th>
-            {headings.map((heading, index) => (
-              <th
-                key={`heading-${index}`}
-                rowSpan="2"
-                className="border border-gray-300 px-2 py-2 capitalize"
-              >
-                {heading}
+  // ✅ NEW: Get UUC observation value from uncertainty_calculations
+  const getUucObservationValue = (row, obsIndex) => {
+    // ✅ Observation values are in uncertainty_calculations as uuc1, uuc2, etc.
+    const uucKey = `uuc${obsIndex + 1}`;
+    const value = row.uncertaintyCalculations[uucKey];
+    
+    console.log(`🔍 Row ${row.srNo}, Obs ${obsIndex + 1}:`, {
+      uucKey,
+      value,
+      uncertaintyCalculations: row.uncertaintyCalculations
+    });
+    
+    return formatValue(value, uucKey);
+  };
+
+  // ✅ Render Table (WITH UUC OBSERVATIONS) - FIXED VERSION
+  const renderMgTable = () => {
+    // ✅ Detect observation columns pattern
+    const observationPattern = /^observation\d+$/i;
+    const observationIndices = [];
+    let firstObsIndex = -1;
+    
+    headings.forEach((heading, idx) => {
+      if (observationPattern.test(heading)) {
+        if (firstObsIndex === -1) firstObsIndex = idx;
+        observationIndices.push(idx);
+      }
+    });
+
+    const hasObservationColumns = observationIndices.length > 0;
+
+    console.log('🔍 Observation detection:', {
+      hasObservationColumns,
+      observationIndices,
+      firstObsIndex,
+      headings
+    });
+
+    return (
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-max border-collapse text-[12px] text-gray-700">
+          <thead>
+            <tr className="bg-gray-200 text-center text-xs font-medium">
+              <th rowSpan="2" className="border border-gray-300 px-2 py-2">
+                Sr no
               </th>
-            ))}
-          </tr>
-        </thead>
-
-        <tbody>
-          {data.map((row, rowIndex) => (
-            <tr key={rowIndex} className="text-center hover:bg-gray-50">
-              <td className="border border-gray-300 px-2 py-2">{row.srNo}</td>
-
-              {headings.map((heading, colIndex) => {
-                const fieldKey = fieldKeys[colIndex];
-                const value = row.uncertaintyCalculations[fieldKey];
-
+              {headings.map((heading, index) => {
+                // ✅ Skip individual observation columns (they'll be merged)
+                if (hasObservationColumns && index > firstObsIndex && observationIndices.includes(index)) {
+                  return null;
+                }
+                
+                // ✅ First observation column - merge all
+                if (hasObservationColumns && index === firstObsIndex) {
+                  return (
+                    <th
+                      key={`heading-${index}`}
+                      colSpan={observationIndices.length}
+                      className="border border-gray-300 px-2 py-2 capitalize"
+                    >
+                      Observation on UUC
+                    </th>
+                  );
+                }
+                
+                // ✅ Regular column
                 return (
-                  <td
-                    key={`${rowIndex}-${colIndex}`}
-                    className="border border-gray-300 px-2 py-2"
+                  <th
+                    key={`heading-${index}`}
+                    rowSpan="2"
+                    className="border border-gray-300 px-2 py-2 capitalize"
                   >
-                    {formatValue(value, fieldKey)}
-                  </td>
+                    {heading}
+                  </th>
                 );
               })}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+            <tr className="bg-gray-200 text-center text-xs font-medium">
+              {/* ✅ Add sub-headers for merged observations */}
+              {hasObservationColumns && observationIndices.map((_, obsIdx) => (
+                <th
+                  key={`obs-subheader-${obsIdx}`}
+                  className="border border-gray-300 px-2 py-1"
+                >
+                  Observation {obsIdx + 1}
+                </th>
+              ))}
+            </tr>
+          </thead>
+
+          <tbody>
+            {data.map((row, rowIndex) => (
+              <tr key={rowIndex} className="text-center hover:bg-gray-50">
+                <td className="border border-gray-300 px-2 py-2">{row.srNo}</td>
+
+                {headings.map((heading, colIndex) => {
+                  // ✅ Skip individual observation columns (they'll be merged)
+                  if (hasObservationColumns && colIndex > firstObsIndex && observationIndices.includes(colIndex)) {
+                    return null;
+                  }
+
+                  // ✅ First observation column - show all UUC values
+                  if (hasObservationColumns && colIndex === firstObsIndex) {
+                    return observationIndices.map((_, obsIdx) => (
+                      <td
+                        key={`${rowIndex}-obs-${obsIdx}`}
+                        className="border border-gray-300 px-2 py-2"
+                      >
+                        {getUucObservationValue(row, obsIdx)}
+                      </td>
+                    ));
+                  }
+
+                  // ✅ Regular column
+                  const fieldKey = fieldKeys[colIndex];
+                  const value = row.uncertaintyCalculations[fieldKey];
+                  return (
+                    <td
+                      key={`${rowIndex}-${colIndex}`}
+                      className="border border-gray-300 px-2 py-2"
+                    >
+                      {formatValue(value, fieldKey)}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
 
   if (loading) {
     return (
