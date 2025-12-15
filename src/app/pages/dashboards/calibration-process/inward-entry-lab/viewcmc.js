@@ -1,8 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import axios from "utils/axios";
 import { toast } from "sonner";
 import { Button } from "components/ui";
+
+
+
+
 
 export default function ViewInwardEntrySrf() {
   const { id: inwardId, itemId: instId } = useParams();
@@ -16,143 +20,13 @@ export default function ViewInwardEntrySrf() {
   const [fieldKeys, setFieldKeys] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Manual formula definitions when API doesn't provide uncertainty_settings
-  const MANUAL_FORMULAS = [
-    {
-      variable: "dof3",
-      formula: "pow($combined, 2)",
-      field_position: 28
-    },
-    {
-      variable: "dofcombined", 
-      formula: "sqrt($combined)",
-      field_position: 29
-    }
-  ];
-
-  // ✅ IMPROVED: Formula Evaluation Function
-  const evaluateFormula = useCallback((formula, variables) => {
-    if (!formula || !formula.trim()) return "";
-
-    try {
-      let expr = formula.trim();
-
-      console.log("🧮 Evaluating formula:", formula);
-
-      // Step 1: Remove $ signs
-      expr = expr.replace(/\$/g, "");
-
-      // Step 2: Create clean numeric variables
-      const cleanVariables = {};
-      Object.keys(variables).forEach((key) => {
-        const cleanKey = key.replace(/\$/g, "");
-        const value = variables[key];
-        cleanVariables[cleanKey] = typeof value === 'number' ? value : (parseFloat(value) || 0);
-      });
-
-      // Step 3: Convert math functions
-      expr = expr.replace(/\bpow\(([^,]+),\s*([^)]+)\)/g, "Math.pow($1, $2)");
-      expr = expr.replace(/\bsqrt\(([^)]+)\)/g, "Math.sqrt($1)");
-      expr = expr.replace(/\babs\(([^)]+)\)/g, "Math.abs($1)");
-      expr = expr.replace(/\bmin\(([^)]+)\)/g, "Math.min($1)");
-      expr = expr.replace(/\bmax\(([^)]+)\)/g, "Math.max($1)");
-
-      // Step 4: Replace variables (longest first)
-      const sortedKeys = Object.keys(cleanVariables).sort((a, b) => b.length - a.length);
-      
-      for (const key of sortedKeys) {
-        const value = cleanVariables[key];
-        if (typeof value === 'number' && !isNaN(value)) {
-          const regex = new RegExp(`\\b${key}\\b`, "g");
-          expr = expr.replace(regex, `(${value})`);
-        }
-      }
-
-      console.log("📝 Final expression:", expr);
-
-      // Step 5: Evaluate safely
-      const result = new Function(`
-        'use strict';
-        return ${expr};
-      `)();
-
-      if (isNaN(result) || result === Infinity || result === -Infinity) {
-        console.warn("⚠️ Invalid result:", result);
-        return "";
-      }
-
-      const finalValue = parseFloat(result.toFixed(6));
-      console.log("✅ Result:", finalValue);
-
-      return finalValue;
-    } catch (err) {
-      console.error("❌ Formula evaluation failed:", err.message);
-      return "";
-    }
-  }, []);
-
-  // ✅ Apply manual formulas to recalculate missing fields
-  const applyManualFormulas = useCallback((calibrationPoints) => {
-    console.log("🔧 Applying manual formulas (pow, sqrt)...");
-
-    return calibrationPoints.map((point, index) => {
-      console.log(`\n📍 Point ${index + 1} (ID: ${point.id})`);
-      
-      const variables = { ...point.uncertainty_calculations };
-      
-      // Convert all to numbers
-      Object.keys(variables).forEach(key => {
-        const value = variables[key];
-        if (typeof value === 'string') {
-          variables[key] = parseFloat(value) || 0;
-        }
-      });
-
-      console.log("🔢 Initial variables:", {
-        combined: variables.combined,
-        dof3: variables.dof3,
-        dofcombined: variables.dofcombined
-      });
-
-      // Apply each manual formula
-      MANUAL_FORMULAS.forEach(({ variable, formula }) => {
-        console.log(`\n🧮 Calculating ${variable}...`);
-        console.log(`   Formula: ${formula}`);
-        
-        const result = evaluateFormula(formula, variables);
-        
-        if (result !== "" && !isNaN(result)) {
-          variables[variable] = result;
-          console.log(`✅ ${variable} = ${result}`);
-        } else {
-          console.warn(`⚠️ Failed to calculate ${variable}`);
-        }
-      });
-
-      console.log("🎯 Final values:", {
-        combined: variables.combined,
-        dof3: variables.dof3,
-        dofcombined: variables.dofcombined
-      });
-
-      return {
-        ...point,
-        uncertainty_calculations: variables
-      };
-    });
-  }, [evaluateFormula]);
-
   // ✅ Formatting Function
   const formatValue = (value, key) => {
     if (value === null || value === undefined) return "-";
 
     if (key === "dof" && (value === 0 || value === "0")) return "0";
 
-    if (typeof value !== "number") {
-      const parsed = parseFloat(value);
-      if (isNaN(parsed)) return value;
-      value = parsed;
-    }
+    if (typeof value !== "number") return value;
 
     const decimalMap = {
       maxzeroerror: 4,
@@ -166,25 +40,17 @@ export default function ViewInwardEntrySrf() {
       hysterisis: 2,
       coveragefactor: 2,
       dof: 2,
-      average: 4,
-      master: 5,
-      combined: 4,
-      std: 6,
-      typea: 6,
-      accu: 4,
-      masteruncertinity: 6,
-      leastcount: 4,
-      combined2: 4,
-      dof2: 2,
-      dof3: 6,
-      k: 2,
-      expandedmu: 6,
-      expendeduncertinity: 6,
-      cmscope: 6,
-      cmctaken: 6,
-      dofcombined: 6,
-      uuc1: 3, uuc2: 3, uuc3: 3, uuc4: 3, uuc5: 3,
-      uuc6: 3, uuc7: 3, uuc8: 3, uuc9: 3, uuc10: 3,
+      // ✅ Add observation fields with 3 decimal places
+      uuc1: 3,
+      uuc2: 3,
+      uuc3: 3,
+      uuc4: 3,
+      uuc5: 3,
+      uuc6: 3,
+      uuc7: 3,
+      uuc8: 3,
+      uuc9: 3,
+      uuc10: 3,
     };
 
     const decimals = decimalMap[key] || 2;
@@ -203,24 +69,18 @@ export default function ViewInwardEntrySrf() {
           }
         );
 
-        console.log('📥 Full API Response:', response.data);
-
         if (response.data?.status === true) {
           let apiHeadings = response.data.data?.heading || [];
-          let calibrationPoints = response.data.data?.calibration_points || [];
-
-          console.log('📋 Original Calibration Points:', calibrationPoints);
-
-          // ✅ Apply manual formulas for pow() and sqrt()
-          calibrationPoints = applyManualFormulas(calibrationPoints);
-          console.log('🎯 After manual formula application:', calibrationPoints);
+          const calibrationPoints = response.data.data?.calibration_points || [];
 
           if (calibrationPoints.length > 0) {
             const firstPoint = calibrationPoints[0];
             
+            // ✅ Get uncertainty calculation keys
             const keys = Object.keys(firstPoint.uncertainty_calculations || {});
             setFieldKeys(keys);
 
+            // ✅ FIX: DOF auto-insert if missing
             if (apiHeadings.length === keys.length - 1) {
               apiHeadings.splice(12, 0, "DOF");
             }
@@ -234,7 +94,8 @@ export default function ViewInwardEntrySrf() {
             uncertaintyCalculations: point.uncertainty_calculations || {},
           }));
 
-          console.log('📊 Final Mapped Data:', mappedData);
+          console.log('📊 Mapped Data:', mappedData);
+
           setData(mappedData);
         } else {
           toast.error("No data found");
@@ -248,7 +109,7 @@ export default function ViewInwardEntrySrf() {
     };
 
     fetchUncertainty();
-  }, [inwardId, instId, applyManualFormulas]);
+  }, [inwardId, instId]);
 
   const handleBackToPerformCalibration = () => {
     navigate(
@@ -266,14 +127,24 @@ export default function ViewInwardEntrySrf() {
     setTimeout(() => window.print(), 1000);
   };
 
+  // ✅ NEW: Get UUC observation value from uncertainty_calculations
   const getUucObservationValue = (row, obsIndex) => {
+    // ✅ Observation values are in uncertainty_calculations as uuc1, uuc2, etc.
     const uucKey = `uuc${obsIndex + 1}`;
     const value = row.uncertaintyCalculations[uucKey];
+    
+    console.log(`🔍 Row ${row.srNo}, Obs ${obsIndex + 1}:`, {
+      uucKey,
+      value,
+      uncertaintyCalculations: row.uncertaintyCalculations
+    });
     
     return formatValue(value, uucKey);
   };
 
+  // ✅ Render Table (WITH UUC OBSERVATIONS) - FIXED VERSION
   const renderMgTable = () => {
+    // ✅ Detect observation columns pattern
     const observationPattern = /^observation\d+$/i;
     const observationIndices = [];
     let firstObsIndex = -1;
@@ -287,6 +158,13 @@ export default function ViewInwardEntrySrf() {
 
     const hasObservationColumns = observationIndices.length > 0;
 
+    console.log('🔍 Observation detection:', {
+      hasObservationColumns,
+      observationIndices,
+      firstObsIndex,
+      headings
+    });
+
     return (
       <div className="overflow-x-auto">
         <table className="w-full min-w-max border-collapse text-[12px] text-gray-700">
@@ -296,10 +174,12 @@ export default function ViewInwardEntrySrf() {
                 Sr no
               </th>
               {headings.map((heading, index) => {
+                // ✅ Skip individual observation columns (they'll be merged)
                 if (hasObservationColumns && index > firstObsIndex && observationIndices.includes(index)) {
                   return null;
                 }
                 
+                // ✅ First observation column - merge all
                 if (hasObservationColumns && index === firstObsIndex) {
                   return (
                     <th
@@ -312,6 +192,7 @@ export default function ViewInwardEntrySrf() {
                   );
                 }
                 
+                // ✅ Regular column
                 return (
                   <th
                     key={`heading-${index}`}
@@ -324,6 +205,7 @@ export default function ViewInwardEntrySrf() {
               })}
             </tr>
             <tr className="bg-gray-200 text-center text-xs font-medium">
+              {/* ✅ Add sub-headers for merged observations */}
               {hasObservationColumns && observationIndices.map((_, obsIdx) => (
                 <th
                   key={`obs-subheader-${obsIdx}`}
@@ -341,10 +223,12 @@ export default function ViewInwardEntrySrf() {
                 <td className="border border-gray-300 px-2 py-2">{row.srNo}</td>
 
                 {headings.map((heading, colIndex) => {
+                  // ✅ Skip individual observation columns (they'll be merged)
                   if (hasObservationColumns && colIndex > firstObsIndex && observationIndices.includes(colIndex)) {
                     return null;
                   }
 
+                  // ✅ First observation column - show all UUC values
                   if (hasObservationColumns && colIndex === firstObsIndex) {
                     return observationIndices.map((_, obsIdx) => (
                       <td
@@ -356,6 +240,7 @@ export default function ViewInwardEntrySrf() {
                     ));
                   }
 
+                  // ✅ Regular column
                   const fieldKey = fieldKeys[colIndex];
                   const value = row.uncertaintyCalculations[fieldKey];
                   return (

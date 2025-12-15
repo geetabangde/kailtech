@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router';
-import axios from 'axios';
+// import axios from 'axios';
+import axios from "utils/axios"
 import Select from 'react-select';
 import { Page } from "components/shared/Page";
 import { Button } from "components/ui";
@@ -184,7 +185,7 @@ const Calibratestep2 = () => {
     // Fetch matrix data for a specific point
     const fetchMatrixForPoint = async (cpid, validityid) => {
         try {
-            const res = await axios.get('https://lims.kailtech.in/api/calibrationprocess/getscope-matrix-data', {
+            const res = await axios.get('calibrationprocess/getscope-matrix-data', {
                 params: { validityid, cpid }
             });
             if (res.data.success) {
@@ -208,7 +209,7 @@ const Calibratestep2 = () => {
                 setLoading(true);
                 setError(null);
 
-                const response = await axios.get('https://lims.kailtech.in/api/calibrationprocess/get-calibration-details-step2', {
+                const response = await axios.get('/calibrationprocess/get-calibration-details-step2', {
                     params: {
                         inward_id: id,
                         instid: itemId,
@@ -663,7 +664,7 @@ const Calibratestep2 = () => {
             console.log('Final Submission Data:', submissionData);
 
             // Submit to API
-            const response = await axios.post('https://lims.kailtech.in/api/calibrationprocess/add-step2-data', submissionData);
+            const response = await axios.post('/calibrationprocess/add-step2-data', submissionData);
 
             if (response.data.status === "true" || response.data.success === true) {
                 // Define step2Data here, before using it
