@@ -4,12 +4,7 @@ import {
   SelectCell,
   SelectHeader,
 } from "components/shared/table/SelectCheckbox";
-import {
-  OrderIdCell,
-  CustomerCell,
-  DateCell,
-  TotalCell,
-} from "./rows";
+import { DateCell } from "./rows";
 
 const columnHelper = createColumnHelper();
 
@@ -28,82 +23,80 @@ export const columns = [
     cell: (info) => info.row.index + 1,
   }),
 
-  // ✅ Name (Instrument Name)
-  columnHelper.accessor((row) => row.customer.name, {
-    id: "customer",
-    label: "Customer",
+  // ✅ Name (Instrument Name) - FIXED
+  columnHelper.accessor("name", {
+    id: "name",
+    label: "Name",
     header: "Name",
-    cell: CustomerCell,
+    cell: (info) => info.getValue() || "-",
   }),
 
-  // ✅ Id No (Instrument ID)
-  columnHelper.accessor((row) => row.order_id, {
-    id: "order_id",
-    label: "Order ID",
+  // ✅ Id No (Instrument ID) - FIXED
+  columnHelper.accessor("idno", {
+    id: "idno",
+    label: "Id No",
     header: "Id No",
-    cell: OrderIdCell,
+    cell: (info) => info.getValue() || "-",
   }),
 
-  // ✅ New Id No
-  columnHelper.accessor((row) => row.new_id_no, {
-    id: "new_id_no",
+  // ✅ New Id No - FIXED
+  columnHelper.accessor("newidno", {
+    id: "newidno",
     header: "New Id No",
     cell: (info) => info.getValue() || "-",
   }),
 
-  // ✅ Serial No
-  columnHelper.accessor((row) => row.serial_no, {
-    id: "serial_no",
+  // ✅ Serial No - FIXED
+  columnHelper.accessor("serialno", {
+    id: "serialno",
     header: "Serial No",
     cell: (info) => info.getValue() || "-",
   }),
 
-  // ✅ Available Quantity
-  columnHelper.accessor((row) => row.total, {
-    id: "total",
-    label: "Total",
+  // ✅ Available Quantity - FIXED
+  columnHelper.accessor("qty", {
+    id: "qty",
+    label: "Quantity",
     header: "Available Quantity",
-    // filterFn: "inNumberRange",
-    // filter: "numberRange",
-    cell: TotalCell,
+    cell: (info) => info.getValue() || "0",
   }),
 
   // ✅ Category
-  columnHelper.accessor((row) => row.category, {
+  columnHelper.accessor("category", {
     id: "category",
     header: "Category",
     cell: (info) => info.getValue() || "-",
   }),
 
-  // ✅ Location
-  columnHelper.accessor((row) => row.location, {
+  // ✅ Location - FIXED
+  columnHelper.accessor("instrumentlocation", {
     id: "location",
     header: "Location",
     cell: (info) => info.getValue() || "-",
   }),
 
   // ✅ Make
-  columnHelper.accessor((row) => row.make, {
+  columnHelper.accessor("make", {
     id: "make",
     header: "Make",
     cell: (info) => info.getValue() || "-",
   }),
 
   // ✅ Model
-  columnHelper.accessor((row) => row.model, {
+  columnHelper.accessor("model", {
     id: "model",
     header: "Model",
     cell: (info) => info.getValue() || "-",
   }),
 
-  // ✅ Purchase Date
-  columnHelper.accessor((row) => Number(row.created_at), {
-    id: "created_at",
-    label: "Order Date",
+  // ✅ Purchase Date - FIXED
+  columnHelper.accessor("purchasedate", {
+    id: "purchasedate",
+    label: "Purchase Date",
     header: "Purchase Date",
     cell: DateCell,
-    filter: "dateRange",
-    filterFn: "inNumberRange",
+    // filter: "dateRange",
+    // filterFn: "inNumberRange",
   }),
 
   // ✅ Action

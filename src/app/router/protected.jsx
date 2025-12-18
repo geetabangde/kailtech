@@ -47,6 +47,7 @@ const protectedRoutes = {
                   children: [
                     {
                       path: "",
+
                       lazy: async () => ({
                         Component: (
                           await import(

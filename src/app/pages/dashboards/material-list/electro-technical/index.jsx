@@ -11,8 +11,9 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import clsx from "clsx";
-import { Fragment, useRef, useState } from "react";
-
+import { Fragment, useRef, useState, useEffect } from "react"; 
+import axios from "utils/axios"; 
+import { useLocation } from "react-router"; 
 
 // Local Imports
 import { TableSortIcon } from "components/shared/table/TableSortIcon";
@@ -30,12 +31,10 @@ import { useSkipper } from "utils/react-table/useSkipper";
 import { SelectedRowsActions } from "./SelectedRowsActions";
 import { SubRowComponent } from "./SubRowComponent";
 import { columns } from "./columns";
-import { ordersList } from "./data";
 import { Toolbar } from "./Toolbar";
 import { useThemeContext } from "app/contexts/theme/context";
 import { getUserAgentBrowser } from "utils/dom/getUserAgentBrowser";
 import { useNavigate } from "react-router";
-
 
 // ----------------------------------------------------------------------
 
@@ -44,11 +43,13 @@ const isSafari = getUserAgentBrowser() === "Safari";
 export default function OrdersDatatableV2() {
   const { cardSkin } = useThemeContext();
   const navigate = useNavigate();
-
+  const location = useLocation();
 
   const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper();
 
-  const [orders, setOrders] = useState([...ordersList]);
+  // ✅ Changed: Now orders state will be populated from API
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true); // ✅ Added loading state
 
   const [tableSettings, setTableSettings] = useState({
     enableSorting: true,
@@ -58,8 +59,13 @@ export default function OrdersDatatableV2() {
   });
 
   const [globalFilter, setGlobalFilter] = useState("");
-
   const [sorting, setSorting] = useState([]);
+  
+  // ✅ Added pagination state for dynamic page size
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
   const [columnVisibility, setColumnVisibility] = useLocalStorage(
     "column-visibility-orders-2",
@@ -72,8 +78,43 @@ export default function OrdersDatatableV2() {
   );
 
   const cardRef = useRef();
-
   const { width: cardWidth } = useBoxSize({ ref: cardRef });
+
+  // ✅ Fetch instruments when query params change
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const labs_id = params.get("labid") || ""; // ✅ Get labid from URL params
+
+    if (labs_id) {
+      fetchInstruments(labs_id); // ✅ Fetch data based on lab ID
+    } else {
+      setLoading(false); // If no labid, stop loading
+      setOrders([]);
+    }
+  }, [location.search]);
+
+  // ✅ API call function
+  const fetchInstruments = async (labs_id) => {
+    try {
+      setLoading(true);
+
+      const response = await axios.get(
+        `/material/mm-instrument-list?labs_id=${labs_id}`  
+      );
+
+      if (Array.isArray(response.data.data)) {
+        setOrders(response.data.data);
+      } else {
+        console.warn("Unexpected response structure:", response.data);
+        setOrders([]);
+      }
+    } catch (err) {
+      console.error("Error fetching instrument list:", err);
+      setOrders([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const table = useReactTable({
     data: orders,
@@ -84,21 +125,20 @@ export default function OrdersDatatableV2() {
       columnVisibility,
       columnPinning,
       tableSettings,
+      pagination, // ✅ Added pagination state
     },
     meta: {
       setTableSettings,
       deleteRow: (row) => {
-        // Skip page index reset until after next rerender
         skipAutoResetPageIndex();
         setOrders((old) =>
-          old.filter((oldRow) => oldRow.order_id !== row.original.order_id),
+          old.filter((oldRow) => oldRow.id !== row.original.id),
         );
       },
       deleteRows: (rows) => {
-        // Skip page index reset until after next rerender
         skipAutoResetPageIndex();
-        const rowIds = rows.map((row) => row.original.order_id);
-        setOrders((old) => old.filter((row) => !rowIds.includes(row.order_id)));
+        const rowIds = rows.map((row) => row.original.id);
+        setOrders((old) => old.filter((row) => !rowIds.includes(row.id)));
       },
     },
 
@@ -120,6 +160,7 @@ export default function OrdersDatatableV2() {
     getRowCanExpand: () => true,
 
     getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination, // ✅ Added pagination handler
     onColumnVisibilityChange: setColumnVisibility,
     onColumnPinningChange: setColumnPinning,
 
@@ -130,66 +171,80 @@ export default function OrdersDatatableV2() {
 
   useLockScrollbar(tableSettings.enableFullScreen);
 
+  // ✅ Loading UI
+  if (loading) {
+    return (
+      <div className="flex h-[60vh] items-center justify-center text-gray-600">
+        <svg className="animate-spin h-6 w-6 mr-2 text-blue-600" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 000 8v4a8 8 0 01-8-8z"></path>
+        </svg>
+        Loading Instruments...
+      </div>
+    );
+  }
+
   return (
     <div className="transition-content grid grid-cols-1 grid-rows-[auto_auto_1fr] px-(--margin-x) py-4">
       <div className="flex items-center justify-between space-x-4 ">
         <div className="min-w-0">
           <h2 className="truncate text-xl font-medium tracking-wide text-gray-800 dark:text-dark-50">
-            MM instrument List
+            MM Instrument List
           </h2>
         </div>
         {/* Right Side Actions */}
-      <div className="flex flex-wrap items-center gap-3">
-      {/* ✅ Category Filter */}
-        <select
-          className="h-8 rounded-md border border-gray-300 bg-white px-3 text-sm shadow-sm dark:border-gray-700 dark:bg-dark-800 dark:text-white"
-          onChange={(e) => {
-            const value = e.target.value || undefined;
-            table.getColumn("category")?.setFilterValue(value);
-          }}
-        >
-          <option value="">All Categories</option>
-          {Array.from(table.getColumn("category")?.getFacetedUniqueValues()?.keys() || [])
-            .filter(Boolean)
-            .sort()
-            .map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-        </select>
+        <div className="flex flex-wrap items-center gap-3">
+          {/* ✅ Category Filter */}
+          <select
+            className="h-8 rounded-md border border-gray-300 bg-white px-3 text-sm shadow-sm dark:border-gray-700 dark:bg-dark-800 dark:text-white"
+            onChange={(e) => {
+              const value = e.target.value || undefined;
+              table.getColumn("category")?.setFilterValue(value);
+            }}
+          >
+            <option value="">All Categories</option>
+            {Array.from(table.getColumn("category")?.getFacetedUniqueValues()?.keys() || [])
+              .filter(Boolean)
+              .sort()
+              .map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+          </select>
 
-        {/* ✅ Department Filter (from `location` column) */}
-        <select
-          className="h-8 rounded-md border border-gray-300 bg-white px-3 text-sm shadow-sm dark:border-gray-700 dark:bg-dark-800 dark:text-white"
-          onChange={(e) => {
-            const value = e.target.value || undefined;
-            table.getColumn("location")?.setFilterValue(value);
-          }}
-        >
-          <option value="">All Departments</option>
-          {Array.from(table.getColumn("location")?.getFacetedUniqueValues()?.keys() || [])
-            .filter(Boolean)
-            .sort()
-            .map((dept) => (
-              <option key={dept} value={dept}>
-                {dept}
-              </option>
-            ))}
-        </select>
-        <Button
-          className="h-8 space-x-1.5 rounded-md px-3 text-xs "
-          color="primary" onClick={() =>
+          {/* ✅ Department Filter (from `location` column) */}
+          <select
+            className="h-8 rounded-md border border-gray-300 bg-white px-3 text-sm shadow-sm dark:border-gray-700 dark:bg-dark-800 dark:text-white"
+            onChange={(e) => {
+              const value = e.target.value || undefined;
+              table.getColumn("location")?.setFilterValue(value);
+            }}
+          >
+            <option value="">All Departments</option>
+            {Array.from(table.getColumn("location")?.getFacetedUniqueValues()?.keys() || [])
+              .filter(Boolean)
+              .sort()
+              .map((dept) => (
+                <option key={dept} value={dept}>
+                  {dept}
+                </option>
+              ))}
+          </select>
+          <Button
+            className="h-8 space-x-1.5 rounded-md px-3 text-xs "
+            color="primary"
+            onClick={() =>
               navigate(
                 "/dashboards/material-list/electro-technical/AddNewInstrument"
               )
-            }>
+            }
+          >
+            Add New Instrument
+          </Button>
+        </div>
+      </div>
 
-          Add New Instrument
-        </Button>
-      </div>
-      </div>
-      
       <div
         className={clsx(
           "flex flex-col pt-4",
@@ -271,7 +326,6 @@ export default function OrdersDatatableV2() {
                             "row-selected after:pointer-events-none after:absolute after:inset-0 after:z-2 after:h-full after:w-full after:border-3 after:border-transparent after:bg-primary-500/10 ltr:after:border-l-primary-500 rtl:after:border-r-primary-500",
                         )}
                       >
-                        {/* first row is a normal row */}
                         {row.getVisibleCells().map((cell) => {
                           return (
                             <Td
@@ -310,7 +364,6 @@ export default function OrdersDatatableV2() {
                       </Tr>
                       {row.getIsExpanded() && (
                         <tr>
-                          {/* 2nd row is a custom 1 cell row */}
                           <td
                             colSpan={row.getVisibleCells().length}
                             className="p-0"
@@ -326,7 +379,7 @@ export default function OrdersDatatableV2() {
             </Table>
           </div>
           <SelectedRowsActions table={table} />
-          {table.getCoreRowModel().rows.length && (
+          {table.getFilteredRowModel().rows.length > 0 && (
             <div
               className={clsx(
                 "px-4 pb-4 sm:px-5 sm:pt-4",
@@ -336,7 +389,41 @@ export default function OrdersDatatableV2() {
                 ) && "pt-4",
               )}
             >
-              <PaginationSection table={table} />
+              {/* ✅ Enhanced pagination with records info */}
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                  {/* Page size selector */}
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <span>Show</span>
+                    <select
+                      value={table.getState().pagination.pageSize}
+                      onChange={(e) => {
+                        table.setPageSize(Number(e.target.value));
+                      }}
+                      className="rounded border border-gray-300 bg-white px-2 py-1 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-dark-700 dark:text-white"
+                    >
+                      {[10, 25, 50, 100].map((pageSize) => (
+                        <option key={pageSize} value={pageSize}>
+                          {pageSize}
+                        </option>
+                      ))}
+                    </select>
+                    <span>entries</span>
+                  </div>
+                  
+                  {/* Records count */}
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{" "}
+                    {Math.min(
+                      (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
+                      table.getFilteredRowModel().rows.length
+                    )}{" "}
+                    of {table.getFilteredRowModel().rows.length} entries
+                  </div>
+                </div>
+                
+                <PaginationSection table={table} />
+              </div>
             </div>
           )}
         </Card>
