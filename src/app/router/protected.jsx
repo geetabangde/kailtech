@@ -33,13 +33,6 @@ const protectedRoutes = {
               }),
             },
             {
-              path: "reports",
-              lazy: async () => ({
-                Component: (await import("app/pages/dashboards/Reports"))
-                  .default,
-              }),
-            },
-            {
               path: "material-list",
               children: [
                 {
@@ -47,7 +40,6 @@ const protectedRoutes = {
                   children: [
                     {
                       path: "",
-
                       lazy: async () => ({
                         Component: (
                           await import(

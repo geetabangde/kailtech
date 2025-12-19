@@ -21,9 +21,7 @@ import { Fragment, useCallback, useState } from "react";
 import PropTypes from "prop-types";
 import { ConfirmModal } from "components/shared/ConfirmModal";
 import { Button } from "components/ui";
-//import axios from "axios";
-//import { toast } from "sonner";
-import { useNavigate} from "react-router";
+import { useNavigate } from "react-router";
 
 const confirmMessages = {
   pending: {
@@ -37,11 +35,13 @@ const confirmMessages = {
 
 export function RowActions({ row, table }) {
   const navigate = useNavigate();
-  //const location = useLocation();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [confirmDeleteLoading, setConfirmDeleteLoading] = useState(false);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
   const [deleteError] = useState(false);
+
+  // ✅ Get instrument ID from row
+  const instrumentId = row.original.id;
 
   const permissions =
     localStorage.getItem("userPermissions")?.split(",").map(Number) || [];
@@ -52,7 +52,6 @@ export function RowActions({ row, table }) {
 
   const openModal = () => {
     setDeleteModalOpen(true);
-    //setDeleteError(false);
     setDeleteSuccess(false);
   };
 
@@ -73,10 +72,10 @@ export function RowActions({ row, table }) {
     {
       label: "View Equipment History",
       icon: EyeIcon,
-      permission: 401, // Add appropriate permission number
+      permission: 401,
       onClick: () =>
         navigate(
-          `/dashboards/material-list/electro-technical/view-equipment-history/${row.original.id}`
+          `/dashboards/material-list/electro-technical/view-equipment-history/${instrumentId}`
         ),
     },
     
@@ -89,29 +88,30 @@ export function RowActions({ row, table }) {
             permission: 98,
             onClick: () =>
               navigate(
-                `/dashboards/material-list/electro-technical/Edit/${row.original.id}`
+                `/dashboards/material-list/electro-technical/Edit/${instrumentId}`
               ),
           },
         ]
       : []),
 
-       {
+    {
       label: "Edit",
       icon: PencilIcon,
-      permission: 402, // Add appropriate permission number
+      permission: 402,
       onClick: () =>
         navigate(
-                  `/dashboards/material-list/electro-technical/Edit/${row.original.id}`   
-     ),
+          `/dashboards/material-list/electro-technical/Edit/${instrumentId}`   
+        ),
     },
-    // Maintenance Equipment History
+
+    // ✅ Maintenance Equipment History - Pass fid parameter
     {
       label: "Maintenance Equipment History",
       icon: WrenchScrewdriverIcon,
-      permission: 402, // Add appropriate permission number
+      permission: 402,
       onClick: () =>
         navigate(
-                  "/dashboards/material-list/electro-technical/maintenance-equipment-history"  
+          `/dashboards/material-list/electro-technical/maintenance-equipment-history?fid=${instrumentId}`
         ),
     },
 
@@ -119,10 +119,10 @@ export function RowActions({ row, table }) {
     {
       label: "View Checklist",
       icon: ClipboardDocumentListIcon,
-      permission: 403, // Add appropriate permission number
+      permission: 403,
       onClick: () =>
         navigate(
-                  `/dashboards/material-list/electro-technical/view-checklist/${row.original.id}`   
+          `/dashboards/material-list/electro-technical/view-checklist/${instrumentId}`
         ),
     },
 
@@ -130,10 +130,10 @@ export function RowActions({ row, table }) {
     {
       label: "View Verification List",
       icon: ShieldCheckIcon,
-      permission: 404, // Add appropriate permission number
+      permission: 404,
       onClick: () =>
         navigate(
-          `/dashboards/material-list/electro-technical/view-verification-list/${row.original.id}`
+          `/dashboards/material-list/electro-technical/view-verification-list/${instrumentId}`
         ),
     },
 
@@ -141,10 +141,10 @@ export function RowActions({ row, table }) {
     {
       label: "Dump",
       icon: DocumentTextIcon,
-      permission: 405, // Add appropriate permission number
+      permission: 405,
       onClick: () =>
         navigate(
-          `/dashboards/material-list/electro-technical/dump/${row.original.id}`
+          `/dashboards/material-list/electro-technical/dump/${instrumentId}`
         ),
     },
 
@@ -152,25 +152,23 @@ export function RowActions({ row, table }) {
     {
       label: "Log Book",
       icon: BookOpenIcon,
-      permission: 406, // Add appropriate permission number
+      permission: 406,
       onClick: () =>
         navigate(
-          `/dashboards/material-list/electro-technical/log-book/${row.original.id}`
+          `/dashboards/material-list/electro-technical/log-book/${instrumentId}`
         ),
     },
 
-
-    // Delete - This will be at the bottom with different styling
+    // Delete
     {
       label: "Delete",
       icon: TrashIcon,
-      permission: 408, // Add appropriate permission number
+      permission: 408,
       onClick: openModal,
-      isDelete: true, // Special flag for delete styling
+      isDelete: true,
     },
   ];
 
-  // Filter actions based on permission (if defined)
   const filteredActions = actions.filter(
     (action) =>
       !action.permission || permissions.includes(action.permission)
@@ -242,4 +240,3 @@ RowActions.propTypes = {
   row: PropTypes.object,
   table: PropTypes.object,
 };
-

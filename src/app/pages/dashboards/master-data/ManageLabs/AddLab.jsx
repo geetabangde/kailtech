@@ -22,13 +22,15 @@ export default function AddLab() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [userOptions, setUserOptions] = useState([]);
+  const [masterOptions, setMasterOptions] = useState([]); // ✅ New state for masters
   const [verticalOptions, setVerticalOptions] = useState([]);
 
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
-        const [userRes, verticalRes] = await Promise.all([
+        const [userRes, masterRes, verticalRes] = await Promise.all([
           axios.get("/hrm/get-users-name"),
+          axios.get("/material/get-master-list"), 
           axios.get("/master/vertical-list")
         ]);
 
@@ -37,12 +39,18 @@ export default function AddLab() {
           value: u.id
         }));
 
+        const masterOptionsFormatted = (masterRes.data.data || []).map(m => ({
+          label: m.name,
+          value: m.id
+        }));
+
         const verticalOptionsFormatted = (verticalRes.data.data || []).map(v => ({
           label: v.name,
           value: v.id
         }));
 
         setUserOptions(userOptionsFormatted);
+        setMasterOptions(masterOptionsFormatted); // ✅ Set master options
         setVerticalOptions(verticalOptionsFormatted);
       } catch (error) {
         console.error("Failed to fetch data:", error);
@@ -146,21 +154,19 @@ export default function AddLab() {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              // removed required attribute
             />
             {errors.name && (
               <p className="text-red-500 text-sm mt-1">{errors.name}</p>
             )}
           </div>
 
-          {/* Existing multi-selects using ReactSelect (unchanged) */}
+          {/* Multi-selects for users using userOptions */}
           {[
             { name: "users", label: "Allotted Users" },
             { name: "qaapprove", label: "QA Approve" },
             { name: "ulrgenerate", label: "Generate ULR" },
             { name: "uploadreport", label: "Upload Report" },
-            { name: "envrecord", label: "Environmental Record" },
-            { name: "masters", label: "Allotted Master" }
+            { name: "envrecord", label: "Environmental Record" }
           ].map((field) => (
             <div key={field.name}>
               <label className="block text-sm font-medium text-gray-700 mb-1">{field.label}</label>
@@ -174,7 +180,19 @@ export default function AddLab() {
             </div>
           ))}
 
-          {/* ✅ Updated: Record Environmental Condition (ReactSelect) */}
+          {/* ✅ Allotted Master - Now using masterOptions */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Allotted Master</label>
+            <ReactSelect
+              isMulti
+              name="masters"
+              options={masterOptions}
+              value={masterOptions.filter(opt => formData.masters.includes(opt.value))}
+              onChange={(selected) => handleSelectChange(selected, "masters")}
+            />
+          </div>
+
+          {/* Record Environmental Condition */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Record Environmental Condition
@@ -201,7 +219,6 @@ export default function AddLab() {
               label="Vertical"
               data={verticalOptions}
               onChange={handleChange}
-              // removed required attribute
             />
             {errors.vertical && (
               <p className="text-red-500 text-sm mt-1">{errors.vertical}</p>

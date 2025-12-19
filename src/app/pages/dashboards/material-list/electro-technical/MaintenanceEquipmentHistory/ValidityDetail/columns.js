@@ -7,159 +7,176 @@ import {
 
 const columnHelper = createColumnHelper();
 
-// Main Validity Columns
+// Main Matrix Columns (API: masters-matrix-detail)
 export const columns = [
-  // ✅ Row selection
   columnHelper.display({
     id: "select",
     label: "Row Selection",
     header: SelectHeader,
     cell: SelectCell,
+    size: 50,
   }),
-  
-  // ✅ S No
+
   columnHelper.accessor((_row, index) => index + 1, {
     id: "s_no",
     header: "S No",
     cell: (info) => info.row.index + 1,
+    size: 80,
   }),
-  
-  // ✅ Unit Type
-  columnHelper.accessor("unit_type", {
-    id: "unit_type",
+
+  columnHelper.accessor("unittype", {
+    id: "unittype",
     header: "Unit Type",
     cell: (info) => info.getValue() || "-",
+    size: 150,
   }),
-  
-  // ✅ Mode
+
   columnHelper.accessor("mode", {
     id: "mode",
     header: "Mode",
     cell: (info) => info.getValue() || "-",
+    size: 120,
   }),
-  
-  // ✅ Unit
+
   columnHelper.accessor("unit", {
     id: "unit",
     header: "Unit",
     cell: (info) => info.getValue() || "-",
+    size: 100,
   }),
-  
-  // ✅ Instrument Range
-  columnHelper.accessor("instrument_range", {
+
+  // Instrument Range (Combined)
+  columnHelper.display({
     id: "instrument_range",
     header: "Instrument Range",
-    cell: (info) => info.getValue() || "-",
+    cell: ({ row }) => {
+      const min = row.original.instrangemin;
+      const max = row.original.instrangemax;
+      return `${min || "0"} - ${max || "0"}`;
+    },
+    size: 150,
   }),
-  
-  // ✅ Calibrated Range
-  columnHelper.accessor("calibrated_range", {
+
+  // Calibrated Range (Combined)
+  columnHelper.display({
     id: "calibrated_range",
     header: "Calibrated Range",
-    cell: (info) => info.getValue() || "-",
+    cell: ({ row }) => {
+      const min = row.original.calibratedrangemin;
+      const max = row.original.calibratedrangemax;
+      return `${min || "0"} - ${max || "0"}`;
+    },
+    size: 150,
   }),
-  
-  // ✅ Least Count
-  columnHelper.accessor("least_count", {
-    id: "least_count",
+
+  columnHelper.accessor("leastcount", {
+    id: "leastcount",
     header: "Least Count",
     cell: (info) => info.getValue() || "-",
+    size: 120,
   }),
-  
-  // ✅ Stability
+
   columnHelper.accessor("stability", {
     id: "stability",
     header: "Stability",
-    cell: (info) => info.getValue() || "-",
+    cell: (info) => info.getValue() || "0",
+    size: 100,
   }),
-  
-  // ✅ Uniformity
+
   columnHelper.accessor("uniformity", {
     id: "uniformity",
     header: "Uniformity",
-    cell: (info) => info.getValue() || "-",
+    cell: (info) => info.getValue() || "0",
+    size: 100,
   }),
-  
-  // ✅ Accuracy
-  columnHelper.accessor("accuracy", {
+
+  columnHelper.accessor("accuracymeasrement", {
     id: "accuracy",
     header: "Accuracy",
-    cell: (info) => info.getValue() || "-",
+    cell: (info) => info.getValue() || "0",
+    size: 120,
   }),
-  
-  // ✅ Action
+
   columnHelper.display({
     id: "actions",
     label: "Row Actions",
     header: "Action",
     cell: RowActions,
+    size: 100,
   }),
 ];
 
-// uncertinity Columns
-export const uncertinityColumns = [
-  // ✅ Row selection
+// Uncertainty Columns (API: masters-validity-detail)
+export const uncertaintyColumns = [
   columnHelper.display({
     id: "select",
     label: "Row Selection",
     header: SelectHeader,
     cell: SelectCell,
+    size: 50,
   }),
-  
-  // ✅ S No
+
   columnHelper.accessor((_row, index) => index + 1, {
     id: "s_no",
     header: "S No",
     cell: (info) => info.row.index + 1,
+    size: 80,
   }),
-  
-  // ✅ Unit Type
-  columnHelper.accessor("unit_type", {
-    id: "unit_type",
+
+  columnHelper.accessor("unittype", {
+    id: "unittype",
     header: "Unit Type",
     cell: (info) => info.getValue() || "-",
+    size: 180,
   }),
-  
-  // ✅ Mode
+
   columnHelper.accessor("mode", {
     id: "mode",
     header: "Mode",
     cell: (info) => info.getValue() || "-",
+    size: 120,
   }),
-  
-  // ✅ Unit
+
   columnHelper.accessor("unit", {
     id: "unit",
     header: "Unit",
     cell: (info) => info.getValue() || "-",
+    size: 100,
   }),
-  
-  // ✅ Point
+
   columnHelper.accessor("point", {
     id: "point",
     header: "Point",
     cell: (info) => info.getValue() || "-",
+    size: 100,
   }),
-  
-  // ✅ CMC
+
   columnHelper.accessor("cmc", {
     id: "cmc",
-    header: "Cmc",
+    header: "CMC",
     cell: (info) => info.getValue() || "-",
+    size: 100,
   }),
-  
-  // ✅ Drift
+
   columnHelper.accessor("drift", {
     id: "drift",
     header: "Drift",
     cell: (info) => info.getValue() || "-",
+    size: 100,
   }),
-  
-  // ✅ Action
+
+  columnHelper.accessor("uncertaintyTerm", {
+    id: "uncertaintyTerm",
+    header: "Uncertainty Term",
+    cell: (info) => info.getValue() || "-",
+    size: 150,
+  }),
+
   columnHelper.display({
     id: "actions",
     label: "Row Actions",
     header: "Action",
     cell: RowActions,
+    size: 100,
   }),
 ];

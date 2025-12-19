@@ -8,7 +8,7 @@ import ReactSelect from "react-select";
 
 export default function EditLab() {
   const navigate = useNavigate();
-  const { id } = useParams(); // Get lab ID from route
+  const { id } = useParams(); 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
@@ -24,6 +24,7 @@ export default function EditLab() {
   });
 
   const [userOptions, setUserOptions] = useState([]);
+  const [masterOptions, setMasterOptions] = useState([]); 
   const [verticalOptions, setVerticalOptions] = useState([]);
 
   const recordEnvOptions = [
@@ -35,8 +36,9 @@ export default function EditLab() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [userRes, verticalRes, labRes] = await Promise.all([
+        const [userRes, masterRes, verticalRes, labRes] = await Promise.all([
           axios.get("/hrm/get-users-name"),
+          axios.get("/material/get-master-list"), // ✅ New API for masters
           axios.get("/master/vertical-list"),
           axios.get(`/master/get-lab-byid/${id}`) // API for lab details
         ]);
@@ -44,6 +46,11 @@ export default function EditLab() {
         const userOptionsFormatted = (userRes.data.data || []).map(u => ({
           label: u.name,
           value: u.id
+        }));
+
+        const masterOptionsFormatted = (masterRes.data.data || []).map(m => ({
+          label: m.name,
+          value: m.id
         }));
 
         const verticalOptionsFormatted = (verticalRes.data.data || []).map(v => ({
@@ -54,6 +61,7 @@ export default function EditLab() {
         const lab = labRes.data.data;
 
         setUserOptions(userOptionsFormatted);
+        setMasterOptions(masterOptionsFormatted); // ✅ Set master options
         setVerticalOptions(verticalOptionsFormatted);
 
         setFormData({
@@ -182,13 +190,13 @@ export default function EditLab() {
             )}
           </div>
 
+          {/* User-related fields using userOptions */}
           {[
             { name: "users", label: "Allotted Users" },
             { name: "qaapprove", label: "QA Approve" },
             { name: "ulrgenerate", label: "Generate ULR" },
             { name: "uploadreport", label: "Upload Report" },
-            { name: "envrecord", label: "Environmental Record" },
-            { name: "masters", label: "Allotted Master" }
+            { name: "envrecord", label: "Environmental Record" }
           ].map((field) => (
             <div key={field.name}>
               <label className="block text-sm font-medium text-gray-700 mb-1">{field.label}</label>
@@ -205,6 +213,22 @@ export default function EditLab() {
             </div>
           ))}
 
+          {/* ✅ Allotted Master - Now using masterOptions */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Allotted Master</label>
+            <ReactSelect
+              isMulti
+              name="masters"
+              options={masterOptions}
+              value={masterOptions.filter(opt => formData.masters.includes(opt.value))}
+              onChange={(selected) => handleSelectChange(selected, "masters")}
+            />
+            {errors.masters && (
+              <p className="text-red-500 text-sm mt-1">{errors.masters}</p>
+            )}
+          </div>
+
+          {/* Record Environmental Condition */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Record Environmental Condition
@@ -227,6 +251,7 @@ export default function EditLab() {
             )}
           </div>
 
+          {/* Vertical Select */}
           <div>
             <Select
               name="vertical"

@@ -11,8 +11,9 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import clsx from "clsx";
-import { Fragment, useRef, useState } from "react";
-
+import { Fragment, useRef, useState, useEffect } from "react"; 
+import axios from "utils/axios"; 
+import { useLocation } from "react-router"; 
 
 // Local Imports
 import { TableSortIcon } from "components/shared/table/TableSortIcon";
@@ -30,25 +31,28 @@ import { useSkipper } from "utils/react-table/useSkipper";
 import { SelectedRowsActions } from "./SelectedRowsActions";
 import { SubRowComponent } from "./SubRowComponent";
 import { columns } from "./columns";
-import { ordersList } from "./data";
 import { Toolbar } from "./Toolbar";
 import { useThemeContext } from "app/contexts/theme/context";
 import { getUserAgentBrowser } from "utils/dom/getUserAgentBrowser";
 import { useNavigate } from "react-router";
 
-
 // ----------------------------------------------------------------------
 
 const isSafari = getUserAgentBrowser() === "Safari";
 
-export default function OrdersDatatableV2() {
+export default function MaintenanceEquipmentHistory() {
   const { cardSkin } = useThemeContext();
   const navigate = useNavigate();
-
+  const location = useLocation();
 
   const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper();
 
-  const [orders, setOrders] = useState([...ordersList]);
+  // ✅ State for API data
+  const [historyData, setHistoryData] = useState([]);
+  const [masterRecord, setMasterRecord] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [recordsTotal, setRecordsTotal] = useState(0);
+  const [recordsFiltered, setRecordsFiltered] = useState(0);
 
   const [tableSettings, setTableSettings] = useState({
     enableSorting: true,
@@ -58,25 +62,76 @@ export default function OrdersDatatableV2() {
   });
 
   const [globalFilter, setGlobalFilter] = useState("");
-
   const [sorting, setSorting] = useState([]);
+  
+  // ✅ Pagination state
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
   const [columnVisibility, setColumnVisibility] = useLocalStorage(
-    "column-visibility-orders-2",
+    "column-visibility-maintenance-history",
     {},
   );
 
   const [columnPinning, setColumnPinning] = useLocalStorage(
-    "column-pinning-orders-2",
+    "column-pinning-maintenance-history",
     {},
   );
 
   const cardRef = useRef();
-
   const { width: cardWidth } = useBoxSize({ ref: cardRef });
 
+  // ✅ Fetch maintenance history when URL params change
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const fid = params.get("fid") || ""; // ✅ Get fid from URL params
+
+    if (fid) {
+      fetchMaintenanceHistory(fid);
+    } else {
+      setLoading(false);
+      setHistoryData([]);
+    }
+  }, [location.search, pagination.pageIndex, pagination.pageSize, globalFilter]);
+
+  // ✅ API call function
+  const fetchMaintenanceHistory = async (fid) => {
+    try {
+      setLoading(true);
+
+      const response = await axios.get(
+        `/material/maintenance-equipment-history`, {
+          params: {
+            fid: fid,
+            draw: 1,
+            start: pagination.pageIndex * pagination.pageSize,
+            length: pagination.pageSize,
+            'search[value]': globalFilter
+          }
+        }
+      );
+
+      if (response.data) {
+        setHistoryData(Array.isArray(response.data.data) ? response.data.data : []);
+        setMasterRecord(response.data.masterRecord || null);
+        setRecordsTotal(response.data.recordsTotal || 0);
+        setRecordsFiltered(response.data.recordsFiltered || 0);
+      } else {
+        console.warn("Unexpected response structure:", response.data);
+        setHistoryData([]);
+      }
+    } catch (err) {
+      console.error("Error fetching maintenance history:", err);
+      setHistoryData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const table = useReactTable({
-    data: orders,
+    data: historyData,
     columns: columns,
     state: {
       globalFilter,
@@ -84,21 +139,20 @@ export default function OrdersDatatableV2() {
       columnVisibility,
       columnPinning,
       tableSettings,
+      pagination,
     },
     meta: {
       setTableSettings,
       deleteRow: (row) => {
-        // Skip page index reset until after next rerender
         skipAutoResetPageIndex();
-        setOrders((old) =>
-          old.filter((oldRow) => oldRow.order_id !== row.original.order_id),
+        setHistoryData((old) =>
+          old.filter((oldRow) => oldRow.id !== row.original.id),
         );
       },
       deleteRows: (rows) => {
-        // Skip page index reset until after next rerender
         skipAutoResetPageIndex();
-        const rowIds = rows.map((row) => row.original.order_id);
-        setOrders((old) => old.filter((row) => !rowIds.includes(row.order_id)));
+        const rowIds = rows.map((row) => row.original.id);
+        setHistoryData((old) => old.filter((row) => !rowIds.includes(row.id)));
       },
     },
 
@@ -120,76 +174,110 @@ export default function OrdersDatatableV2() {
     getRowCanExpand: () => true,
 
     getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination,
     onColumnVisibilityChange: setColumnVisibility,
     onColumnPinningChange: setColumnPinning,
 
     autoResetPageIndex,
+    pageCount: Math.ceil(recordsFiltered / pagination.pageSize),
+    manualPagination: true, // ✅ Server-side pagination
   });
 
-  useDidUpdate(() => table.resetRowSelection(), [orders]);
+  useDidUpdate(() => table.resetRowSelection(), [historyData]);
 
   useLockScrollbar(tableSettings.enableFullScreen);
 
+  // ✅ Loading UI
+  if (loading) {
+    return (
+      <div className="flex h-[60vh] items-center justify-center text-gray-600">
+        <svg className="animate-spin h-6 w-6 mr-2 text-blue-600" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 000 8v4a8 8 0 01-8-8z"></path>
+        </svg>
+        Loading Maintenance History...
+      </div>
+    );
+  }
+
   return (
     <div className="transition-content grid grid-cols-1 grid-rows-[auto_auto_1fr] px-(--margin-x) py-4">
-      <div className="flex items-center justify-between space-x-4 ">
+      {/* ✅ Master Record Information */}
+      {masterRecord && (
+        <div className="mb-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-dark-800">
+          <h3 className="mb-3 text-lg font-semibold text-gray-800 dark:text-white">
+            Equipment Details
+          </h3>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            <div>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Name:</span>
+              <p className="text-sm font-semibold text-gray-800 dark:text-white">{masterRecord.name}</p>
+            </div>
+            <div>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">ID No:</span>
+              <p className="text-sm font-semibold text-gray-800 dark:text-white">{masterRecord.idno}</p>
+            </div>
+            <div>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Serial No:</span>
+              <p className="text-sm font-semibold text-gray-800 dark:text-white">{masterRecord.serialno}</p>
+            </div>
+            <div>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Make:</span>
+              <p className="text-sm font-semibold text-gray-800 dark:text-white">{masterRecord.make}</p>
+            </div>
+            <div>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Model:</span>
+              <p className="text-sm font-semibold text-gray-800 dark:text-white">{masterRecord.model}</p>
+            </div>
+            <div>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Quantity:</span>
+              <p className="text-sm font-semibold text-gray-800 dark:text-white">{masterRecord.quantity}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between space-x-4">
         <div className="min-w-0">
           <h2 className="truncate text-xl font-medium tracking-wide text-gray-800 dark:text-dark-50">
-            MM instrument List
+            Maintenance Equipment History
           </h2>
         </div>
         {/* Right Side Actions */}
-      <div className="flex flex-wrap items-center gap-3">
-      {/* ✅ Category Filter */}
-        <select
-          className="h-8 rounded-md border border-gray-300 bg-white px-3 text-sm shadow-sm dark:border-gray-700 dark:bg-dark-800 dark:text-white"
-          onChange={(e) => {
-            const value = e.target.value || undefined;
-            table.getColumn("category")?.setFilterValue(value);
-          }}
-        >
-          <option value="">All Categories</option>
-          {Array.from(table.getColumn("category")?.getFacetedUniqueValues()?.keys() || [])
-            .filter(Boolean)
-            .sort()
-            .map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-        </select>
+        <div className="flex flex-wrap items-center gap-3">
+          {/* ✅ Service Type Filter */}
+          <select
+            className="h-8 rounded-md border border-gray-300 bg-white px-3 text-sm shadow-sm dark:border-gray-700 dark:bg-dark-800 dark:text-white"
+            onChange={(e) => {
+              const value = e.target.value || undefined;
+              table.getColumn("typeofservice")?.setFilterValue(value);
+            }}
+          >
+            <option value="">All Service Types</option>
+            {Array.from(table.getColumn("typeofservice")?.getFacetedUniqueValues()?.keys() || [])
+              .filter(Boolean)
+              .sort()
+              .map((service) => (
+                <option key={service} value={service}>
+                  {service}
+                </option>
+              ))}
+          </select>
 
-        {/* ✅ Department Filter (from `location` column) */}
-        <select
-          className="h-8 rounded-md border border-gray-300 bg-white px-3 text-sm shadow-sm dark:border-gray-700 dark:bg-dark-800 dark:text-white"
-          onChange={(e) => {
-            const value = e.target.value || undefined;
-            table.getColumn("location")?.setFilterValue(value);
-          }}
-        >
-          <option value="">All Departments</option>
-          {Array.from(table.getColumn("location")?.getFacetedUniqueValues()?.keys() || [])
-            .filter(Boolean)
-            .sort()
-            .map((dept) => (
-              <option key={dept} value={dept}>
-                {dept}
-              </option>
-            ))}
-        </select>
-        <Button
-          className="h-8 space-x-1.5 rounded-md px-3 text-xs "
-          color="primary" onClick={() =>
+          <Button
+            className="h-8 space-x-1.5 rounded-md px-3 text-xs"
+            color="primary"
+            onClick={() =>
               navigate(
                 "/dashboards/material-list/electro-technical/maintenance-equipment-history/add-new-equipment-history"
               )
-            }>
+            }
+          >
+            Add New Equipment History
+          </Button>
+        </div>
+      </div>
 
-          Add New Equipment History
-        </Button>
-      </div>
-      </div>
-      
       <div
         className={clsx(
           "flex flex-col pt-4",
@@ -230,7 +318,7 @@ export default function OrdersDatatableV2() {
                       >
                         {header.column.getCanSort() ? (
                           <div
-                            className="flex cursor-pointer select-none items-center space-x-3 "
+                            className="flex cursor-pointer select-none items-center space-x-3"
                             onClick={header.column.getToggleSortingHandler()}
                           >
                             <span className="flex-1">
@@ -271,7 +359,6 @@ export default function OrdersDatatableV2() {
                             "row-selected after:pointer-events-none after:absolute after:inset-0 after:z-2 after:h-full after:w-full after:border-3 after:border-transparent after:bg-primary-500/10 ltr:after:border-l-primary-500 rtl:after:border-r-primary-500",
                         )}
                       >
-                        {/* first row is a normal row */}
                         {row.getVisibleCells().map((cell) => {
                           return (
                             <Td
@@ -310,7 +397,6 @@ export default function OrdersDatatableV2() {
                       </Tr>
                       {row.getIsExpanded() && (
                         <tr>
-                          {/* 2nd row is a custom 1 cell row */}
                           <td
                             colSpan={row.getVisibleCells().length}
                             className="p-0"
@@ -326,7 +412,7 @@ export default function OrdersDatatableV2() {
             </Table>
           </div>
           <SelectedRowsActions table={table} />
-          {table.getCoreRowModel().rows.length && (
+          {historyData.length > 0 && (
             <div
               className={clsx(
                 "px-4 pb-4 sm:px-5 sm:pt-4",
@@ -336,7 +422,42 @@ export default function OrdersDatatableV2() {
                 ) && "pt-4",
               )}
             >
-              <PaginationSection table={table} />
+              {/* ✅ Enhanced pagination with records info */}
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                  {/* Page size selector */}
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <span>Show</span>
+                    <select
+                      value={table.getState().pagination.pageSize}
+                      onChange={(e) => {
+                        table.setPageSize(Number(e.target.value));
+                      }}
+                      className="rounded border border-gray-300 bg-white px-2 py-1 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-dark-700 dark:text-white"
+                    >
+                      {[10, 25, 50, 100].map((pageSize) => (
+                        <option key={pageSize} value={pageSize}>
+                          {pageSize}
+                        </option>
+                      ))}
+                    </select>
+                    <span>entries</span>
+                  </div>
+                  
+                  {/* Records count */}
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    Showing {pagination.pageIndex * pagination.pageSize + 1} to{" "}
+                    {Math.min(
+                      (pagination.pageIndex + 1) * pagination.pageSize,
+                      recordsFiltered
+                    )}{" "}
+                    of {recordsFiltered} entries
+                    {recordsFiltered !== recordsTotal && ` (filtered from ${recordsTotal} total entries)`}
+                  </div>
+                </div>
+                
+                <PaginationSection table={table} />
+              </div>
             </div>
           )}
         </Card>

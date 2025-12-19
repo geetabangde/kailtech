@@ -9,116 +9,78 @@ import { DateCell } from "./rows";
 const columnHelper = createColumnHelper();
 
 export const columns = [
-  // ✅ Row selection
+  // Row selection
   columnHelper.display({
     id: "select",
     label: "Row Selection",
     header: SelectHeader,
     cell: SelectCell,
+    size: 50,
   }),
 
-  // ✅ S No
+  // S No
   columnHelper.accessor((_row, index) => index + 1, {
     id: "s_no",
     header: "S No",
     cell: (info) => info.row.index + 1,
+    size: 80,
   }),
 
-    columnHelper.accessor((row) => row.type_of_service, {
-    id: "type_of_service",
+  // Type of Service
+  columnHelper.accessor("typeofservice", {
+    id: "typeofservice",
     header: "Type Of Service",
     cell: (info) => info.getValue() || "-",
+    enableColumnFilter: true,
+    size: 150,
   }),
 
-  // ✅ Type Of Service
-  // columnHelper.accessor("type_of_service", {
-  //   id: "type_of_service",
-  //   header: "Type Of Service",
-  //   cell: (info) => info.getValue() || "-",
-  // }),
-
-  // ✅ Name and address of service provider
-  columnHelper.accessor("name_and_address_of_service_provider", {
-    id: "name_and_address_of_service_provider",
+  // Service Provider (NO JSX)
+  columnHelper.accessor("serviceprovider", {
+    id: "serviceprovider",
     header: "Name and address of service provider",
     cell: (info) => info.getValue() || "-",
+    size: 300,
   }),
 
-  // ✅ Certificate No
-  columnHelper.accessor("certificate_no", {
-    id: "certificate_no",
+  // Certificate No
+  columnHelper.accessor("certificateno", {
+    id: "certificateno",
     header: "Certificate No",
     cell: (info) => info.getValue() || "-",
+    size: 150,
   }),
 
-  // ✅ Start Date
-  columnHelper.accessor("start_date", {
-    id: "start_date",
+  // Start Date
+  columnHelper.accessor("startdate", {
+    id: "startdate",
     header: "Start Date",
     cell: DateCell,
+    size: 150,
   }),
 
-  // ✅ End Date
-  columnHelper.accessor("end_date", {
-    id: "end_date",
+  // End Date
+  columnHelper.accessor("enddate", {
+    id: "enddate",
     header: "End Date",
     cell: DateCell,
+    size: 150,
   }),
 
-  // ✅ Action
+  // IMC Added (NO JSX)
+  columnHelper.accessor("imcadded", {
+    id: "imcadded",
+    header: "IMC Added",
+    cell: (info) => info.getValue() || "No",
+    size: 120,
+  }),
+
+  // Action
   columnHelper.display({
     id: "actions",
     label: "Row Actions",
     header: "Action",
     cell: RowActions,
+    size: 100,
   }),
 ];
-
-// import { createColumnHelper } from "@tanstack/react-table";
-// import { DateCell } from "./rows"; // Aapki existing DateCell component use kar sakte hain
-
-// const columnHelper = createColumnHelper();
-
-// export const serviceColumns = [
-//     // ✅ S No
-//     columnHelper.accessor((_row, index) => index + 1, {
-//         id: "s_no",
-//         header: "S No",
-//         cell: (info) => info.row.index + 1,
-//     }),
-
-//     // ✅ Type Of Service
-//     columnHelper.accessor("type_of_service", {
-//         id: "type_of_service",
-//         header: "Type Of Service",
-//         cell: (info) => info.getValue(),
-//     }),
-
-//     // ✅ Name and address of service provider
-//     columnHelper.accessor("service_provider", {
-//         id: "service_provider",
-//         header: "Name and address of service provider",
-//         cell: (info) => info.getValue(),
-//     }),
-
-//     // ✅ Certificate No
-//     columnHelper.accessor("certificate_no", {
-//         id: "certificate_no",
-//         header: "Certificate No",
-//         cell: (info) => info.getValue(),
-//     }),
-
-//     // ✅ Start Date
-//     columnHelper.accessor((row) => Number(row.start_date), {
-//         id: "start_date",
-//         header: "Start Date",
-//         cell: DateCell, // Aapki existing DateCell use karein
-//     }),
-
-//     // ✅ End Date
-//     columnHelper.accessor((row) => Number(row.end_date), {
-//         id: "end_date",
-//         header: "End Date",
-//         cell: DateCell, // Aapki existing DateCell use karein
-//     }),
-// ];
