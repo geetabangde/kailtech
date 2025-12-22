@@ -13,7 +13,7 @@ import {
 import clsx from "clsx";
 import { Fragment, useRef, useState, useEffect } from "react"; 
 import axios from "utils/axios"; 
-import { useLocation } from "react-router"; 
+import {  useSearchParams } from "react-router"; 
 
 // Local Imports
 import { TableSortIcon } from "components/shared/table/TableSortIcon";
@@ -43,7 +43,11 @@ const isSafari = getUserAgentBrowser() === "Safari";
 export default function OrdersDatatableV2() {
   const { cardSkin } = useThemeContext();
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation();
+  const [searchParams] = useSearchParams();
+const labId = searchParams.get('labId'); 
+  
+  console.log('Lab ID from query params:', labId); // Debug log
 
   const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper();
 
@@ -81,25 +85,25 @@ export default function OrdersDatatableV2() {
   const { width: cardWidth } = useBoxSize({ ref: cardRef });
 
   // ✅ Fetch instruments when query params change
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const labs_id = params.get("labid") || ""; // ✅ Get labid from URL params
-
-    if (labs_id) {
-      fetchInstruments(labs_id); // ✅ Fetch data based on lab ID
+   useEffect(() => {
+    if (labId) {
+      fetchInstruments(labId);
     } else {
-      setLoading(false); // If no labid, stop loading
+      setLoading(false);
       setOrders([]);
+      console.warn('No labId found in query parameters');
     }
-  }, [location.search]);
+  }, [labId]);
 
   // ✅ API call function
-  const fetchInstruments = async (labs_id) => {
+  // ✅ API call function
+  const fetchInstruments = async (labId) => {
     try {
       setLoading(true);
+      console.log('Fetching instruments for labId:', labId); // Debug
 
       const response = await axios.get(
-        `/material/mm-instrument-list?labs_id=${labs_id}`  
+        `/material/mm-instrument-list?labs_id=${labId}`  
       );
 
       if (Array.isArray(response.data.data)) {

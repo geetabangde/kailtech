@@ -32,6 +32,7 @@ const protectedRoutes = {
                 Component: (await import("app/pages/dashboards/home")).default,
               }),
             },
+            
             {
               path: "material-list",
               children: [

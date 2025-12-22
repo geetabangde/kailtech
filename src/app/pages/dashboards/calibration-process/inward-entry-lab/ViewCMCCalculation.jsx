@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "utils/axios";
 import { toast } from "sonner";
 import { Button } from "components/ui";
+
 export default function ViewInwardEntrySrf() {
   const { id: inwardId, itemId: instId } = useParams();
   const navigate = useNavigate();
@@ -15,41 +16,17 @@ export default function ViewInwardEntrySrf() {
   const [fieldKeys, setFieldKeys] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Formatting Function
+  // ✅ Formatting Function - Display exact values from API
   const formatValue = (value, key) => {
     if (value === null || value === undefined) return "-";
 
     if (key === "dof" && (value === 0 || value === "0")) return "0";
 
+    // ✅ Return string values as-is (like "1.00000")
     if (typeof value !== "number") return value;
 
-    const decimalMap = {
-      maxzeroerror: 4,
-      repeatability: 6,
-      masterunc: 6,
-      combineuncertinity: 6,
-      expandeduncertainty: 6,
-      cmc_taken: 6,
-      averagemaster: 2,
-      error: 2,
-      hysterisis: 2,
-      coveragefactor: 2,
-      dof: 2,
-      // ✅ Add observation fields with 3 decimal places
-      uuc1: 3,
-      uuc2: 3,
-      uuc3: 3,
-      uuc4: 3,
-      uuc5: 3,
-      uuc6: 3,
-      uuc7: 3,
-      uuc8: 3,
-      uuc9: 3,
-      uuc10: 3,
-    };
-
-    const decimals = decimalMap[key] || 2;
-    return value.toFixed(decimals);
+    // ✅ Return exact numeric values without adding extra zeros
+    return value.toString();
   };
 
   // ✅ Fetch API Data
