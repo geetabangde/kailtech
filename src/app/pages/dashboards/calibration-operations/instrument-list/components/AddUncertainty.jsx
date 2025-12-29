@@ -528,7 +528,7 @@ export default function AddUncertainty({
             style={{ cursor: loading ? "not-allowed" : "pointer" }}
             className="rounded-md bg-blue-600 px-8 py-3 text-lg font-medium text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Complete & Finish
+          Save & Next
           </button>
         </div>
       </div>

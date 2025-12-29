@@ -811,7 +811,7 @@ export function PerformActions({ item, onAction }) {
               key={`${action.action}-${index}`}
               onClick={() => handleActionClick(action.action)}
               className={clsx(
-                "btn-base btn bg-gray-150 text-gray-900 hover:bg-gray-200 focus:bg-gray-200 active:bg-gray-200/80 dark:bg-surface-2 dark:text-dark-50 dark:hover:bg-surface-1 dark:focus:bg-surface-1 dark:active:bg-surface-1/90 h-7 rounded bg-blue-500 px-2.5 py-1 text-xs font-medium text-black outline-none transition-all hover:bg-blue-600 hover:shadow-md",
+                "btn-base btn bg-gray-150 text-gray-900 hover:bg-gray-200 focus:bg-gray-200 active:bg-gray-200/80 dark:bg-surface-2 dark:text-dark-50 dark:hover:bg-surface-1 dark:focus:bg-surface-1 dark:active:bg-surface-1/90 bg-indigo-500 hover:bg-fuchsia-500 text-white px-4 py-2 rounded text-sm font-medium transition-colors",
                 
               )}
               title={action.label}

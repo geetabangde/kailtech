@@ -11,7 +11,8 @@ import CustomFormatFields from "./components/CustomFormatFields";
 import EnvironmentalFields from "./components/EnvironmentalFields";
 import PriceListSection from "./components/PriceListSection";
 import AddCalibration from "./components/AddCalibration";
-import AddUncertainty from "./components/AddUncertainty ";
+import AddUncertainty from "./components/AddUncertainty";
+import AddCertificateSetting from "./components/AddCertificateSetting";
 
 export default function AddInstrument() {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ export default function AddInstrument() {
   const [savedInstrumentId, setSavedInstrumentId] = useState(null);
   const [savedFormatId, setSavedFormatId] = useState(null);
   const [savedUncertaintyId, setSavedUncertaintyId] = useState(null);
+  
   // Step 1 - Add Instrument States
   const [formData, setFormData] = useState({
     name: "",
@@ -75,7 +77,7 @@ export default function AddInstrument() {
     uncertaintyincertificate: "Yes",
     allottolab: "",
     suffix: "",
-    suffixId: "", // ✅ New field for format ID
+    suffixId: "",
     uncertaintytable: [],
     uncertaintyIds: [],
     vertical: "1",
@@ -203,23 +205,13 @@ export default function AddInstrument() {
           })),
         );
         
-        // In the fetchDropdowns function
         setFormateOptions(
           safeArray(formatelist.data.data).map((item) => ({
-            label: item.name, // UI mein name dikhega
-            value: item.description, // Description store hogi
-            id: item.id.toString(), // ID alag se available rahegi
+            label: item.name,
+            value: item.description,
+            id: item.id.toString(),
           })),
         );
-
-        // setFormateOptions(
-        //   safeArray(formatelist.data.data).map((item) => ({
-        //     label: item.name,    // UI mein description dikhega
-        //     value: item.description,    // Value bhi description hi
-        //     actualId: item.id.toString(), // ID alag field mein
-        //     name: item.name
-        //   })),
-        // );
 
         setLabOptions(
           safeArray(lablist.data.data).map((item) => ({
@@ -268,7 +260,6 @@ export default function AddInstrument() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -277,21 +268,17 @@ export default function AddInstrument() {
     }
   };
 
-  // ✅ UPDATE handleMultiSelectChange - Now it will store VALUE (which is the name)
-  // ✅ UPDATE handleMultiSelectChange - Now it will store description as value
   const handleMultiSelectChange = (selectedOptions, name) => {
     if (name === "suffix") {
-      // Single select - store both description and id
       const selectedValue = selectedOptions ? selectedOptions.value : "";
       const selectedId = selectedOptions ? selectedOptions.id : "";
 
       setFormData((prev) => ({
         ...prev,
-        [name]: selectedValue, // Description for display/API
-        suffixId: selectedId, // ID stored separately
+        [name]: selectedValue,
+        suffixId: selectedId,
       }));
     } else if (name === "uncertaintytable") {
-      // Multi select - store arrays of both descriptions and ids
       const selectedValues = selectedOptions
         ? selectedOptions.map((opt) => opt.value)
         : [];
@@ -301,11 +288,10 @@ export default function AddInstrument() {
 
       setFormData((prev) => ({
         ...prev,
-        [name]: selectedValues, // Descriptions array
-        uncertaintyIds: selectedIds, // IDs array stored separately
+        [name]: selectedValues,
+        uncertaintyIds: selectedIds,
       }));
     } else {
-      // Other fields remain unchanged
       setFormData((prev) => ({
         ...prev,
         [name]: selectedOptions ? selectedOptions.map((opt) => opt.value) : [],
@@ -323,7 +309,6 @@ export default function AddInstrument() {
       [fieldName]: selectedOption?.value || "",
     }));
 
-    // Clear error when user makes selection
     if (errors[fieldName]) {
       setErrors((prev) => ({
         ...prev,
@@ -340,7 +325,6 @@ export default function AddInstrument() {
       return updated;
     });
 
-    // Clear price list errors
     if (errors[`price_${index}_${name}`]) {
       setErrors((prev) => ({
         ...prev,
@@ -476,7 +460,6 @@ export default function AddInstrument() {
   };
 
   // Step 1: Save Instrument Details
-  // ✅ UPDATE handleSubmit - No conversion needed now!
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -490,7 +473,6 @@ export default function AddInstrument() {
     try {
       const payload = {
         ...formData,
-        // ✅ Send description to API (as your backend expects)
         suffix: Array.isArray(formData.suffix)
           ? formData.suffix[0] || ""
           : formData.suffix || "",
@@ -544,11 +526,6 @@ export default function AddInstrument() {
       });
 
       console.log("FINAL JSON Payload:", payload);
-      console.log("✅ suffix value (description):", payload.suffix);
-      console.log(
-        "✅ uncertaintytable value (description):",
-        payload.uncertaintytable,
-      );
 
       const response = await axios.post(
         "/calibrationoperations/add-new-instrument",
@@ -562,30 +539,23 @@ export default function AddInstrument() {
 
       console.log("=== COMPLETE API RESPONSE ===");
       console.log("Response Data:", response.data);
-      console.log("=== END OF RESPONSE ===");
 
-      // ✅ Extract values from response and formData
       const instrumentId = response.data?.instid;
       const formatId = formData.suffixId || null;
       const uncertaintyId = formData.uncertaintyIds?.[0] || null;
 
       console.log("📌 Instrument ID:", instrumentId);
       console.log("📌 Format ID (numeric):", formatId);
-      console.log("📌 Format Description:", formData.suffix);
       console.log("📌 Uncertainty ID (numeric):", uncertaintyId);
-      console.log("📌 Uncertainty Description:", formData.uncertaintytable);
 
-      // ✅ Validate required data
       if (instrumentId && formatId) {
         const finalInstrumentId =
           typeof instrumentId === "string"
             ? parseInt(instrumentId, 10)
             : instrumentId;
 
-        // ✅ Parse formatId as number
         const finalFormatId = parseInt(formatId, 10);
 
-        // ✅ Check validity
         if (
           !isNaN(finalInstrumentId) &&
           finalInstrumentId > 0 &&
@@ -598,7 +568,6 @@ export default function AddInstrument() {
           setSavedInstrumentId(finalInstrumentId);
           setSavedFormatId(finalFormatId);
 
-          // ✅ Handle uncertainty ID if exists
           if (uncertaintyId) {
             const finalUncertaintyId = parseInt(uncertaintyId, 10);
             if (!isNaN(finalUncertaintyId) && finalUncertaintyId > 0) {
@@ -625,19 +594,14 @@ export default function AddInstrument() {
           console.error("Invalid data:", {
             finalInstrumentId,
             finalFormatId,
-            instrumentIdValid:
-              !isNaN(finalInstrumentId) && finalInstrumentId > 0,
-            formatIdValid: !isNaN(finalFormatId) && finalFormatId > 0,
           });
         }
       } else {
         if (!instrumentId) {
           toast.error("Instrument ID not received from server");
-          console.error("Missing instid in response");
         }
         if (!formatId) {
           toast.error("Please select a Format before proceeding");
-          console.error("No Format ID found in suffixId field");
         }
       }
     } catch (err) {
@@ -648,11 +612,11 @@ export default function AddInstrument() {
     }
   };
 
-  // Step Progress Indicator
+  // Step Progress Indicator (Updated for 4 steps)
   const renderStepIndicator = () => (
     <div className="mb-6 flex items-center justify-center">
       <div className="flex items-center space-x-4">
-        {[1, 2, 3].map((step) => (
+        {[1, 2, 3, 4].map((step) => (
           <div key={step} className="flex items-center">
             <div
               className={`flex h-10 w-10 items-center justify-center rounded-full ${
@@ -663,7 +627,7 @@ export default function AddInstrument() {
             >
               {step}
             </div>
-            {step < 3 && (
+            {step < 4 && (
               <div
                 className={`h-1 w-16 ${
                   currentStep > step ? "bg-blue-600" : "bg-gray-300"
@@ -684,6 +648,7 @@ export default function AddInstrument() {
             {currentStep === 1 && "Step 1: Add Instrument"}
             {currentStep === 2 && "Step 2: Calibration Results Settings"}
             {currentStep === 3 && "Step 3: Uncertainty Settings"}
+            {currentStep === 4 && "Step 4: Certificate Settings"}
           </h2>
           <Button
             variant="outline"
@@ -791,14 +756,14 @@ export default function AddInstrument() {
                     Saving...
                   </div>
                 ) : (
-                  "Save"
+                  "Save & Continue"
                 )}
               </Button>
             </div>
           </form>
         )}
 
-        {/* ✅ Step 2: Pass BOTH instrumentId AND formatId */}
+        {/* Step 2: Calibration Settings */}
         {currentStep === 2 && (
           <div>
             {savedInstrumentId && savedFormatId ? (
@@ -823,7 +788,7 @@ export default function AddInstrument() {
           </div>
         )}
 
-        {/* ✅ Step 3: Pass BOTH instrumentId AND formatId */}
+        {/* Step 3: Uncertainty Settings */}
         {currentStep === 3 && (
           <div>
             {savedInstrumentId && savedFormatId ? (
@@ -832,13 +797,38 @@ export default function AddInstrument() {
                 instrumentId={savedInstrumentId}
                 formatId={savedFormatId}
                 uncertaintyId={savedUncertaintyId}
+                onComplete={() => setCurrentStep(4)} // ✅ Go to step 4 instead of finishing
+                onBack={() => setCurrentStep(2)}
+              />
+            ) : (
+              <div className="p-8 text-center">
+                <p className="text-red-600">
+                  Error: {!savedInstrumentId ? "Instrument ID" : "Format ID"}{" "}
+                  not found. Please start from Step 1.
+                </p>
+                <Button onClick={() => setCurrentStep(1)} className="mt-4">
+                  Go Back to Step 1
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ✅ Step 4: Certificate Settings */}
+        {currentStep === 4 && (
+          <div>
+            {savedInstrumentId && savedFormatId ? (
+              <AddCertificateSetting
+                instid={savedInstrumentId}
+                instrumentId={savedInstrumentId}
+                formatId={savedFormatId}
                 onComplete={() => {
                   toast.success("All steps completed successfully!");
                   navigate(
                     "/dashboards/calibration-operations/instrument-list",
                   );
                 }}
-                onBack={() => setCurrentStep(2)}
+                onBack={() => setCurrentStep(3)}
               />
             ) : (
               <div className="p-8 text-center">

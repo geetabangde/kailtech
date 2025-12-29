@@ -42,36 +42,39 @@ export default function OrdersDatatableV1() {
   const location = useLocation();
 
   // ✅ Fetch from API when query params change
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const loc = params.get("caliblocation") || "";
-    const acc = params.get("calibacc") || "";
+useEffect(() => {
+  const params = new URLSearchParams(location.search);
+  const loc = params.get("caliblocation") || "";
+  const acc = params.get("calibacc") || "";
 
-    fetchModes(loc, acc); // ✅ pass dynamic values
-  }, [location.search]);
+  
 
-  const fetchModes = async (loc, acc) => {
-    try {
-      setLoading(true);
+  fetchModes(loc, acc); // ✅ pass dynamic values
+}, [location.search]);
 
-      const response = await axios.get(
-        `/calibrationprocess/inward-entry-list?caliblocation=${encodeURIComponent(
-          loc
-        )}&calibacc=${encodeURIComponent(acc)}`
-      );
+const fetchModes = async (loc, acc) => {
+  try {
+    setLoading(true);
 
-      if (Array.isArray(response.data.data)) {
-        setOrders(response.data.data);
-      } else {
-        console.warn("Unexpected response structure:", response.data);
-        setOrders([]);
-      }
-    } catch (err) {
-      console.error("Error fetching mode list:", err);
-    } finally {
-      setLoading(false);
+    const response = await axios.get(
+      `/calibrationprocess/inward-entry-list?caliblocation=${encodeURIComponent(
+        loc
+      )}&calibacc=${encodeURIComponent(acc)}`
+    );
+
+    if (Array.isArray(response.data.data)) {
+      setOrders(response.data.data);
+    } else {
+      console.warn("Unexpected response structure:", response.data);
+      setOrders([]);
     }
-  };
+  } catch (err) {
+    console.error("Error fetching mode list:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // ✅ Table Settings
   const [tableSettings, setTableSettings] = useState({
@@ -80,6 +83,7 @@ export default function OrdersDatatableV1() {
   });
 
   const [globalFilter, setGlobalFilter] = useState("");
+
   const [sorting, setSorting] = useState([]);
 
   const [columnVisibility, setColumnVisibility] = useLocalStorage(
@@ -87,10 +91,10 @@ export default function OrdersDatatableV1() {
     {},
   );
 
-  // ✅ MODIFIED: Set initial columnPinning with actions pinned to right
-  const [columnPinning, setColumnPinning] = useState({
-    right: ['actions'] // Pin actions column to the right
-  });
+  const [columnPinning, setColumnPinning] = useLocalStorage(
+    "column-pinning-orders-1",
+    {},
+  );
 
   const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper();
 
@@ -101,37 +105,37 @@ export default function OrdersDatatableV1() {
       globalFilter,
       sorting,
       columnVisibility,
-      columnPinning, // ✅ This now includes the pinned actions column
+      columnPinning,
       tableSettings,
     },
     meta: {
-      updateData: (rowIndex, columnId, value) => {
-        skipAutoResetPageIndex();
-        setOrders((old) =>
-          old.map((row, index) => {
-            if (index === rowIndex) {
-              return {
-                ...old[rowIndex],
-                [columnId]: value,
-              };
-            }
-            return row;
-          })
-        );
-      },
-      deleteRow: (row) => {
-        skipAutoResetPageIndex();
-        setOrders((old) =>
-          old.filter((oldRow) => oldRow.id !== row.original.id)
-        );
-      },
-      deleteRows: (rows) => {
-        skipAutoResetPageIndex();
-        const rowIds = rows.map((row) => row.original.id);
-        setOrders((old) => old.filter((row) => !rowIds.includes(row.id)));
-      },
-      setTableSettings
-    },
+  updateData: (rowIndex, columnId, value) => {
+    skipAutoResetPageIndex();
+    setOrders((old) =>
+      old.map((row, index) => {
+        if (index === rowIndex) {
+          return {
+            ...old[rowIndex],
+            [columnId]: value,
+          };
+        }
+        return row;
+      })
+    );
+  },
+  deleteRow: (row) => {
+    skipAutoResetPageIndex();
+    setOrders((old) =>
+      old.filter((oldRow) => oldRow.id !== row.original.id)
+    );
+  },
+  deleteRows: (rows) => {
+    skipAutoResetPageIndex();
+    const rowIds = rows.map((row) => row.original.id);
+    setOrders((old) => old.filter((row) => !rowIds.includes(row.id)));
+  },
+  setTableSettings
+},
     filterFns: {
       fuzzy: fuzzyFilter,
     },
@@ -145,13 +149,16 @@ export default function OrdersDatatableV1() {
     globalFilterFn: fuzzyFilter,
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+
     getPaginationRowModel: getPaginationRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onColumnPinningChange: setColumnPinning,
+
     autoResetPageIndex,
   });
 
   useDidUpdate(() => table.resetRowSelection(), [orders]);
+
   useLockScrollbar(tableSettings.enableFullScreen);
   
   // ✅ Loading UI
@@ -169,6 +176,7 @@ export default function OrdersDatatableV1() {
     );
   }
 
+  
   return (
     <Page title="Calibration Inward Entry Lab List">
       <div className="transition-content w-full pb-5">
@@ -211,9 +219,9 @@ export default function OrdersDatatableV1() {
                               "bg-gray-200 font-semibold uppercase text-gray-800 dark:bg-dark-800 dark:text-dark-100 first:ltr:rounded-tl-lg last:ltr:rounded-tr-lg first:rtl:rounded-tr-lg last:rtl:rounded-tl-lg",
                               header.column.getCanPin() && [
                                 header.column.getIsPinned() === "left" &&
-                                  "sticky z-20 ltr:left-0 rtl:right-0 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]",
+                                  "sticky z-2 ltr:left-0 rtl:right-0",
                                 header.column.getIsPinned() === "right" &&
-                                  "sticky z-20 ltr:right-0 rtl:left-0 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.1)]",
+                                  "sticky z-2 ltr:right-0 rtl:left-0",
                               ],
                             )}
                           >
@@ -256,6 +264,7 @@ export default function OrdersDatatableV1() {
                               "row-selected after:pointer-events-none after:absolute after:inset-0 after:z-2 after:h-full after:w-full after:border-3 after:border-transparent after:bg-primary-500/10 ltr:after:border-l-primary-500 rtl:after:border-r-primary-500",
                           )}
                         >
+                          {/* first row is a normal row */}
                           {row.getVisibleCells().map((cell) => {
                             return (
                               <Td
@@ -267,9 +276,9 @@ export default function OrdersDatatableV1() {
                                     : "dark:bg-dark-900",
                                   cell.column.getCanPin() && [
                                     cell.column.getIsPinned() === "left" &&
-                                      "sticky z-10 ltr:left-0 rtl:right-0 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]",
+                                      "sticky z-2 ltr:left-0 rtl:right-0",
                                     cell.column.getIsPinned() === "right" &&
-                                      "sticky z-10 ltr:right-0 rtl:left-0 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.1)]",
+                                      "sticky z-2 ltr:right-0 rtl:left-0",
                                   ],
                                 )}
                               >

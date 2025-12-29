@@ -11,7 +11,8 @@ import CustomFormatFields from "./components/CustomFormatFields";
 import EnvironmentalFields from "./components/EnvironmentalFields";
 import PriceListSection from "./components/PriceListSection";
 import AddCalibration from "./components/AddCalibration";
-import AddUncertainty from "./components/AddUncertainty ";
+import AddUncertainty from "./components/AddUncertainty";
+import AddCertificateSetting from "./components/AddCertificateSetting";
 
 export default function EditCalibrationInstrumnet() {
   const navigate = useNavigate();
@@ -77,7 +78,7 @@ export default function EditCalibrationInstrumnet() {
     uncertaintyincertificate: "Yes",
     allottolab: "",
     suffix: "",
-    suffixId: "", // ✅ New field for format ID
+    suffixId: "",
     uncertaintytable: [],
     uncertaintyIds: [],
     vertical: "1",
@@ -119,280 +120,340 @@ export default function EditCalibrationInstrumnet() {
 
   // Fetch all data on mount
   useEffect(() => {
-  const fetchAllData = async () => {
-    try {
-      setLoading(true);
+    const fetchAllData = async () => {
+      try {
+        setLoading(true);
 
-      if (id) {
-        const instrumentIdFromUrl =
-          typeof id === "string" ? parseInt(id, 10) : id;
-        if (!isNaN(instrumentIdFromUrl) && instrumentIdFromUrl > 0) {
-          setSavedInstrumentId(instrumentIdFromUrl);
-          console.log("✅ Set Instrument ID from URL:", instrumentIdFromUrl);
-        }
-      }
-
-      // ✅ STEP 1: First fetch all dropdown options
-      const [
-        sopRes,
-        standardRes,
-        subcategoryoneRes,
-        subcategorytwoRes,
-        formatelist,
-        lablist,
-        currencylist,
-        unitTypeRes,
-        unitRes,
-        modeRes,
-      ] = await Promise.all([
-        axios.get("/calibrationoperations/calibration-method-list"),
-        axios.get("/calibrationoperations/calibration-standard-list"),
-        axios.get("/inventory/subcategory-list"),
-        axios.get("/inventory/subcategory-list"),
-        axios.get("/get-formate"),
-        axios.get("/master/list-lab"),
-        axios.get("/master/currency-list"),
-        axios.get("/master/unit-type-list"),
-        axios.get("/master/units-list"),
-        axios.get("/master/mode-list"),
-      ]);
-
-      const safeArray = (data) => (Array.isArray(data) ? data : []);
-
-      // ✅ STEP 2: Set all dropdown options FIRST
-      setSopOptions(
-        safeArray(sopRes.data.data).map((item) => ({
-          label: item.name,
-          value: item.id.toString(),
-        }))
-      );
-      setStandardOptions(
-        safeArray(standardRes.data.data).map((item) => ({
-          label: item.name,
-          value: item.id.toString(),
-        }))
-      );
-      setSubcategoryOne(
-        safeArray(subcategoryoneRes.data.data).map((item) => ({
-          label: item.name,
-          value: item.id.toString(),
-        }))
-      );
-      setSubcategoryTwo(
-        safeArray(subcategorytwoRes.data.data).map((item) => ({
-          label: item.name,
-          value: item.id.toString(),
-        }))
-      );
-      
-      // ✅ Store formatted options in a variable
-      const formattedOptions = safeArray(formatelist.data.data).map((item) => ({
-        label: item.name,
-        value: item.description,
-        id: item.id.toString(),
-      }));
-      
-      setFormateOptions(formattedOptions);
-      console.log("✅ Format Options Set:", formattedOptions);
-      
-      setLabOptions(
-        safeArray(lablist.data.data).map((item) => ({
-          label: item.name,
-          value: item.id.toString(),
-        }))
-      );
-      setCurrencyOptions(
-        safeArray(currencylist.data.data).map((item) => ({
-          label: `${item.name} (${item.description})`,
-          value: item.id.toString(),
-        }))
-      );
-      setUnitTypeOptions(
-        safeArray(unitTypeRes.data.data).map((item) => ({
-          label: item.name,
-          value: item.name,
-        }))
-      );
-      setUnitOptions(
-        safeArray(unitRes.data.data).map((item) => ({
-          label: item.name,
-          value: item.id.toString(),
-        }))
-      );
-      setModeOptions(
-        safeArray(modeRes.data.data).map((item) => ({
-          label: item.name,
-          value: item.name,
-        }))
-      );
-
-      // ✅ STEP 3: NOW fetch instrument data AFTER options are ready
-      const instrumentRes = await axios.get(
-        `/calibrationoperations/get-instrument-byid/${id}`
-      );
-
-      const instrumentData = instrumentRes.data.data;
-      
-      console.log("=== DEBUGGING SUFFIX DATA ===");
-      console.log("📌 Suffix from API:", instrumentData.instrument.suffix);
-      console.log("📌 Format Options Now Available:", formattedOptions);
-      console.log("=== END DEBUG ===");
-
-      const safeArrayData = (value) =>
-        Array.isArray(value)
-          ? value
-          : typeof value === "string" && value
-            ? value.split(",")
-            : [];
-      const safeString = (value) => (value != null ? String(value) : "");
-
-      // ✅ Find matching format by description
-      const savedSuffix = safeString(instrumentData.instrument.suffix);
-      const matchingFormat = formattedOptions.find(
-        (opt) => opt.value === savedSuffix
-      );
-
-      console.log("🔍 Looking for suffix:", savedSuffix);
-      console.log("🔍 Found matching format:", matchingFormat);
-
-      setFormData((prev) => ({
-        ...prev,
-        name: safeString(instrumentData.instrument.name),
-        sop: safeArrayData(instrumentData.instrument.sop),
-        standard: safeArrayData(instrumentData.instrument.standard),
-        typeofsupport: safeArrayData(instrumentData.instrument.typeofsupport),
-        typeofmaster: safeArrayData(instrumentData.instrument.typeofmaster),
-        description: safeString(instrumentData.instrument.description),
-        discipline: safeString(instrumentData.instrument.discipline),
-        groups: safeString(instrumentData.instrument.groups),
-        remark: safeString(instrumentData.instrument.remark),
-        range: safeString(instrumentData.instrument.range),
-        leastcount: safeString(instrumentData.instrument.leastcount),
-        unittype: safeString(instrumentData.instrument.unittype),
-        mode: safeString(instrumentData.instrument.mode),
-        supportmaster: safeString(instrumentData.instrument.supportmaster),
-        supportrange: safeString(instrumentData.instrument.supportrange),
-        supportleastcount: safeString(instrumentData.instrument.supportleastcount),
-        supportunittype: safeString(instrumentData.instrument.supportunittype),
-        supportmode: safeString(instrumentData.instrument.supportmode),
-        scopematrixvalidation: safeString(instrumentData.instrument.scopematrixvalidation),
-        digitincmc: safeString(instrumentData.instrument.digitincmc || "2"),
-        biomedical: safeString(instrumentData.instrument.biomedical || "No"),
-        showvisualtest: safeString(instrumentData.instrument.showvisualtest || "No"),
-        showelectricalsafety: safeString(instrumentData.instrument.showelectricalsafety || "No"),
-        showbasicsafety: safeString(instrumentData.instrument.showbasicsafety || "No"),
-        showperformancetest: safeString(instrumentData.instrument.showperformancetest || "No"),
-        setpoint: safeString(instrumentData.instrument.setpoint || "UUC"),
-        uuc: safeString(instrumentData.instrument.uuc || "1"),
-        master: safeString(instrumentData.instrument.master || "1"),
-        setpointheading: safeString(instrumentData.instrument.setpointheading || "Set Point"),
-        parameterheading: safeString(instrumentData.instrument.parameterheading || ""),
-        uucheading: safeString(instrumentData.instrument.uucheading || "Observation On UUC"),
-        masterheading: safeString(instrumentData.instrument.masterheading || "Standard Reading"),
-        errorheading: safeString(instrumentData.instrument.errorheading || "Error"),
-        remarkheading: safeString(instrumentData.instrument.remarkheading || "Remark"),
-        setpointtoshow: safeString(instrumentData.instrument.setpointtoshow || "Yes"),
-        parametertoshow: safeString(instrumentData.instrument.parametertoshow || "Yes"),
-        uuctoshow: safeString(instrumentData.instrument.uuctoshow || "Yes"),
-        mastertoshow: safeString(instrumentData.instrument.mastertoshow || "Yes"),
-        errortoshow: safeString(instrumentData.instrument.errortoshow || "Yes"),
-        remarktoshow: safeString(instrumentData.instrument.remarktoshow || "Yes"),
-        specificationtoshow: safeString(instrumentData.instrument.specificationtoshow || "Yes"),
-        specificationheading: safeString(instrumentData.instrument.specificationheading || ""),
-        tempsite: safeString(instrumentData.instrument.tempsite),
-        tempvariablesite: safeString(instrumentData.instrument.tempvariablesite),
-        humisite: safeString(instrumentData.instrument.humisite),
-        humivariablesite: safeString(instrumentData.instrument.humivariablesite),
-        templab: safeString(instrumentData.instrument.templab),
-        tempvariablelab: safeString(instrumentData.instrument.tempvariablelab),
-        humilab: safeString(instrumentData.instrument.humilab),
-        humivariablelab: safeString(instrumentData.instrument.humivariablelab),
-        mastersincertificate: safeString(instrumentData.instrument.mastersincertificate || "Yes"),
-        uncertaintyincertificate: safeString(instrumentData.instrument.uncertaintyincertificate || "Yes"),
-        allottolab: safeString(instrumentData.instrument.allottolab),
-        // ✅ Store description for display AND id separately
-        suffix: savedSuffix,
-        suffixId: matchingFormat ? matchingFormat.id : "",
-        uncertaintytable: safeArrayData(instrumentData.instrument.uncertaintytable),
-        vertical: safeString(instrumentData.instrument.vertical || "1"),
-      }));
-
-      // ✅ Set saved IDs
-      if (matchingFormat && matchingFormat.id) {
-        const formatId = parseInt(matchingFormat.id, 10);
-        if (!isNaN(formatId) && formatId > 0) {
-          setSavedFormatId(formatId);
-          console.log("✅ Loaded Format ID:", formatId);
-        }
-      }
-
-      const uncertaintyData = safeArrayData(instrumentData.instrument.uncertaintytable);
-      if (uncertaintyData && uncertaintyData.length > 0) {
-        // Find matching uncertainty by description
-        const matchingUncertainties = formattedOptions.filter((opt) =>
-          uncertaintyData.includes(opt.value)
-        );
-        
-        if (matchingUncertainties.length > 0) {
-          const uncertaintyIds = matchingUncertainties.map((u) => parseInt(u.id, 10));
-          setFormData((prev) => ({
-            ...prev,
-            uncertaintyIds: uncertaintyIds,
-          }));
-          
-          if (uncertaintyIds[0]) {
-            setSavedUncertaintyId(uncertaintyIds[0]);
-            console.log("✅ Loaded Uncertainty IDs:", uncertaintyIds);
+        if (id) {
+          const instrumentIdFromUrl =
+            typeof id === "string" ? parseInt(id, 10) : id;
+          if (!isNaN(instrumentIdFromUrl) && instrumentIdFromUrl > 0) {
+            setSavedInstrumentId(instrumentIdFromUrl);
+            console.log("✅ Set Instrument ID from URL:", instrumentIdFromUrl);
           }
         }
-      }
 
-      // Set price lists
-      const priceMatrix = Array.isArray(instrumentData.pricematrix)
-        ? instrumentData.pricematrix
-        : [];
-      const fetchedPriceLists =
-        priceMatrix.length > 0
-          ? priceMatrix.map((price) => ({
-              id: price.id || "",
-              packagename: safeString(price.packagename),
-              packagedesc: safeString(price.packagedesc),
-              accreditation: safeString(price.accreditation),
-              location: safeString(price.location),
-              currency:
-                currencyOptions.find(
-                  (opt) => opt.value === safeString(price.currency)
-                ) || null,
-              rate: safeString(price.rate),
-              daysrequired: safeString(price.daysrequired),
-              matrices:
-                Array.isArray(price.matrix) && price.matrix.length > 0
-                  ? price.matrix.map((matrix, matrixIndex) => ({
-                      id: matrix.id || "",
-                      matrixno: matrixIndex + 1,
-                      unittype: safeString(matrix.unittype),
-                      unit: safeString(matrix.unit),
-                      mode: safeString(matrix.mode),
-                      instrangemin: safeString(matrix.instrangemin),
-                      instrangemax: safeString(matrix.instrangemax),
-                      tolerance: safeString(matrix.tolerance),
-                      tolerancetype: safeString(matrix.tolerancetype),
-                    }))
-                  : [],
-            }))
+        // ✅ STEP 1: First fetch all dropdown options
+        const [
+          sopRes,
+          standardRes,
+          subcategoryoneRes,
+          subcategorytwoRes,
+          formatelist,
+          lablist,
+          currencylist,
+          unitTypeRes,
+          unitRes,
+          modeRes,
+        ] = await Promise.all([
+          axios.get("/calibrationoperations/calibration-method-list"),
+          axios.get("/calibrationoperations/calibration-standard-list"),
+          axios.get("/inventory/subcategory-list"),
+          axios.get("/inventory/subcategory-list"),
+          axios.get("/get-formate"),
+          axios.get("/master/list-lab"),
+          axios.get("/master/currency-list"),
+          axios.get("/master/unit-type-list"),
+          axios.get("/master/units-list"),
+          axios.get("/master/mode-list"),
+        ]);
+
+        const safeArray = (data) => (Array.isArray(data) ? data : []);
+
+        // ✅ STEP 2: Set all dropdown options FIRST
+        setSopOptions(
+          safeArray(sopRes.data.data).map((item) => ({
+            label: item.name,
+            value: item.id.toString(),
+          })),
+        );
+        setStandardOptions(
+          safeArray(standardRes.data.data).map((item) => ({
+            label: item.name,
+            value: item.id.toString(),
+          })),
+        );
+        setSubcategoryOne(
+          safeArray(subcategoryoneRes.data.data).map((item) => ({
+            label: item.name,
+            value: item.id.toString(),
+          })),
+        );
+        setSubcategoryTwo(
+          safeArray(subcategorytwoRes.data.data).map((item) => ({
+            label: item.name,
+            value: item.id.toString(),
+          })),
+        );
+
+        // ✅ Store formatted options in a variable
+        const formattedOptions = safeArray(formatelist.data.data).map(
+          (item) => ({
+            label: item.name,
+            value: item.description,
+            id: item.id.toString(),
+          }),
+        );
+
+        setFormateOptions(formattedOptions);
+        console.log("✅ Format Options Set:", formattedOptions);
+
+        setLabOptions(
+          safeArray(lablist.data.data).map((item) => ({
+            label: item.name,
+            value: item.id.toString(),
+          })),
+        );
+        setCurrencyOptions(
+          safeArray(currencylist.data.data).map((item) => ({
+            label: `${item.name} (${item.description})`,
+            value: item.id.toString(),
+          })),
+        );
+        setUnitTypeOptions(
+          safeArray(unitTypeRes.data.data).map((item) => ({
+            label: item.name,
+            value: item.name,
+          })),
+        );
+        setUnitOptions(
+          safeArray(unitRes.data.data).map((item) => ({
+            label: item.name,
+            value: item.id.toString(),
+          })),
+        );
+        setModeOptions(
+          safeArray(modeRes.data.data).map((item) => ({
+            label: item.name,
+            value: item.name,
+          })),
+        );
+
+        // ✅ STEP 3: NOW fetch instrument data AFTER options are ready
+        const instrumentRes = await axios.get(
+          `/calibrationoperations/get-instrument-byid/${id}`,
+        );
+
+        const instrumentData = instrumentRes.data.data;
+
+        console.log("=== DEBUGGING SUFFIX DATA ===");
+        console.log("📌 Suffix from API:", instrumentData.instrument.suffix);
+        console.log("📌 Format Options Now Available:", formattedOptions);
+        console.log("=== END DEBUG ===");
+
+        const safeArrayData = (value) =>
+          Array.isArray(value)
+            ? value
+            : typeof value === "string" && value
+              ? value.split(",")
+              : [];
+        const safeString = (value) => (value != null ? String(value) : "");
+
+        // ✅ Find matching format by description
+        const savedSuffix = safeString(instrumentData.instrument.suffix);
+        const matchingFormat = formattedOptions.find(
+          (opt) => opt.value === savedSuffix,
+        );
+
+        console.log("🔍 Looking for suffix:", savedSuffix);
+        console.log("🔍 Found matching format:", matchingFormat);
+
+        setFormData((prev) => ({
+          ...prev,
+          name: safeString(instrumentData.instrument.name),
+          sop: safeArrayData(instrumentData.instrument.sop),
+          standard: safeArrayData(instrumentData.instrument.standard),
+          typeofsupport: safeArrayData(instrumentData.instrument.typeofsupport),
+          typeofmaster: safeArrayData(instrumentData.instrument.typeofmaster),
+          description: safeString(instrumentData.instrument.description),
+          discipline: safeString(instrumentData.instrument.discipline),
+          groups: safeString(instrumentData.instrument.groups),
+          remark: safeString(instrumentData.instrument.remark),
+          range: safeString(instrumentData.instrument.range),
+          leastcount: safeString(instrumentData.instrument.leastcount),
+          unittype: safeString(instrumentData.instrument.unittype),
+          mode: safeString(instrumentData.instrument.mode),
+          supportmaster: safeString(instrumentData.instrument.supportmaster),
+          supportrange: safeString(instrumentData.instrument.supportrange),
+          supportleastcount: safeString(
+            instrumentData.instrument.supportleastcount,
+          ),
+          supportunittype: safeString(
+            instrumentData.instrument.supportunittype,
+          ),
+          supportmode: safeString(instrumentData.instrument.supportmode),
+          scopematrixvalidation: safeString(
+            instrumentData.instrument.scopematrixvalidation,
+          ),
+          digitincmc: safeString(instrumentData.instrument.digitincmc || "2"),
+          biomedical: safeString(instrumentData.instrument.biomedical || "No"),
+          showvisualtest: safeString(
+            instrumentData.instrument.showvisualtest || "No",
+          ),
+          showelectricalsafety: safeString(
+            instrumentData.instrument.showelectricalsafety || "No",
+          ),
+          showbasicsafety: safeString(
+            instrumentData.instrument.showbasicsafety || "No",
+          ),
+          showperformancetest: safeString(
+            instrumentData.instrument.showperformancetest || "No",
+          ),
+          setpoint: safeString(instrumentData.instrument.setpoint || "UUC"),
+          uuc: safeString(instrumentData.instrument.uuc || "1"),
+          master: safeString(instrumentData.instrument.master || "1"),
+          setpointheading: safeString(
+            instrumentData.instrument.setpointheading || "Set Point",
+          ),
+          parameterheading: safeString(
+            instrumentData.instrument.parameterheading || "",
+          ),
+          uucheading: safeString(
+            instrumentData.instrument.uucheading || "Observation On UUC",
+          ),
+          masterheading: safeString(
+            instrumentData.instrument.masterheading || "Standard Reading",
+          ),
+          errorheading: safeString(
+            instrumentData.instrument.errorheading || "Error",
+          ),
+          remarkheading: safeString(
+            instrumentData.instrument.remarkheading || "Remark",
+          ),
+          setpointtoshow: safeString(
+            instrumentData.instrument.setpointtoshow || "Yes",
+          ),
+          parametertoshow: safeString(
+            instrumentData.instrument.parametertoshow || "Yes",
+          ),
+          uuctoshow: safeString(instrumentData.instrument.uuctoshow || "Yes"),
+          mastertoshow: safeString(
+            instrumentData.instrument.mastertoshow || "Yes",
+          ),
+          errortoshow: safeString(
+            instrumentData.instrument.errortoshow || "Yes",
+          ),
+          remarktoshow: safeString(
+            instrumentData.instrument.remarktoshow || "Yes",
+          ),
+          specificationtoshow: safeString(
+            instrumentData.instrument.specificationtoshow || "Yes",
+          ),
+          specificationheading: safeString(
+            instrumentData.instrument.specificationheading || "",
+          ),
+          tempsite: safeString(instrumentData.instrument.tempsite),
+          tempvariablesite: safeString(
+            instrumentData.instrument.tempvariablesite,
+          ),
+          humisite: safeString(instrumentData.instrument.humisite),
+          humivariablesite: safeString(
+            instrumentData.instrument.humivariablesite,
+          ),
+          templab: safeString(instrumentData.instrument.templab),
+          tempvariablelab: safeString(
+            instrumentData.instrument.tempvariablelab,
+          ),
+          humilab: safeString(instrumentData.instrument.humilab),
+          humivariablelab: safeString(
+            instrumentData.instrument.humivariablelab,
+          ),
+          mastersincertificate: safeString(
+            instrumentData.instrument.mastersincertificate || "Yes",
+          ),
+          uncertaintyincertificate: safeString(
+            instrumentData.instrument.uncertaintyincertificate || "Yes",
+          ),
+          allottolab: safeString(instrumentData.instrument.allottolab),
+          // ✅ Store description for display AND id separately
+          suffix: savedSuffix,
+          suffixId: matchingFormat ? matchingFormat.id : "",
+          uncertaintytable: safeArrayData(
+            instrumentData.instrument.uncertaintytable,
+          ),
+          vertical: safeString(instrumentData.instrument.vertical || "1"),
+        }));
+
+        // ✅ Set saved IDs
+        if (matchingFormat && matchingFormat.id) {
+          const formatId = parseInt(matchingFormat.id, 10);
+          if (!isNaN(formatId) && formatId > 0) {
+            setSavedFormatId(formatId);
+            console.log("✅ Loaded Format ID:", formatId);
+          }
+        }
+
+        const uncertaintyData = safeArrayData(
+          instrumentData.instrument.uncertaintytable,
+        );
+        if (uncertaintyData && uncertaintyData.length > 0) {
+          // Find matching uncertainty by description
+          const matchingUncertainties = formattedOptions.filter((opt) =>
+            uncertaintyData.includes(opt.value),
+          );
+
+          if (matchingUncertainties.length > 0) {
+            const uncertaintyIds = matchingUncertainties.map((u) =>
+              parseInt(u.id, 10),
+            );
+            setFormData((prev) => ({
+              ...prev,
+              uncertaintyIds: uncertaintyIds,
+            }));
+
+            if (uncertaintyIds[0]) {
+              setSavedUncertaintyId(uncertaintyIds[0]);
+              console.log("✅ Loaded Uncertainty IDs:", uncertaintyIds);
+            }
+          }
+        }
+
+        // Set price lists
+        const priceMatrix = Array.isArray(instrumentData.pricematrix)
+          ? instrumentData.pricematrix
           : [];
+        const fetchedPriceLists =
+          priceMatrix.length > 0
+            ? priceMatrix.map((price) => ({
+                id: price.id || "",
+                packagename: safeString(price.packagename),
+                packagedesc: safeString(price.packagedesc),
+                accreditation: safeString(price.accreditation),
+                location: safeString(price.location),
+                currency:
+                  currencyOptions.find(
+                    (opt) => opt.value === safeString(price.currency),
+                  ) || null,
+                rate: safeString(price.rate),
+                daysrequired: safeString(price.daysrequired),
+                matrices:
+                  Array.isArray(price.matrix) && price.matrix.length > 0
+                    ? price.matrix.map((matrix, matrixIndex) => ({
+                        id: matrix.id || "",
+                        matrixno: matrixIndex + 1,
+                        unittype: safeString(matrix.unittype),
+                        unit: safeString(matrix.unit),
+                        mode: safeString(matrix.mode),
+                        instrangemin: safeString(matrix.instrangemin),
+                        instrangemax: safeString(matrix.instrangemax),
+                        tolerance: safeString(matrix.tolerance),
+                        tolerancetype: safeString(matrix.tolerancetype),
+                      }))
+                    : [],
+              }))
+            : [];
 
-      setPriceLists(fetchedPriceLists);
-    } catch (err) {
-      toast.error("Error loading data");
-      console.error("Data Fetch Error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+        setPriceLists(fetchedPriceLists);
+      } catch (err) {
+        toast.error("Error loading data");
+        console.error("Data Fetch Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  fetchAllData();
-}, [id]);
+    fetchAllData();
+  }, [id]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -675,26 +736,21 @@ export default function EditCalibrationInstrumnet() {
 
       console.log("=== UPDATE API RESPONSE ===");
       console.log("Response Data:", response.data);
-      // ✅ STEP 1: Get Instrument ID from API response (instid: 259)
-      // ✅ Use the ID from URL params since we're editing
+
       const instrumentId = id;
       const formatId = formData.suffixId || null;
-      const uncertaintyId = formData.uncertaintyIds?.[0] || null; // Use the ID from useParams, not from response
+      const uncertaintyId = formData.uncertaintyIds?.[0] || null;
+
       console.log("📌 Instrument ID from URL params:", instrumentId);
 
-      // Extract Format ID and Uncertainty ID from form data
-      // Extract Format ID from form data
-      // ✅ Validate required data
       if (instrumentId && formatId) {
         const finalInstrumentId =
           typeof instrumentId === "string"
             ? parseInt(instrumentId, 10)
             : instrumentId;
 
-        // ✅ Parse formatId as number
         const finalFormatId = parseInt(formatId, 10);
 
-        // ✅ Check validity
         if (
           !isNaN(finalInstrumentId) &&
           finalInstrumentId > 0 &&
@@ -707,7 +763,6 @@ export default function EditCalibrationInstrumnet() {
           setSavedInstrumentId(finalInstrumentId);
           setSavedFormatId(finalFormatId);
 
-          // ✅ Handle uncertainty ID if exists
           if (uncertaintyId) {
             const finalUncertaintyId = parseInt(uncertaintyId, 10);
             if (!isNaN(finalUncertaintyId) && finalUncertaintyId > 0) {
@@ -751,92 +806,109 @@ export default function EditCalibrationInstrumnet() {
       }
     } catch (err) {
       console.error("API Error:", err);
-      toast.error(err.response?.data?.message || "Error adding instrument");
+      toast.error(err.response?.data?.message || "Error updating instrument");
     } finally {
       setLoading(false);
     }
   };
 
-  // Step Progress Indicator
-  // Step Progress Indicator - CLICKABLE VERSION (replace the existing one)
-const renderStepIndicator = () => {
-  // Function to handle step click
-  const handleStepClick = (step) => {
-    // Allow going to step 1 always
-    if (step === 1) {
-      setCurrentStep(step);
-      return;
-    }
-    
-    // For step 2 - check if step 1 is completed
-    if (step === 2) {
-      if (savedInstrumentId && savedFormatId) {
+  // Step Progress Indicator - CLICKABLE VERSION with 4 steps
+  const renderStepIndicator = () => {
+    const handleStepClick = (step) => {
+      // Allow going to step 1 always
+      if (step === 1) {
         setCurrentStep(step);
-      } else {
-        toast.error("Please complete Step 1 first");
+        return;
       }
-      return;
-    }
-    
-    // For step 3 - check if step 2 is completed
-    if (step === 3) {
-      if (savedInstrumentId && savedFormatId) {
-        setCurrentStep(step);
-      } else {
-        toast.error("Please complete Step 2 first");
-      }
-      return;
-    }
-  };
 
-  return (
-    <div className="mb-6 flex items-center justify-center">
-      <div className="flex items-center space-x-4">
-        {[1, 2, 3].map((step) => {
-          // Check if step is clickable
-          const isClickable = step === 1 || 
-            (step === 2 && savedInstrumentId && savedFormatId) ||
-            (step === 3 && savedInstrumentId && savedFormatId);
-          
-          return (
-            <div key={step} className="flex items-center">
-              <button
-                type="button"
-                onClick={() => isClickable && handleStepClick(step)}
-                className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200 ${
-                  currentStep >= step
-                    ? isClickable 
-                      ? "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
-                      : "bg-blue-600 text-white cursor-default"
-                    : isClickable
-                    ? "bg-gray-300 text-gray-600 hover:bg-gray-400 cursor-pointer"
-                    : "bg-gray-300 text-gray-600 cursor-not-allowed"
-                } ${currentStep === step ? "ring-2 ring-blue-400 ring-offset-2" : ""}`}
-                disabled={!isClickable}
-                title={
-                  step === 1 
-                    ? "Go to Step 1: Instrument Details" 
-                    : step === 2 
-                    ? (isClickable ? "Go to Step 2: Calibration Settings" : "Complete Step 1 first")
-                    : (isClickable ? "Go to Step 3: Uncertainty Settings" : "Complete previous steps first")
-                }
-              >
-                {step}
-              </button>
-              {step < 3 && (
-                <div
-                  className={`h-1 w-16 ${
-                    currentStep > step ? "bg-blue-600" : "bg-gray-300"
-                  }`}
-                />
-              )}
-            </div>
-          );
-        })}
+      // For step 2 - check if step 1 is completed
+      if (step === 2) {
+        if (savedInstrumentId && savedFormatId) {
+          setCurrentStep(step);
+        } else {
+          toast.error("Please complete Step 1 first");
+        }
+        return;
+      }
+
+      // For step 3 - check if step 2 is completed
+      if (step === 3) {
+        if (savedInstrumentId && savedFormatId) {
+          setCurrentStep(step);
+        } else {
+          toast.error("Please complete Step 2 first");
+        }
+        return;
+      }
+
+      // For step 4 - check if step 3 is completed
+      if (step === 4) {
+        if (savedInstrumentId && savedFormatId) {
+          setCurrentStep(step);
+        } else {
+          toast.error("Please complete Step 3 first");
+        }
+        return;
+      }
+    };
+
+    return (
+      <div className="mb-6 flex items-center justify-center">
+        <div className="flex items-center space-x-4">
+          {[1, 2, 3, 4].map((step) => {
+            const isClickable =
+              step === 1 ||
+              (step === 2 && savedInstrumentId && savedFormatId) ||
+              (step === 3 && savedInstrumentId && savedFormatId) ||
+              (step === 4 && savedInstrumentId && savedFormatId);
+
+            return (
+              <div key={step} className="flex items-center">
+                <button
+                  type="button"
+                  onClick={() => isClickable && handleStepClick(step)}
+                  className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200 ${
+                    currentStep >= step
+                      ? isClickable
+                        ? "cursor-pointer bg-blue-600 text-white hover:bg-blue-700"
+                        : "cursor-default bg-blue-600 text-white"
+                      : isClickable
+                        ? "cursor-pointer bg-gray-300 text-gray-600 hover:bg-gray-400"
+                        : "cursor-not-allowed bg-gray-300 text-gray-600"
+                  } ${currentStep === step ? "ring-2 ring-blue-400 ring-offset-2" : ""}`}
+                  disabled={!isClickable}
+                  title={
+                    step === 1
+                      ? "Go to Step 1: Instrument Details"
+                      : step === 2
+                        ? isClickable
+                          ? "Go to Step 2: Calibration Settings"
+                          : "Complete Step 1 first"
+                        : step === 3
+                          ? isClickable
+                            ? "Go to Step 3: Uncertainty Settings"
+                            : "Complete previous steps first"
+                          : isClickable
+                            ? "Go to Step 4: Certificate Settings"
+                            : "Complete previous steps first"
+                  }
+                >
+                  {step}
+                </button>
+                {step < 4 && (
+                  <div
+                    className={`h-1 w-16 ${
+                      currentStep > step ? "bg-blue-600" : "bg-gray-300"
+                    }`}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
   if (loading && !formData.name) {
     return (
@@ -878,7 +950,9 @@ const renderStepIndicator = () => {
             {currentStep === 1 && "Step 1: Edit Instrument"}
             {currentStep === 2 && "Step 2: Calibration Results Settings"}
             {currentStep === 3 && "Step 3: Uncertainty Settings"}
+            {currentStep === 4 && "Step 4: Certificate Settings"}
           </h2>
+
           <Button
             variant="outline"
             className="bg-blue-600 text-white hover:bg-blue-700"
@@ -909,7 +983,7 @@ const renderStepIndicator = () => {
 
             <ValidationFields
               formData={formData || {}}
-              errors={errors || {}}  
+              errors={errors || {}}
               handleInputChange={handleInputChange}
               handleMultiSelectChange={handleMultiSelectChange}
               subcategoryOne={subcategoryOne}
@@ -1026,18 +1100,42 @@ const renderStepIndicator = () => {
                 instid={savedInstrumentId}
                 formatId={savedFormatId}
                 uncertaintyId={savedUncertaintyId}
-                onComplete={() => {
-                  toast.success("All steps completed successfully!");
-                  navigate(
-                    "/dashboards/calibration-operations/instrument-list",
-                  );
-                }}
+                onComplete={() => setCurrentStep(4)}
                 onBack={() => setCurrentStep(2)}
               />
             ) : (
               <div className="p-8 text-center">
                 <p className="text-red-600">
                   Error: Format ID not found. Please start from Step 1.
+                </p>
+                <Button onClick={() => setCurrentStep(1)} className="mt-4">
+                  Go Back to Step 1
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+        {/* ✅ Step 4: Certificate Settings */}
+        {currentStep === 4 && (
+          <div>
+            {savedInstrumentId && savedFormatId ? (
+              <AddCertificateSetting
+                instid={savedInstrumentId}
+                instrumentId={savedInstrumentId}
+                formatId={savedFormatId}
+                onComplete={() => {
+                  toast.success("All steps completed successfully!");
+                  navigate(
+                    "/dashboards/calibration-operations/instrument-list",
+                  );
+                }}
+                onBack={() => setCurrentStep(3)}
+              />
+            ) : (
+              <div className="p-8 text-center">
+                <p className="text-red-600">
+                  Error: {!savedInstrumentId ? "Instrument ID" : "Format ID"}{" "}
+                  not found. Please start from Step 1.
                 </p>
                 <Button onClick={() => setCurrentStep(1)} className="mt-4">
                   Go Back to Step 1
