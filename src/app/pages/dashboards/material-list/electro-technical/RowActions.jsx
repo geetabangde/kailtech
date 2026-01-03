@@ -21,7 +21,7 @@ import { Fragment, useCallback, useState } from "react";
 import PropTypes from "prop-types";
 import { ConfirmModal } from "components/shared/ConfirmModal";
 import { Button } from "components/ui";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams, useSearchParams } from "react-router"; // ✅ Added useParams and useSearchParams
 
 const confirmMessages = {
   pending: {
@@ -35,12 +35,15 @@ const confirmMessages = {
 
 export function RowActions({ row, table }) {
   const navigate = useNavigate();
+  const { labSlug } = useParams(); // ✅ Get labSlug from URL
+  const [searchParams] = useSearchParams();
+  const labId = searchParams.get('labId'); // ✅ Get labId from query
+  
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [confirmDeleteLoading, setConfirmDeleteLoading] = useState(false);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
   const [deleteError] = useState(false);
 
-  // ✅ Get instrument ID from row
   const instrumentId = row.original.id;
 
   const permissions =
@@ -62,8 +65,7 @@ export function RowActions({ row, table }) {
       setDeleteSuccess(true);
       setConfirmDeleteLoading(false);
     }, 1000);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [row]);
+  }, [row, table]);
 
   const state = deleteError ? "error" : deleteSuccess ? "success" : "pending";
 
@@ -75,7 +77,7 @@ export function RowActions({ row, table }) {
       permission: 401,
       onClick: () =>
         navigate(
-          `/dashboards/material-list/electro-technical/view-equipment-history/${instrumentId}`
+          `/dashboards/material-list/${labSlug}/view-equipment-history/${instrumentId}?labId=${labId}`
         ),
     },
     
@@ -88,7 +90,7 @@ export function RowActions({ row, table }) {
             permission: 98,
             onClick: () =>
               navigate(
-                `/dashboards/material-list/electro-technical/Edit/${instrumentId}`
+                `/dashboards/material-list/${labSlug}/Edit/${instrumentId}?labId=${labId}`
               ),
           },
         ]
@@ -100,66 +102,60 @@ export function RowActions({ row, table }) {
       permission: 402,
       onClick: () =>
         navigate(
-          `/dashboards/material-list/electro-technical/Edit/${instrumentId}`   
+          `/dashboards/material-list/${labSlug}/Edit/${instrumentId}?labId=${labId}`
         ),
     },
 
-    // ✅ Maintenance Equipment History - Pass fid parameter
     {
       label: "Maintenance Equipment History",
       icon: WrenchScrewdriverIcon,
       permission: 402,
       onClick: () =>
         navigate(
-          `/dashboards/material-list/electro-technical/maintenance-equipment-history?fid=${instrumentId}`
+          `/dashboards/material-list/${labSlug}/maintenance-equipment-history?fid=${instrumentId}&labId=${labId}`
         ),
     },
 
-    // View Checklist
     {
       label: "View Checklist",
       icon: ClipboardDocumentListIcon,
       permission: 403,
       onClick: () =>
         navigate(
-          `/dashboards/material-list/electro-technical/view-checklist/${instrumentId}`
+          `/dashboards/material-list/${labSlug}/view-checklist/${instrumentId}?labId=${labId}`
         ),
     },
 
-    // View Verification List
     {
       label: "View Verification List",
       icon: ShieldCheckIcon,
       permission: 404,
       onClick: () =>
         navigate(
-          `/dashboards/material-list/electro-technical/view-verification-list/${instrumentId}`
+          `/dashboards/material-list/${labSlug}/view-verification-list/${instrumentId}?labId=${labId}`
         ),
     },
 
-    // Dump
     {
       label: "Dump",
       icon: DocumentTextIcon,
       permission: 405,
       onClick: () =>
         navigate(
-          `/dashboards/material-list/electro-technical/dump/${instrumentId}`
+          `/dashboards/material-list/${labSlug}/dump/${instrumentId}?labId=${labId}`
         ),
     },
 
-    // Log Book
     {
       label: "Log Book",
       icon: BookOpenIcon,
       permission: 406,
       onClick: () =>
         navigate(
-          `/dashboards/material-list/electro-technical/log-book/${instrumentId}`
+          `/dashboards/material-list/${labSlug}/log-book/${instrumentId}?labId=${labId}`
         ),
     },
 
-    // Delete
     {
       label: "Delete",
       icon: TrashIcon,

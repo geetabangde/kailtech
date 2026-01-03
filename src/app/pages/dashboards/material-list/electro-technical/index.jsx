@@ -13,7 +13,7 @@ import {
 import clsx from "clsx";
 import { Fragment, useRef, useState, useEffect } from "react"; 
 import axios from "utils/axios"; 
-import {  useSearchParams } from "react-router"; 
+import { useSearchParams, useParams } from "react-router"; // ✅ Added useParams
 
 // Local Imports
 import { TableSortIcon } from "components/shared/table/TableSortIcon";
@@ -43,11 +43,12 @@ const isSafari = getUserAgentBrowser() === "Safari";
 export default function OrdersDatatableV2() {
   const { cardSkin } = useThemeContext();
   const navigate = useNavigate();
-  // const location = useLocation();
   const [searchParams] = useSearchParams();
-const labId = searchParams.get('labId'); 
+  const { labSlug } = useParams(); // ✅ Get current lab slug from URL
+  const labId = searchParams.get('labId'); 
   
-  console.log('Lab ID from query params:', labId); // Debug log
+  console.log('Lab ID from query params:', labId);
+  console.log('Lab Slug from URL params:', labSlug); // ✅ Debug log
 
   const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper();
 
@@ -85,7 +86,7 @@ const labId = searchParams.get('labId');
   const { width: cardWidth } = useBoxSize({ ref: cardRef });
 
   // ✅ Fetch instruments when query params change
-   useEffect(() => {
+  useEffect(() => {
     if (labId) {
       fetchInstruments(labId);
     } else {
@@ -95,7 +96,6 @@ const labId = searchParams.get('labId');
     }
   }, [labId]);
 
-  // ✅ API call function
   // ✅ API call function
   const fetchInstruments = async (labId) => {
     try {
@@ -118,6 +118,18 @@ const labId = searchParams.get('labId');
     } finally {
       setLoading(false);
     }
+  };
+
+  // ✅ Handler for Add New Instrument button
+  const handleAddNewInstrument = () => {
+    if (!labSlug || !labId) {
+      console.error('Missing labSlug or labId');
+      alert('Unable to add instrument. Lab information is missing.');
+      return;
+    }
+    
+    // Navigate to AddNewInstrument with labId query parameter
+    navigate(`/dashboards/material-list/${labSlug}/AddNewInstrument?labId=${labId}`);
   };
 
   const table = useReactTable({
@@ -235,14 +247,12 @@ const labId = searchParams.get('labId');
                 </option>
               ))}
           </select>
+          
+          {/* ✅ Add New Instrument Button with dynamic labId and slug */}
           <Button
             className="h-8 space-x-1.5 rounded-md px-3 text-xs "
             color="primary"
-            onClick={() =>
-              navigate(
-                "/dashboards/material-list/electro-technical/AddNewInstrument"
-              )
-            }
+            onClick={handleAddNewInstrument}
           >
             Add New Instrument
           </Button>

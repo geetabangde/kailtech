@@ -21,7 +21,7 @@ export default function AddInstrument() {
   const [savedFormatId, setSavedFormatId] = useState(null);
   const [savedUncertaintyId, setSavedUncertaintyId] = useState(null);
   
-  // Step 1 - Add Instrument States
+  // Form state management
   const [formData, setFormData] = useState({
     name: "",
     sop: [],
@@ -377,7 +377,6 @@ export default function AddInstrument() {
       newMatrices.push(newMatrix);
       selectedPrice.matrices = newMatrices;
       updated[priceIndex] = selectedPrice;
-
       return updated;
     });
   }, []);
@@ -455,7 +454,6 @@ export default function AddInstrument() {
       }
       return false;
     }
-
     return true;
   };
 
@@ -544,9 +542,9 @@ export default function AddInstrument() {
       const formatId = formData.suffixId || null;
       const uncertaintyId = formData.uncertaintyIds?.[0] || null;
 
-      console.log("📌 Instrument ID:", instrumentId);
-      console.log("📌 Format ID (numeric):", formatId);
-      console.log("📌 Uncertainty ID (numeric):", uncertaintyId);
+      console.log("Instrument ID:", instrumentId);
+      console.log("Format ID (numeric):", formatId);
+      console.log("Uncertainty ID (numeric):", uncertaintyId);
 
       if (instrumentId && formatId) {
         const finalInstrumentId =
@@ -797,7 +795,7 @@ export default function AddInstrument() {
                 instrumentId={savedInstrumentId}
                 formatId={savedFormatId}
                 uncertaintyId={savedUncertaintyId}
-                onComplete={() => setCurrentStep(4)} // ✅ Go to step 4 instead of finishing
+                onComplete={() => setCurrentStep(4)} 
                 onBack={() => setCurrentStep(2)}
               />
             ) : (

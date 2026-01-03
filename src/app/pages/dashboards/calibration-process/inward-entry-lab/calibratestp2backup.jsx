@@ -32,7 +32,7 @@ const Calibratestep2 = () => {
     const [mastersList, setMastersList] = useState([]);
     const [supportMastersList, setSupportMastersList] = useState([]);
     const [calibrationPoints, setCalibrationPoints] = useState([]);
-    // const [matrixData, setMatrixData] = useState({});
+    const [matrixData, setMatrixData] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -182,24 +182,23 @@ const Calibratestep2 = () => {
         axios.defaults.headers.common['Accept'] = 'application/json';
     }, []);
 
-    // ========== MATRIX CODE - COMMENTED OUT ==========
     // Fetch matrix data for a specific point
-    // const fetchMatrixForPoint = async (cpid, validityid) => {
-    //     try {
-    //         const res = await axios.get('calibrationprocess/getscope-matrix-data', {
-    //             params: { validityid, cpid }
-    //         });
-    //         if (res.data.success) {
-    //             const options = res.data.data.map(d => ({
-    //                 value: d.id,
-    //                 label: d.label
-    //             }));
-    //             setMatrixData(prev => ({ ...prev, [cpid]: options }));
-    //         }
-    //     } catch (err) {
-    //         console.error('Error fetching matrix data for', cpid, err);
-    //     }
-    // };
+    const fetchMatrixForPoint = async (cpid, validityid) => {
+        try {
+            const res = await axios.get('calibrationprocess/getscope-matrix-data', {
+                params: { validityid, cpid }
+            });
+            if (res.data.success) {
+                const options = res.data.data.map(d => ({
+                    value: d.id,
+                    label: d.label
+                }));
+                setMatrixData(prev => ({ ...prev, [cpid]: options }));
+            }
+        } catch (err) {
+            console.error('Error fetching matrix data for', cpid, err);
+        }
+    };
 
     // Fetch calibration details from API
     useEffect(() => {
@@ -282,9 +281,9 @@ const Calibratestep2 = () => {
                                 masters: [],
                                 supportMasterMode: point.supportmastermode || 'Not Specified',
                                 supportMasters: [],
-                                // matrixMasters: [],
-                                // validityid: point.validityid,
-                                // matrixType: point.matrix_type,
+                                matrixMasters: [],
+                                validityid: point.validityid,
+                                matrixType: point.matrix_type,
                                 repeatable: '3'
                             };
                         });
@@ -320,18 +319,17 @@ const Calibratestep2 = () => {
         fetchCalibrationDetails();
     }, [id, itemId, caliblocation, calibacc, employeeId, navigate]);
 
-    // ========== MATRIX CODE - COMMENTED OUT ==========
     // Fetch matrix data for points with validityid
-    // useEffect(() => {
-    //     if (calibPointsState.length > 0) {
-    //         const pointsWithMatrix = calibPointsState.filter(p => p.validityid);
-    //         pointsWithMatrix.forEach(point => {
-    //             if (!matrixData[point.id]) {
-    //                 fetchMatrixForPoint(point.id, point.validityid);
-    //             }
-    //         });
-    //     }
-    // }, [calibPointsState, matrixData]);
+    useEffect(() => {
+        if (calibPointsState.length > 0) {
+            const pointsWithMatrix = calibPointsState.filter(p => p.validityid);
+            pointsWithMatrix.forEach(point => {
+                if (!matrixData[point.id]) {
+                    fetchMatrixForPoint(point.id, point.validityid);
+                }
+            });
+        }
+    }, [calibPointsState, matrixData]);
 
     useEffect(() => {
         // Filter masters for all points based on selectForAllPoint.unit and .mode
@@ -469,10 +467,9 @@ const Calibratestep2 = () => {
         return filtered;
     };
 
-    // ========== MATRIX CODE - COMMENTED OUT ==========
-    // const getMatrixOptionsForPoint = (pointId) => {
-    //     return matrixData[pointId] || [];
-    // };
+    const getMatrixOptionsForPoint = (pointId) => {
+        return matrixData[pointId] || [];
+    };
 
     // Helper functions
     const formatDate = (dateString) => {
@@ -563,7 +560,7 @@ const Calibratestep2 = () => {
     // Handle individual calibration point changes
     const handleCalibPointChange = (pointId, field, selected) => {
         let value;
-        const multiFields = ['masters', 'supportMasters']; // Removed 'matrixMasters'
+        const multiFields = ['masters', 'supportMasters', 'matrixMasters'];
         if (multiFields.includes(field)) {
             value = selected ? selected.map(s => s.value) : [];
         } else if (field === 'repeatable') {
@@ -587,9 +584,9 @@ const Calibratestep2 = () => {
         calibPointsState.forEach(point => {
             console.log(`Point ${point.id}:`, {
                 calibpointid: point.calibpointid,
-                // matrixMasters: point.matrixMasters,
-                // validityid: point.validityid,
-                // matrixType: point.matrixType
+                matrixMasters: point.matrixMasters,
+                validityid: point.validityid,
+                matrixType: point.matrixType
             });
         });
     };
@@ -638,16 +635,15 @@ const Calibratestep2 = () => {
                     submissionData[`mastercalibid${pointNumber}`] = [];
                 }
 
-                // ========== MATRIX CODE - COMMENTED OUT ==========
                 // Handle matrix
-                // if (point.validityid) {
-                //     if (point.matrixMasters && Array.isArray(point.matrixMasters) && point.matrixMasters.length > 0) {
-                //         submissionData[`scopematrix${pointNumber}`] = point.matrixMasters;
-                //         console.log(`Adding matrix for point ${pointNumber}:`, point.matrixMasters);
-                //     } else {
-                //         console.warn(`Point ${pointNumber} has validityid but no matrix selected`);
-                //     }
-                // }
+                if (point.validityid) {
+                    if (point.matrixMasters && Array.isArray(point.matrixMasters) && point.matrixMasters.length > 0) {
+                        submissionData[`scopematrix${pointNumber}`] = point.matrixMasters;
+                        console.log(`Adding matrix for point ${pointNumber}:`, point.matrixMasters);
+                    } else {
+                        console.warn(`Point ${pointNumber} has validityid but no matrix selected`);
+                    }
+                }
 
                 // Handle support masters with proper validation
                 if (instrumentInfo?.supportmaster === "Yes") {
@@ -1123,8 +1119,7 @@ const Calibratestep2 = () => {
                                         {calibPointsState.map((point) => {
                                             const filteredMasters = getFilteredMastersForPoint(point);
                                             const filteredSupportMasters = getFilteredSupportMastersForPoint(point);
-                                            // ========== MATRIX CODE - COMMENTED OUT ==========
-                                            // const matrixOptions = getMatrixOptionsForPoint(point.id);
+                                            const matrixOptions = getMatrixOptionsForPoint(point.id);
                                             return (
                                                 <tr key={point.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                                     <td className="p-3 border border-gray-300 dark:border-gray-600">
@@ -1206,9 +1201,8 @@ const Calibratestep2 = () => {
                                                             <p className="text-red-500 text-xs mt-1">{fieldErrors[`mastercalibid${point.calibpointid}`][0]}</p>
                                                         )}
 
-                                                        {/* ========== MATRIX CODE - COMMENTED OUT ========== */}
                                                         {/* Third Select: Matrix / Scope - Shown if validityid present */}
-                                                        {/* {point.validityid && matrixOptions.length > 0 && (
+                                                        {point.validityid && matrixOptions.length > 0 && (
                                                             <div className="mt-2">
                                                                 <Select
                                                                     isMulti={true}
@@ -1226,7 +1220,7 @@ const Calibratestep2 = () => {
                                                                     <p className="text-red-500 text-xs mt-1">{fieldErrors[`scopematrix${point.calibpointid}`][0]}</p>
                                                                 )}
                                                             </div>
-                                                        )} */}
+                                                        )}
 
                                                         {instrumentInfo?.supportmaster === "Yes" && (
                                                             <div className="mt-2">
