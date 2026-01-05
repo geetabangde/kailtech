@@ -73,14 +73,14 @@ const Select = ({ options, value, onChange, placeholder, name, isSearchable = tr
 const AddNewInstrument = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  // ✅ Fixed: Remove unused variable warning by using it
+  
   const labId = searchParams.get('labId');
   
   const [formData, setFormData] = useState({
     category: '',
     productType: '',
     vertical: '',
-    instrumentLocation: labId || '', // ✅ Use labId to pre-fill location
+    instrumentLocation: labId || '', 
     instrumentName: '',
     description: '',
     nickName: '',
@@ -113,7 +113,7 @@ const AddNewInstrument = () => {
     submitting: false
   });
 
-  // State for dropdown options from APIs
+  
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [subcategoryOptions, setSubcategoryOptions] = useState([]);
   const [verticalOptions, setVerticalOptions] = useState([]);
